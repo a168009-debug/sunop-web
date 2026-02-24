@@ -1,0 +1,52 @@
+:root {
+  --gold: #d6b15e;
+  --gold2: #b8923a;
+  --bg1: #050404;
+  --bg2: #120c07;
+  --text: #f7f3e8;
+  --card: rgba(255,255,255,.06);
+  --stroke: rgba(214,177,94,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Noto Serif TC",serif;
+  color:var(--text);
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+}
+.page{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.top{text-align:center;padding:20px 0 30px}
+.brand{font-size:48px;letter-spacing:8px;color:var(--gold);font-weight:700}
+.subtitle{opacity:.8;margin-top:8px;font-size:16px}
+.card{
+  background:var(--card);
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  padding:24px 20px;
+  box-shadow:0 12px 40px rgba(0,0,0,.4)
+}
+.h1{font-size:22px;text-align:center;margin-bottom:24px;letter-spacing:4px;color:var(--gold)}
+.form{display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field span{font-size:14px;opacity:.9}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+input,select{
+  width:100%;padding:14px 14px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.3);
+  color:var(--text);
+  font-family:inherit;font-size:16px;
+  outline:none
+}
+input:focus,select:focus{border-color:var(--gold)}
+.hint{font-size:12px;opacity:.7}
+.btn{
+  width:100%;padding:16px;
+  border-radius:14px;border:none;
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  color:#1b1207;font-weight:900;font-size:18px;letter-spacing:4px;
+  cursor:pointer;margin-top:8px
+}
+.muted{text-align:center;opacity:.7;font-size:13px;min-height:20px}
+.foot{text-align:center;margin-top:40px;opacity:.5;font-size:12px}
