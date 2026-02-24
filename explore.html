@@ -293,7 +293,7 @@ async function bootQuickOpening() {
   var aiBtn = document.getElementById('askAiBtn');
   if(aiBtn) aiBtn.style.display = 'flex';
   
-  var input = JSON.parse(localStorage.getItem('bazi_input') || '{}');
+  var input = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
   if (!input || !input.name) return;
   
   // 顯示歡迎訊息
@@ -309,7 +309,7 @@ async function bootQuickOpening() {
     var res = await fetch('/.netlify/functions/bazi_ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourBranch: input.hourBranch })
+      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourZhi: input.hourZhi })
     });
     var data = await res.json();
     
@@ -348,7 +348,7 @@ async function bootQuickOpening() {
 }
 
 async function askAIWithQuestion(question) {
-  var input = JSON.parse(localStorage.getItem('bazi_input') || '{}');
+  var input = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
   if (!input || !input.name) return;
   
   showAIChat('請根據我的八字給我更多建議：' + question);
@@ -513,9 +513,16 @@ function initMoodChart() {
 // ========== AI Chat Functions ==========
 function showAIChat(autoMsg) { 
   document.getElementById('aiOverlay').classList.add('open'); 
-  if(document.getElementById('aiMessages').children.length === 0) { 
-    addAIMsg('meta', '你好！我是 AI 命理助理，有任何問題都可以問我～'); 
-  } 
+  
+  // 顯示已讀取的 profile
+  var profile = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
+  if(profile && profile.name) {
+    var profileText = profile.name + '｜' + profile.year + '/' + String(profile.month).padStart(2,'0') + '/' + String(profile.day).padStart(2,'0') + '｜' + profile.hourZhi;
+    addAIMsg('meta', '已讀取：' + profileText);
+  } else {
+    addAIMsg('meta', '請先在首頁輸入出生資料');
+  }
+  
   setTimeout(function(){
     document.getElementById('aiInput').focus(); 
     if (autoMsg) {
@@ -532,6 +539,10 @@ async function sendAIMessage(autoMsg) {
   var input = document.getElementById('aiInput'); 
   var text = autoMsg || input.value.trim(); 
   if(!text) return; 
+  
+  // 取得 profile
+  var profile = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
+  
   addAIMsg('user', text); 
   chatHistory.push({role:'user',content:text}); 
   if(!autoMsg) input.value = ''; 
@@ -539,12 +550,42 @@ async function sendAIMessage(autoMsg) {
   addAIMsg('ai', '...'); 
   var loadingMsg = document.getElementById('aiMessages').lastChild; 
   try { 
-    var url = '/.netlify/functions/chat'; 
-    var resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:text, context:currentContext, history:chatHistory}), signal:AbortSignal.timeout(30000) }); 
+    var url = '/.netlify/functions/bazi_ai'; 
+    var resp = await fetch(url, { 
+      method:'POST', 
+      headers:{'Content-Type':'application/json'}, 
+      body:JSON.stringify({
+        name: profile.name,
+        year: profile.year,
+        month: profile.month,
+        day: profile.day,
+        hourBranch: profile.hourZhi,
+        mode: 'deep',
+        question: text
+      }), 
+      signal:AbortSignal.timeout(30000) 
+    }); 
     var data = await resp.json(); 
-    if(!resp.ok) throw new Error(data.error || 'API 錯誤: ' + resp.status); 
-    loadingMsg.querySelector('.bubble').innerHTML = data.reply.replace(/\n/g, '<br>'); 
-    chatHistory.push({role:'assistant',content:data.reply}); 
+    if(!resp.ok) throw new Error(data.error || data.message || 'API 錯誤'); 
+    if(data.result) {
+      // Deep mode 回覆格式
+      var r = data.result;
+      var replyText = '';
+      if(r.sections && r.sections.length > 0) {
+        r.sections.forEach(function(s) {
+          replyText += '<strong>' + s.title + '</strong><br>' + s.summary + '<br>';
+        });
+      }
+      if(r.action_plan && r.action_plan.length > 0) {
+        replyText += '<br><strong>💡 建議：</strong><ul>';
+        r.action_plan.forEach(function(a) { replyText += '<li>' + a + '</li>'; });
+        replyText += '</ul>';
+      }
+      loadingMsg.querySelector('.bubble').innerHTML = replyText || JSON.stringify(r);
+    } else if (data.reply) {
+      loadingMsg.querySelector('.bubble').innerHTML = data.reply.replace(/\n/g, '<br>'); 
+    }
+    chatHistory.push({role:'assistant',content:JSON.stringify(data.result || data.reply)}); 
   } catch(e) { 
     loadingMsg.querySelector('.bubble').textContent = '錯誤: ' + e.message; 
     addAIMsg('error', e.message); 
