@@ -154,7 +154,7 @@
 <div class="form-group"><label>月份</label><input type="number" id="month" placeholder="1" min="1" max="12"></div>
 <div class="form-group"><label>日期</label><input type="number" id="day" placeholder="1" min="1" max="31"></div>
 <div class="form-group"><label>出生時辰</label><select id="hour"><option value="子">子時</option><option value="丑">丑時</option><option value="寅">寅時</option><option value="卯">卯時</option><option value="辰">辰時</option><option value="巳">巳時</option><option value="午">午時</option><option value="未">未時</option><option value="申">申時</option><option value="酉">酉時</option><option value="戌">戌時</option><option value="亥">亥時</option></select></div>
-<button class="btn-primary" onclick="startAnalysis()">開始分析</button>
+<button class="btn-primary" onclick="checkAndStart()">開始分析</button>
 </div>
 </div>
 
@@ -175,6 +175,7 @@
 <h3>今日指引</h3>
 <ul><li>點擊任一功能了解自己</li><li>有問題可以問 AI 助理</li></ul>
 </div>
+<button class="btn-primary" style="margin-top:14px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -183,7 +184,7 @@
 <div class="wrap">
 <div class="title">八字命盤</div>
 <div id="baziResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -192,7 +193,7 @@
 <div class="wrap">
 <div class="title">姓名分析</div>
 <div id="nameResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -208,7 +209,7 @@
 <button class="mood-btn" data-mood="2">😟</button>
 <button class="mood-btn" data-mood="1">😫</button>
 </div>
-<button class="btn-primary" style="margin-top:16px" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -218,7 +219,7 @@
 <div class="title">AI靈魂畫像</div>
 <div id="soulCanvas" class="soul-canvas"></div>
 <div id="artInfo" style="text-align:center;margin-bottom:14px;color:var(--gold)"></div>
-<button class="btn-primary" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -234,7 +235,7 @@
 </div>
 </button>
 </div>
-<button class="btn-primary" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -245,7 +246,7 @@
 <div class="zi-grid" id="ziGrid"></div>
 <div class="zi-input-area"><input type="text" id="ziInput" maxlength="1" placeholder="輸入字"><button onclick="showZiResult()">解讀</button></div>
 <div class="zi-result" id="ziResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="showPage('menuPage')">返回</button>
+<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
@@ -253,6 +254,30 @@
 var currentContext = '命理分析';
 var apiKey = localStorage.getItem('openai_api_key') || '';
 var chatHistory = [];
+
+// 載入已儲存的用戶資料
+function loadUserData() {
+  var saved = localStorage.getItem('metamind_user');
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      document.getElementById('userName').value = data.name || '';
+      document.getElementById('year').value = data.year || '';
+      document.getElementById('month').value = data.month || '';
+      document.getElementById('day').value = data.day || '';
+      document.getElementById('hour').value = data.hour || '子';
+      window.userData = data;
+      document.getElementById('welcomeMsg').innerText = '歡迎 · ' + data.name;
+      return true;
+    } catch(e) { console.error(e); }
+  }
+  return false;
+}
+
+// 頁面載入時恢復資料
+window.addEventListener('DOMContentLoaded', function() {
+  loadUserData();
+});
 
 var CONTEXTS = {
   '命理分析': { examples: ['為什麼我的日柱是火？', '我的五行偏弱要怎麼補？'], system: '你是命理分析 AI 助理。用繁體中文回答，溫和專業。' },
@@ -265,6 +290,8 @@ var CONTEXTS = {
 
 function setContext(ctx) { currentContext = ctx; }
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function goHome() { loadUserData(); showPage('homePage'); }
+function checkAndStart() { if(loadUserData() && window.userData && window.userData.name) { showPage('menuPage'); } else { startAnalysis(); } }
 
 function startAnalysis() {
   var name = document.getElementById('userName').value.trim();
@@ -274,6 +301,7 @@ function startAnalysis() {
   var hour = document.getElementById('hour').value;
   if (!name || !year || !month || !day) { alert('請完整填寫！'); return; }
   window.userData = { name, year, month, day, hour };
+  localStorage.setItem('metamind_user', JSON.stringify(window.userData));
   document.getElementById('welcomeMsg').innerText = '歡迎 · ' + name;
   calculateBazi();
   analyzeName();
