@@ -1,393 +1,57 @@
-(function(){
-const $ = (id) => document.getElementById(id);
-const FUNCTION_NAME = "bazi_ai";
-const HISTORY_KEY = "metamind_qa_history";
-
-function getSiteOrigin(){ return window.location.origin; }
-function functionUrl(){ return getSiteOrigin() + "/.netlify/functions/" + FUNCTION_NAME; }
-function isInAppBrowser(){
-  const ua = navigator.userAgent || "";
-  return /Telegram|Line|FBAN|FBAV|Instagram|WebView|wv/i.test(ua);
-}
-function loadProfile(){
-  try{
-    const raw = localStorage.getItem("metamind_profile");
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
-function saveProfile(profile){
-  localStorage.setItem("metamind_profile", JSON.stringify(profile));
-}
-function pickText(v){
-  if(v == null) return "";
-  if(typeof v === "string") return v;
-  if(typeof v === "object"){
-    return v.text || v.message || v.content || v.reply || JSON.stringify(v);
+{
+  "name": "app.js",
+  "path": "assets/app.js",
+  "sha": "a1c9d32995a81664854a8f0caeb7a3ceb7c9c28d",
+  "size": 14499,
+  "url": "https://api.github.com/repos/a168009-debug/sunop-web/contents/assets/app.js?ref=main",
+  "html_url": "https://github.com/a168009-debug/sunop-web/blob/main/assets/app.js",
+  "git_url": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/a1c9d32995a81664854a8f0caeb7a3ceb7c9c28d",
+  "download_url": "https://raw.githubusercontent.com/a168009-debug/sunop-web/main/assets/app.js",
+  "type": "file",
+  "content": "KGZ1bmN0aW9uKCl7CmNvbnN0ICQgPSAoaWQpID0+IGRvY3VtZW50LmdldEVs\nZW1lbnRCeUlkKGlkKTsKY29uc3QgRlVOQ1RJT05fTkFNRSA9ICJiYXppX2Fp\nIjsKY29uc3QgSElTVE9SWV9LRVkgPSAibWV0YW1pbmRfcWFfaGlzdG9yeSI7\nCgpmdW5jdGlvbiBnZXRTaXRlT3JpZ2luKCl7IHJldHVybiB3aW5kb3cubG9j\nYXRpb24ub3JpZ2luOyB9CmZ1bmN0aW9uIGZ1bmN0aW9uVXJsKCl7IHJldHVy\nbiBnZXRTaXRlT3JpZ2luKCkgKyAiLy5uZXRsaWZ5L2Z1bmN0aW9ucy8iICsg\nRlVOQ1RJT05fTkFNRTsgfQpmdW5jdGlvbiBpc0luQXBwQnJvd3Nlcigpewog\nIGNvbnN0IHVhID0gbmF2aWdhdG9yLnVzZXJBZ2VudCB8fCAiIjsKICByZXR1\ncm4gL1RlbGVncmFtfExpbmV8RkJBTnxGQkFWfEluc3RhZ3JhbXxXZWJWaWV3\nfHd2L2kudGVzdCh1YSk7Cn0KZnVuY3Rpb24gbG9hZFByb2ZpbGUoKXsKICB0\ncnl7CiAgICBjb25zdCByYXcgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgibWV0\nYW1pbmRfcHJvZmlsZSIpOwogICAgcmV0dXJuIHJhdyA/IEpTT04ucGFyc2Uo\ncmF3KSA6IG51bGw7CiAgfWNhdGNoKGUpeyByZXR1cm4gbnVsbDsgfQp9CmZ1\nbmN0aW9uIHNhdmVQcm9maWxlKHByb2ZpbGUpewogIGxvY2FsU3RvcmFnZS5z\nZXRJdGVtKCJtZXRhbWluZF9wcm9maWxlIiwgSlNPTi5zdHJpbmdpZnkocHJv\nZmlsZSkpOwp9CmZ1bmN0aW9uIHBpY2tUZXh0KHYpewogIGlmKHYgPT0gbnVs\nbCkgcmV0dXJuICIiOwogIGlmKHR5cGVvZiB2ID09PSAic3RyaW5nIikgcmV0\ndXJuIHY7CiAgaWYodHlwZW9mIHYgPT09ICJvYmplY3QiKXsKICAgIHJldHVy\nbiB2LnRleHQgfHwgdi5tZXNzYWdlIHx8IHYuY29udGVudCB8fCB2LnJlcGx5\nIHx8IEpTT04uc3RyaW5naWZ5KHYpOwogIH0KICByZXR1cm4gU3RyaW5nKHYp\nOwp9CgovLyA9PT09PT09PT09IFNoYXJlIEZ1bmN0aW9ucyA9PT09PT09PT09\nCmZ1bmN0aW9uIGdldEFuc3dlclRleHQoKXsKICBjb25zdCBlbCA9ICQoImFu\nc3dlciIpOwogIGlmKCFlbCkgcmV0dXJuICIiOwogIHJldHVybiAoZWwuaW5u\nZXJUZXh0IHx8IGVsLnRleHRDb250ZW50IHx8ICIiKS50cmltKCk7Cn0KCmZ1\nbmN0aW9uIGJ1aWxkU2hhcmVUZXh0KGFuc3dlclRleHQpewogIGNvbnN0IHVy\nbCA9ICJodHRwczovL3N0dW5uaW5nLWdlY2tvLTRhMmM4Yi5uZXRsaWZ5LmFw\ncCI7CiAgcmV0dXJuICLjgJBNZXRhTWluZCDmmbrmhaflkb3nkIbjgJFcblxu\nIiArIGFuc3dlclRleHQgKyAiXG5cbvCflJcg5LqG6Kej5pu05aSa77yaIiAr\nIHVybDsKfQoKbGV0IHRvYXN0VGltZXIgPSBudWxsOwpmdW5jdGlvbiBzaG93\nVG9hc3QobWVzc2FnZSl7CiAgY29uc3QgdG9hc3QgPSAkKCJ0b2FzdCIpOwog\nIGlmKCF0b2FzdCkgcmV0dXJuOwogIHRvYXN0LnRleHRDb250ZW50ID0gbWVz\nc2FnZTsKICB0b2FzdC5jbGFzc0xpc3QuYWRkKCJzaG93Iik7CiAgaWYodG9h\nc3RUaW1lcikgY2xlYXJUaW1lb3V0KHRvYXN0VGltZXIpOwogIHRvYXN0VGlt\nZXIgPSBzZXRUaW1lb3V0KCgpID0+IHsKICAgIHRvYXN0LmNsYXNzTGlzdC5y\nZW1vdmUoInNob3ciKTsKICB9LCAyMDAwKTsKfQoKYXN5bmMgZnVuY3Rpb24g\nY29weVRvQ2xpcGJvYXJkKHRleHQpewogIHRyeXsKICAgIGlmKG5hdmlnYXRv\nci5jbGlwYm9hcmQgJiYgd2luZG93LmlzU2VjdXJlQ29udGV4dCl7CiAgICAg\nIGF3YWl0IG5hdmlnYXRvci5jbGlwYm9hcmQud3JpdGVUZXh0KHRleHQpOwog\nICAgICByZXR1cm4gdHJ1ZTsKICAgIH0KICB9Y2F0Y2goZSl7fQogIHRyeXsK\nICAgIGNvbnN0IHRhID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgidGV4dGFy\nZWEiKTsKICAgIHRhLnZhbHVlID0gdGV4dDsKICAgIHRhLnN0eWxlLm9wYWNp\ndHkgPSAiMCI7CiAgICBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKHRhKTsK\nICAgIHRhLnNlbGVjdCgpOwogICAgZG9jdW1lbnQuZXhlY0NvbW1hbmQoImNv\ncHkiKTsKICAgIGRvY3VtZW50LmJvZHkucmVtb3ZlQ2hpbGQodGEpOwogICAg\ncmV0dXJuIHRydWU7CiAgfWNhdGNoKGUpewogICAgcmV0dXJuIGZhbHNlOwog\nIH0KfQoKYXN5bmMgZnVuY3Rpb24gc2hhcmVBbnN3ZXIoKXsKICBjb25zdCBh\nbnN3ZXJUZXh0ID0gZ2V0QW5zd2VyVGV4dCgpOwogIGlmKCFhbnN3ZXJUZXh0\nKXsKICAgIHNob3dUb2FzdCgi55uu5YmN5rKS5pyJ5Y+v5YiG5Lqr55qE5YWn\n5a65Iik7CiAgICByZXR1cm47CiAgfQogIGNvbnN0IHNoYXJlVGV4dCA9IGJ1\naWxkU2hhcmVUZXh0KGFuc3dlclRleHQpOwogIAogIGlmKG5hdmlnYXRvci5z\naGFyZSl7CiAgICB0cnl7CiAgICAgIGF3YWl0IG5hdmlnYXRvci5zaGFyZSh7\ndGV4dDogc2hhcmVUZXh0fSk7CiAgICAgIHJldHVybjsKICAgIH1jYXRjaChl\ncnIpe30KICB9CiAgY29uc3Qgb2sgPSBhd2FpdCBjb3B5VG9DbGlwYm9hcmQo\nc2hhcmVUZXh0KTsKICBzaG93VG9hc3Qob2sgPyAi5bey6KSH6KO95Yiw5Ymq\n6LK857C/77yBIiA6ICLopIfoo73lpLHmlZciKTsKfQp3aW5kb3cuc2hhcmVB\nbnN3ZXIgPSBzaGFyZUFuc3dlcjsKCi8vID09PT09PT09PT0gSGlzdG9yeSBG\ndW5jdGlvbnMgPT09PT09PT09PQpmdW5jdGlvbiBhZGRIaXN0b3J5RW50cnko\ncXVlc3Rpb24sIGFuc3dlcil7CiAgdHJ5ewogICAgbGV0IGggPSBKU09OLnBh\ncnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKEhJU1RPUllfS0VZKSB8fCAiW10i\nKTsKICAgIGgudW5zaGlmdCh7dHM6RGF0ZS5ub3coKSwgcXVlc3Rpb246cXVl\nc3Rpb24sIGFuc3dlcjphbnN3ZXJ9KTsKICAgIGlmKGgubGVuZ3RoID4gNTAp\nIGggPSBoLnNsaWNlKDAsIDUwKTsKICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVt\nKEhJU1RPUllfS0VZLCBKU09OLnN0cmluZ2lmeShoKSk7CiAgfWNhdGNoKGUp\ne30KfQoKZnVuY3Rpb24gZm9ybWF0VGltZSh0cyl7CiAgY29uc3QgZCA9IG5l\ndyBEYXRlKHRzKTsKICBjb25zdCBub3cgPSBuZXcgRGF0ZSgpOwogIGNvbnN0\nIHRvZGF5ID0gbmV3IERhdGUobm93LmdldEZ1bGxZZWFyKCksIG5vdy5nZXRN\nb250aCgpLCBub3cuZ2V0RGF0ZSgpKTsKICBjb25zdCB5ZXN0ZXJkYXkgPSBu\nZXcgRGF0ZSh0b2RheS5nZXRUaW1lKCkgLSA4NjQwMDAwMCk7CiAgY29uc3Qg\nZGF0ZU9ubHkgPSBuZXcgRGF0ZShkLmdldEZ1bGxZZWFyKCksIGQuZ2V0TW9u\ndGgoKSwgZC5nZXREYXRlKCkpOwogIGNvbnN0IHRpbWUgPSBkLnRvTG9jYWxl\nVGltZVN0cmluZygiemgtVFciLCB7aG91cjoiMi1kaWdpdCIsIG1pbnV0ZToi\nMi1kaWdpdCJ9KTsKICBpZihkYXRlT25seS5nZXRUaW1lKCkgPT09IHRvZGF5\nLmdldFRpbWUoKSkgcmV0dXJuICLku4rlpKkgIiArIHRpbWU7CiAgaWYoZGF0\nZU9ubHkuZ2V0VGltZSgpID09PSB5ZXN0ZXJkYXkuZ2V0VGltZSgpKSByZXR1\ncm4gIuaYqOWkqSAiICsgdGltZTsKICByZXR1cm4gZC50b0xvY2FsZURhdGVT\ndHJpbmcoInpoLVRXIiwge21vbnRoOiJudW1lcmljIiwgZGF5OiJudW1lcmlj\nIn0pICsgIiAiICsgdGltZTsKfQoKZnVuY3Rpb24gcmVuZGVySGlzdG9yeSgp\newogIGNvbnN0IGxpc3QgPSAkKCJxYUhpc3RvcnlMaXN0Iik7CiAgY29uc3Qg\nZW1wdHkgPSAkKCJxYUhpc3RvcnlFbXB0eSIpOwogIGlmKCFsaXN0IHx8ICFl\nbXB0eSkgcmV0dXJuOwogIHRyeXsKICAgIGNvbnN0IGggPSBKU09OLnBhcnNl\nKGxvY2FsU3RvcmFnZS5nZXRJdGVtKEhJU1RPUllfS0VZKSB8fCAiW10iKTsK\nICAgIGlmKGgubGVuZ3RoID09PSAwKXsKICAgICAgZW1wdHkuc3R5bGUuZGlz\ncGxheSA9ICJibG9jayI7CiAgICAgIGxpc3QuaW5uZXJIVE1MID0gIiI7CiAg\nICAgIHJldHVybjsKICAgIH0KICAgIGVtcHR5LnN0eWxlLmRpc3BsYXkgPSAi\nbm9uZSI7CiAgICBsaXN0LmlubmVySFRNTCA9IGgubWFwKChpdGVtLCBpKSA9\nPiB7CiAgICAgIGNvbnN0IHByZXZpZXcgPSBpdGVtLmFuc3dlci5zdWJzdHJp\nbmcoMCwgNTApICsgKGl0ZW0uYW5zd2VyLmxlbmd0aCA+IDUwID8gIi4uLiIg\nOiAiIik7CiAgICAgIHJldHVybiAnPGRpdiBjbGFzcz0icWEtY2FyZCIgZGF0\nYS1pbmRleD0iJytpKyciPicrCiAgICAgICAgJzxkaXYgY2xhc3M9InFhLWhl\nYWQiPjxzcGFuIGNsYXNzPSJxYS10aW1lIj4nK2Zvcm1hdFRpbWUoaXRlbS50\ncykrJzwvc3Bhbj4nKwogICAgICAgICc8YnV0dG9uIGNsYXNzPSJxYS10b2dn\nbGUiIG9uY2xpY2s9InRvZ2dsZUhpc3RvcnkoJytpKycpIj4nKyhpPT09MD8n\n5pS26LW3Jzon5bGV6ZaLJykrJzwvYnV0dG9uPjwvZGl2PicrCiAgICAgICAg\nJzxkaXYgY2xhc3M9InFhLXEiPicraXRlbS5xdWVzdGlvbisnPC9kaXY+JysK\nICAgICAgICAnPGRpdiBjbGFzcz0icWEtYS1wcmV2aWV3Ij4nK3ByZXZpZXcr\nJzwvZGl2PicrCiAgICAgICAgJzxkaXYgY2xhc3M9InFhLWEiIHN0eWxlPSJk\naXNwbGF5Om5vbmU7Ij4nK2l0ZW0uYW5zd2VyKyc8L2Rpdj4nKwogICAgICAn\nPC9kaXY+JzsKICAgIH0pLmpvaW4oIiIpOwogIH1jYXRjaChlKXt9Cn0KCmZ1\nbmN0aW9uIHRvZ2dsZUhpc3RvcnkoaSl7CiAgY29uc3QgY2FyZHMgPSBkb2N1\nbWVudC5xdWVyeVNlbGVjdG9yQWxsKCIucWEtY2FyZCIpOwogIGNvbnN0IGNh\ncmQgPSBjYXJkc1tpXTsKICBpZighY2FyZCkgcmV0dXJuOwogIGNvbnN0IGEg\nPSBjYXJkLnF1ZXJ5U2VsZWN0b3IoIi5xYS1hIik7CiAgY29uc3QgcHJldmll\ndyA9IGNhcmQucXVlcnlTZWxlY3RvcigiLnFhLWEtcHJldmlldyIpOwogIGNv\nbnN0IGJ0biA9IGNhcmQucXVlcnlTZWxlY3RvcigiLnFhLXRvZ2dsZSIpOwog\nIGlmKGEuc3R5bGUuZGlzcGxheSA9PT0gIm5vbmUiKXsKICAgIGEuc3R5bGUu\nZGlzcGxheSA9ICJibG9jayI7CiAgICBwcmV2aWV3LnN0eWxlLmRpc3BsYXkg\nPSAibm9uZSI7CiAgICBidG4udGV4dENvbnRlbnQgPSAi5pS26LW3IjsKICB9\nZWxzZXsKICAgIGEuc3R5bGUuZGlzcGxheSA9ICJub25lIjsKICAgIHByZXZp\nZXcuc3R5bGUuZGlzcGxheSA9ICJibG9jayI7CiAgICBidG4udGV4dENvbnRl\nbnQgPSAi5bGV6ZaLIjsKICB9Cn0Kd2luZG93LnRvZ2dsZUhpc3RvcnkgPSB0\nb2dnbGVIaXN0b3J5OwoKZnVuY3Rpb24gY2xlYXJIaXN0b3J5KCl7CiAgaWYo\nY29uZmlybSgi56K65a6a6KaB5riF56m65omA5pyJ5ZWP562U57SA6YyE5ZeO\n77yfIikpewogICAgbG9jYWxTdG9yYWdlLnJlbW92ZUl0ZW0oSElTVE9SWV9L\nRVkpOwogICAgcmVuZGVySGlzdG9yeSgpOwogIH0KfQoKZnVuY3Rpb24gaW5p\ndEhpc3RvcnlVSSgpewogIHJlbmRlckhpc3RvcnkoKTsKICBjb25zdCBjbGVh\nckJ0biA9ICQoInFhSGlzdG9yeUNsZWFyIik7CiAgaWYoY2xlYXJCdG4pIGNs\nZWFyQnRuLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwgY2xlYXJIaXN0b3J5\nKTsKICBjb25zdCBzaGFyZUJ0biA9ICQoInNoYXJlQnRuIik7CiAgaWYoc2hh\ncmVCdG4pIHNoYXJlQnRuLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwgc2hh\ncmVBbnN3ZXIpOwp9CgovLyA9PT09PT09PT09IERhaWx5IEx1Y2sgLSBTYWZl\nIFZlcnNpb24gPT09PT09PT09PQpmdW5jdGlvbiBjYWxjdWxhdGVEYWlseUx1\nY2socHJvZmlsZSl7CiAgdHJ5ewogICAgaWYoIXByb2ZpbGUgfHwgIXByb2Zp\nbGUueWVhciB8fCAhcHJvZmlsZS5tb250aCB8fCAhcHJvZmlsZS5kYXkpIHJl\ndHVybiBudWxsOwogICAgaWYodHlwZW9mIFNvbGFyID09PSAidW5kZWZpbmVk\nIikgcmV0dXJuIG51bGw7CiAgICAKICAgIGNvbnN0IG5vdyA9IG5ldyBEYXRl\nKCk7CiAgICBjb25zdCB0b2RheSA9IG5ldyBEYXRlKG5vdy5nZXRGdWxsWWVh\ncigpLCBub3cuZ2V0TW9udGgoKSwgbm93LmdldERhdGUoKSk7CiAgICBjb25z\ndCB0b2RheVRzID0gdG9kYXkuZ2V0VGltZSgpOwogICAgCiAgICB0cnl7CiAg\nICAgIGNvbnN0IGNhY2hlZCA9IEpTT04ucGFyc2UobG9jYWxTdG9yYWdlLmdl\ndEl0ZW0oIm1ldGFtaW5kX2RhaWx5IikpOwogICAgICBpZihjYWNoZWQgJiYg\nY2FjaGVkLnByb2ZpbGVUcyA9PT0gcHJvZmlsZS50cyAmJiBjYWNoZWQuZGF0\nZSA9PT0gdG9kYXlUcykgcmV0dXJuIGNhY2hlZDsKICAgIH1jYXRjaChlKXt9\nCiAgICAKICAgIGNvbnN0IHk9cGFyc2VJbnQocHJvZmlsZS55ZWFyKSwgbT1w\nYXJzZUludChwcm9maWxlLm1vbnRoKSwgZD1wYXJzZUludChwcm9maWxlLmRh\neSk7CiAgICBsZXQgaCA9IDEyOwogICAgY29uc3QgaGJNYXAgPSB75a2QOjIz\nLCDkuJE6MSwg5a+FOjMsIOWNrzo1LCDovrA6Nywg5bezOjksIOWNiDoxMSwg\n5pyqOjEzLCDnlLM6MTUsIOmFiToxNywg5oiMOjE5LCDkuqU6MjF9OwogICAg\naCA9IGhiTWFwW3Byb2ZpbGUuaG91ckJyYW5jaF0gfHwgMTI7CiAgICAKICAg\nIGxldCBzb2xhciA9IFNvbGFyLmZyb21ZbWRIbXMoeSwgbSwgZCwgaCwgMCwg\nMCk7CiAgICBsZXQgbHVuYXIgPSBzb2xhci5nZXRMdW5hcigpOwogICAgCiAg\nICBjb25zdCBkYXlHYW4gPSBsdW5hci5nZXREYXlHYW4oKTsKICAgIGNvbnN0\nIGRheVpoaSA9IGx1bmFyLmdldERheVpoaSgpOwogICAgY29uc3QgZ2FuQ29s\nb3JzID0ge+eUsjoi6Z2SL+e2oCIsIOS5mToi6Z2SL+e2oCIsIOS4mToi57SF\nL+e0qyIsIOS4gToi57SFL+e0qyIsIOaIijoi6buDL+WSliIsIOW3sToi6buD\nL+WSliIsIOW6mjoi55m9L+mHkSIsIOi+mzoi55m9L+mHkSIsIOWjrDoi6buR\nL+iXjSIsIOeZuDoi6buRL+iXjSJ9OwogICAgY29uc3QgemhpTnVtcyA9IHvl\nrZA6MSwg5LiROjIsIOWvhTozLCDlja86NCwg6L6wOjUsIOW3szo2LCDljYg6\nNywg5pyqOjgsIOeUszo5LCDphYk6MTAsIOaIjDoxMSwg5LqlOjEyfTsKICAg\nIGNvbnN0IHpoaURpcnMgPSB75a2QOiLljJciLCDkuJE6IuadseWMlyIsIOWv\nhToi5p2x5YyXIiwg5Y2vOiLmnbEiLCDovrA6IuadseWNlyIsIOW3szoi5p2x\n5Y2XIiwg5Y2IOiLljZciLCDmnKo6Iuilv+WNlyIsIOeUszoi6KW/5Y2XIiwg\n6YWJOiLopb8iLCDmiIw6Iuilv+WMlyIsIOS6pToi6KW/5YyXIn07CiAgICBj\nb25zdCBnYW5TdHJlbmd0aCA9IHvnlLI6NCwg5LmZOjMsIOS4mTo1LCDkuIE6\nNCwg5oiKOjQsIOW3sTozLCDlupo6NSwg6L6bOjQsIOWjrDo0LCDnmbg6M307\nCiAgICBjb25zdCBhc3BlY3RzID0gewogICAgICDnlLI6e2xvdmU6IuaIgOaE\nm+mBi+S4jemMryIsIGNhcmVlcjoi5LqL5qWt5pyJ6KGd5YuBIiwgaGVhbHRo\nOiLlpJrllp3msLQifSwKICAgICAg5LmZOntsb3ZlOiLmhJ/mg4XntLDohqki\nLCBjYXJlZXI6IuiytOS6uuW5q+W/mSIsIGhlYWx0aDoi5rOo5oSP6IW46IOD\nIn0sCiAgICAgIOS4mTp7bG92ZToi5qGD6Iqx5py15py1IiwgY2FyZWVyOiLo\ngbLli6LkuIrmvLIiLCBoZWFsdGg6IuWwj+W/g+eBq+awoyJ9LAogICAgICDk\nuIE6e2xvdmU6IueVsOaAp+e3o+S9syIsIGNhcmVlcjoi6KuH5Yik6aCG5Yip\nIiwgaGVhbHRoOiLlv4PooYDnrqEifSwKICAgICAg5oiKOntsb3ZlOiLnqanl\nrprnmbzlsZUiLCBjYXJlZXI6IuiyoemBi+S6qOmAmiIsIGhlYWx0aDoi6IS+\n6IODIn0sCiAgICAgIOW3sTp7bG92ZToi5YuZ5a+mIiwgY2FyZWVyOiLnqY3l\nsJHmiJDlpJoiLCBoZWFsdGg6IuWwkeeGrOWknCJ9LAogICAgICDlupo6e2xv\ndmU6IuaenOaWt+WHuuaTiiIsIGNhcmVlcjoi5qWt5YuZ5by35YuBIiwgaGVh\nbHRoOiLlkbzlkLjns7vntbEifSwKICAgICAg6L6bOntsb3ZlOiLmnInprYXl\nipsiLCBjYXJlZXI6IuS6i+alreS4iuWNhyIsIGhlYWx0aDoi6IK66YOoIn0s\nCiAgICAgIOWjrDp7bG92ZToi55CG5oCnIiwgY2FyZWVyOiLosqHmupDlu6Pp\ngLIiLCBoZWFsdGg6IuWkmuWWneawtCJ9LAogICAgICDnmbg6e2xvdmU6Iuaf\nlOaDhSIsIGNhcmVlcjoi5b6M5YuB5by3IiwgaGVhbHRoOiLohY7oh58ifQog\nICAgfTsKICAgIAogICAgY29uc3QgcmVzdWx0ID0gewogICAgICBkYXRlOiB0\nb2RheVRzLCBwcm9maWxlVHM6IHByb2ZpbGUudHMsCiAgICAgIHN0YXJzOiBn\nYW5TdHJlbmd0aFtkYXlHYW5dfHwzLAogICAgICBsb3ZlOiBhc3BlY3RzW2Rh\neUdhbl0/LmxvdmV8fCIiLAogICAgICBjYXJlZXI6IGFzcGVjdHNbZGF5R2Fu\nXT8uY2FyZWVyfHwiIiwKICAgICAgaGVhbHRoOiBhc3BlY3RzW2RheUdhbl0/\nLmhlYWx0aHx8IiIsCiAgICAgIGx1Y2t5Q29sb3I6IGdhbkNvbG9yc1tkYXlH\nYW5dfHwi55m9IiwKICAgICAgbHVja3lOdW06IHpoaU51bXNbZGF5WmhpXXx8\nMSwKICAgICAgbHVja3lEaXI6IHpoaURpcnNbZGF5WmhpXXx8IuWMlyIsCiAg\nICAgIHVwZGF0ZWRBdDogbmV3IERhdGUoKS50b0xvY2FsZVRpbWVTdHJpbmco\nInpoLVRXIiwge2hvdXI6IjItZGlnaXQiLCBtaW51dGU6IjItZGlnaXQifSkK\nICAgIH07CiAgICBsb2NhbFN0b3JhZ2Uuc2V0SXRlbSgibWV0YW1pbmRfZGFp\nbHkiLCBKU09OLnN0cmluZ2lmeShyZXN1bHQpKTsKICAgIHJldHVybiByZXN1\nbHQ7CiAgfWNhdGNoKGUpewogICAgY29uc29sZS5sb2coIkRhaWx5IGx1Y2sg\nZXJyb3I6IiwgZSk7CiAgICByZXR1cm4gbnVsbDsKICB9Cn0KCmZ1bmN0aW9u\nIHJlbmRlckRhaWx5THVjayhkYXRhKXsKICBjb25zdCBlbCA9ICQoImRhaWx5\nTHVjayIpOwogIGlmKCFlbCB8fCAhZGF0YSkgcmV0dXJuOwogIHRyeXsKICAg\nIGVsLnN0eWxlLmRpc3BsYXkgPSAiYmxvY2siOwogICAgY29uc3QgdGltZUVs\nID0gZWwucXVlcnlTZWxlY3RvcigiLmRhaWx5LXRpbWUiKTsKICAgIGNvbnN0\nIHN0YXJzRWwgPSBlbC5xdWVyeVNlbGVjdG9yKCIubHVjay1zdGFycyIpOwog\nICAgY29uc3QgYXNwZWN0c0VsID0gZWwucXVlcnlTZWxlY3RvcigiLmx1Y2st\nYXNwZWN0cyIpOwogICAgY29uc3QgdGFnc0VsID0gZWwucXVlcnlTZWxlY3Rv\ncigiLmx1Y2stdGFncyIpOwogICAgaWYodGltZUVsKSB0aW1lRWwudGV4dENv\nbnRlbnQgPSAi5pu05paw5pa8ICIgKyBkYXRhLnVwZGF0ZWRBdDsKICAgIGlm\nKHN0YXJzRWwpIHN0YXJzRWwuaW5uZXJIVE1MID0gIuaVtOmrlOmBi+WLoiAi\nICsgIuKYhSIucmVwZWF0KGRhdGEuc3RhcnMpICsgIuKYhiIucmVwZWF0KDUt\nZGF0YS5zdGFycyk7CiAgICBpZihhc3BlY3RzRWwpIGFzcGVjdHNFbC5pbm5l\nckhUTUwgPSAiPGRpdj7wn5KVIOaEm+aDhe+8miIrZGF0YS5sb3ZlKyI8L2Rp\ndj48ZGl2PvCfkrwg5LqL5qWt77yaIitkYXRhLmNhcmVlcisiPC9kaXY+PGRp\ndj7wn4+lIOWBpeW6t++8miIrZGF0YS5oZWFsdGgrIjwvZGl2PiI7CiAgICBp\nZih0YWdzRWwpIHRhZ3NFbC5pbm5lckhUTUwgPSAnPHNwYW4gY2xhc3M9InRh\nZyI+5bm46YGL6ImyICcrZGF0YS5sdWNreUNvbG9yKyc8L3NwYW4+PHNwYW4g\nY2xhc3M9InRhZyI+5bm46YGL5pW4ICcrZGF0YS5sdWNreU51bSsnPC9zcGFu\nPjxzcGFuIGNsYXNzPSJ0YWciPuW5uOmBi+aWuSAnK2RhdGEubHVja3lEaXIr\nJzwvc3Bhbj4nOwogIH1jYXRjaChlKXt9Cn0KCi8vIEluaXQgZGFpbHkgbHVj\nayBhZnRlciBwYWdlIGxvYWRzCnNldFRpbWVvdXQoZnVuY3Rpb24oKXsKICB0\ncnl7CiAgICBjb25zdCBwcm9maWxlID0gbG9hZFByb2ZpbGUoKTsKICAgIGlm\nKHByb2ZpbGUpewogICAgICBjb25zdCBkYXRhID0gY2FsY3VsYXRlRGFpbHlM\ndWNrKHByb2ZpbGUpOwogICAgICBpZihkYXRhKSByZW5kZXJEYWlseUx1Y2so\nZGF0YSk7CiAgICB9CiAgfWNhdGNoKGUpe30KfSwgMTAwKTsKCi8vID09PT09\nPT09PT0gTWFpbiBQYWdlID09PT09PT09PT0KY29uc3QgZm9ybSA9ICQoImJh\nemlGb3JtIik7CmlmKGZvcm0pewogIGZvcm0uYWRkRXZlbnRMaXN0ZW5lcigi\nc3VibWl0IiwgKGUpID0+IHsKICAgIGUucHJldmVudERlZmF1bHQoKTsKICAg\nIGNvbnN0IHByb2ZpbGUgPSB7CiAgICAgIG5hbWU6ICgkKCJuYW1lIik/LnZh\nbHVlfHwiIikudHJpbSgpLAogICAgICB5ZWFyOiAoJCgieWVhciIpPy52YWx1\nZXx8IiIpLnRyaW0oKSwKICAgICAgbW9udGg6ICgkKCJtb250aCIpPy52YWx1\nZXx8IiIpLnRyaW0oKSwKICAgICAgZGF5OiAoJCgiZGF5Iik/LnZhbHVlfHwi\nIikudHJpbSgpLAogICAgICBob3VyQnJhbmNoOiAoJCgiaG91ckJyYW5jaCIp\nPy52YWx1ZXx8IiIpLnRyaW0oKSwKICAgICAgdHM6IERhdGUubm93KCkKICAg\nIH07CiAgICBpZighcHJvZmlsZS5uYW1lIHx8ICFwcm9maWxlLnllYXIgfHwg\nIXByb2ZpbGUubW9udGggfHwgIXByb2ZpbGUuZGF5KXsKICAgICAgYWxlcnQo\nIuiri+Whq+Wvq+Wnk+WQjeiIh+WHuueUn+W5tOaciOaXpSIpOyByZXR1cm47\nCiAgICB9CiAgICBzYXZlUHJvZmlsZShwcm9maWxlKTsKICAgIGNvbnN0IGRh\ndGEgPSBjYWxjdWxhdGVEYWlseUx1Y2socHJvZmlsZSk7CiAgICBpZihkYXRh\nKSByZW5kZXJEYWlseUx1Y2soZGF0YSk7CiAgICB3aW5kb3cubG9jYXRpb24u\naHJlZiA9ICIuL2V4cGxvcmUuaHRtbCI7CiAgfSk7CiAgcmV0dXJuOwp9Cgov\nLyA9PT09PT09PT09IEV4cGxvcmUgUGFnZSA9PT09PT09PT09CmluaXRIaXN0\nb3J5VUkoKTsKCmNvbnN0IHByb2ZpbGVMaW5lID0gJCgicHJvZmlsZUxpbmUi\nKTsKY29uc3QgcXVpY2tSZWFkaW5nID0gJCgicXVpY2tSZWFkaW5nIik7CmNv\nbnN0IGZlYXR1cmVHcmlkID0gJCgiZmVhdHVyZUdyaWQiKTsKY29uc3QgYXNr\nQnRuID0gJCgiYXNrQnRuIik7CmNvbnN0IHF1ZXN0aW9uID0gJCgicXVlc3Rp\nb24iKTsKY29uc3QgYW5zd2VyID0gJCgiYW5zd2VyIik7CmNvbnN0IG9wZW5T\nYWZhcmlCdG4gPSAkKCJvcGVuU2FmYXJpQnRuIik7CgppZihwcm9maWxlTGlu\nZSl7CiAgY29uc3QgcHJvZmlsZSA9IGxvYWRQcm9maWxlKCk7CiAgaWYoIXBy\nb2ZpbGUpewogICAgcHJvZmlsZUxpbmUudGV4dENvbnRlbnQgPSAi5bCa5pyq\n6Ly45YWl6LOH5paZ44CC6KuL5Zue6aaW6aCB6Ly45YWl5b6M5YaN6YCy5L6G\n44CCIjsKICAgIGlmKHF1aWNrUmVhZGluZykgcXVpY2tSZWFkaW5nLnRleHRD\nb250ZW50ID0gIu+8iOacqui8uOWFpeizh+aWme+8jOeEoeazleeUn+aIkO+8\niSI7CiAgfWVsc2V7CiAgICBjb25zdCBoYiA9IHByb2ZpbGUuaG91ckJyYW5j\naCA/IHByb2ZpbGUuaG91ckJyYW5jaCsi5pmCIiA6ICLmmYLovrDmnKrnn6Xv\nvIjmpoLnlaXnm6TvvIkiOwogICAgcHJvZmlsZUxpbmUudGV4dENvbnRlbnQg\nPSAi5bey6K6A5Y+W5ZG955uk6LOH5paZ77yaIisocHJvZmlsZS5uYW1lfHwi\n5pyq5aGr5aeT5ZCNIikrIu+9nCIrcHJvZmlsZS55ZWFyKyItIitwcm9maWxl\nLm1vbnRoKyItIitwcm9maWxlLmRheSsi772cIitoYisi44CC5L2g5Y+v5Lul\n55u05o6l5Zyo5LiL5pa55ZWPIEFJ44CCIjsKICAgIGdlbmVyYXRlUXVpY2tS\nZWFkaW5nKHByb2ZpbGUpLmNhdGNoKCgpID0+IHsgcXVpY2tSZWFkaW5nLnRl\neHRDb250ZW50ID0gIu+8iOebruWJjeeEoeazleeUn+aIkO+8jOiri+eojeW+\njOWGjeippu+8iSI7IH0pOwogIH0KfQoKY29uc3QgZmVhdHVyZXMgPSBbCiAg\ne2tleToiYmF6aSIsbmFtZToi5YWr5a2X5ZG955ukIixkZXNjOiLmipPph43p\nu57jgIHlv6vni6DmupYifSwKICB7a2V5OiJuYW1lIixuYW1lOiLlp5PlkI3l\niIbmnpAiLGRlc2M6IueUqOWtl+awo+WLouiIh+mBv+mbtyJ9LAogIHtrZXk6\nImxvdmUiLG5hbWU6IuWpmuWnu+mFjeWwjSIsZGVzYzoi6YGp6YWN5bqm6IiH\n55u46JmV6Zu36bueIn0sCiAge2tleToid29yZCIsbmFtZToi5ris5a2XIixk\nZXNjOiLkuIDlj6XlrZfnnIvnlbbkuIvlsYAifSwKICB7a2V5OiJjYXJlZXIi\nLG5hbWU6IuS6i+alreiyoemBiyIsZGVzYzoi5LuK5bm0L+i/keacn+etlueV\npSJ9LAogIHtrZXk6ImZlbmdzaHVpIixuYW1lOiLpoqjmsLTlu7rorbAiLGRl\nc2M6IuWgtOWfn+iIh+WLlee3miJ9LApdOwoKaWYoZmVhdHVyZUdyaWQpewog\nIGZlYXR1cmVHcmlkLmlubmVySFRNTCA9IGZlYXR1cmVzLm1hcChmID0+ICc8\nZGl2IGNsYXNzPSJmZWF0dXJlIiBkYXRhLWtleT0iJytmLmtleSsnIj48ZGl2\nPjxkaXYgY2xhc3M9Im5hbWUiPicrZi5uYW1lKyc8L2Rpdj48ZGl2IGNsYXNz\nPSJkZXNjIj4nK2YuZGVzYysnPC9kaXY+PC9kaXY+PGRpdj7igLo8L2Rpdj48\nL2Rpdj4nKS5qb2luKCIiKTsKICBmZWF0dXJlR3JpZC5hZGRFdmVudExpc3Rl\nbmVyKCJjbGljayIsIChlKSA9PiB7CiAgICBjb25zdCBjYXJkID0gZS50YXJn\nZXQuY2xvc2VzdCgiLmZlYXR1cmUiKTsKICAgIGlmKCFjYXJkKSByZXR1cm47\nCiAgICBjb25zdCBrZXkgPSBjYXJkLmdldEF0dHJpYnV0ZSgiZGF0YS1rZXki\nKTsKICAgIGNvbnN0IHByb21wdHMgPSB7CiAgICAgIGJhemk6IueUqOS4gOWP\npeipseiqquepv+aIkeePvuWcqOeahOeLgOaFi++8jOS4pue1puaIkeS4ieWA\ni+acgOmHjeimgeeahOaPkOmGkuOAgiIsCiAgICAgIG5hbWU6IuaIkeeahOWQ\njeWtl+awo+WgtOW8t+W8seWcqOWTqu+8n+acg+S4jeacg+WNoemBi++8n+aA\njum6vOS/ru+8nyIsCiAgICAgIGxvdmU6IuaIkeaEn+aDhS/lqZrlp7vnmoTp\nm7fpu57mmK/ku4DpurzvvJ/miJHpganlkIjku4DpurzpoZ7lnovvvJ8iLAog\nICAgICB3b3JkOiLmiJHmg7PmuKzlrZfjgI7ms7DjgI/vvIzkvaDnlKjluKvl\ngoXlj6PlkLvnm7TmjqXntabntZDoq5boiIflu7rorbDjgIIiLAogICAgICBj\nYXJlZXI6IuaIkeacgOi/keS6i+alreiyoeWLmeWNoem7nuWcqOWTqu+8n+aA\njum6vOegtO+8n+eUqOefreWPpeOAgiIsCiAgICAgIGZlbmdzaHVpOiLmiJHk\nvY8v6L6m5YWs5a6k5oCO6bq85L2I5bGA6IO956mp5L2P6LKh5rCj6IiH5Lq6\n5ZKM77yfIiwKICAgIH07CiAgICBpZihxdWVzdGlvbikgcXVlc3Rpb24udmFs\ndWUgPSBwcm9tcHRzW2tleV0gfHwgIiI7CiAgICBxdWVzdGlvbj8uZm9jdXMo\nKTsKICB9KTsKfQoKaWYob3BlblNhZmFyaUJ0bil7CiAgb3BlblNhZmFyaUJ0\nbi5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsICgpID0+IHsKICAgIHdpbmRv\ndy5vcGVuKHdpbmRvdy5sb2NhdGlvbi5ocmVmLCAiX2JsYW5rIik7CiAgICBh\nbGVydCgi6Iul5LuN5Zyo5YWn5bu654CP6Ka95Zmo77yM6KuL6bue5Y+z5LiK\n6KeS44CM4oCm44CN4oaSIOeUqCBTYWZhcmkg6ZaL5ZWf44CCIik7CiAgfSk7\nCiAgaWYoaXNJbkFwcEJyb3dzZXIoKSkgb3BlblNhZmFyaUJ0bi5zdHlsZS5k\naXNwbGF5ID0gImlubGluZS1ibG9jayI7Cn0KCmlmKGFza0J0bil7CiAgYXNr\nQnRuLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwgYXN5bmMgKCkgPT4gewog\nICAgY29uc3QgcHJvZmlsZSA9IGxvYWRQcm9maWxlKCk7CiAgICBjb25zdCBx\nID0gKHF1ZXN0aW9uPy52YWx1ZXx8IiIpLnRyaW0oKTsKICAgIGlmKCFwcm9m\naWxlKXsgYW5zd2VyLnRleHRDb250ZW50ID0gIuS9oOmChOaykui8uOWFpeiz\nh+aWme+8jOiri+WbnummlumggeWFiOi8uOWFpeOAgiI7IHJldHVybjsgfQog\nICAgaWYoIXEpeyBhbnN3ZXIudGV4dENvbnRlbnQgPSAi5YWI6Ly45YWl5L2g\n5oOz5ZWP55qE5ZWP6aGM44CCIjsgcmV0dXJuOyB9CiAgICBhbnN3ZXIudGV4\ndENvbnRlbnQgPSAi5bir5YKF5q2j5Zyo55yL55uk4oCmIjsKICAgIHRyeXsK\nICAgICAgY29uc3QgdGV4dCA9IGF3YWl0IGNhbGxCYXppRnVuY3Rpb24ocHJv\nZmlsZSwgcSk7CiAgICAgIGNvbnN0IHJlc3VsdCA9IHBpY2tUZXh0KHRleHQp\nOwogICAgICBhbnN3ZXIudGV4dENvbnRlbnQgPSByZXN1bHQ7CiAgICAgIGFk\nZEhpc3RvcnlFbnRyeShxLCByZXN1bHQpOwogICAgICByZW5kZXJIaXN0b3J5\nKCk7CiAgICB9Y2F0Y2goZXJyKXsKICAgICAgYW5zd2VyLnRleHRDb250ZW50\nID0gIuebruWJjeeEoeazleWPluW+l+Wbnuimhu+8miIgKyAoZXJyPy5tZXNz\nYWdlfHxlcnIpOwogICAgfQogIH0pOwp9Cgphc3luYyBmdW5jdGlvbiBnZW5l\ncmF0ZVF1aWNrUmVhZGluZyhwcm9maWxlKXsKICBpZighcXVpY2tSZWFkaW5n\nKSByZXR1cm47CiAgcXVpY2tSZWFkaW5nLnRleHRDb250ZW50ID0gIuW4q+WC\nheeci+ebpOS4reKApiI7CiAgdHJ5ewogICAgY29uc3QgdGV4dCA9IGF3YWl0\nIGNhbGxCYXppRnVuY3Rpb24ocHJvZmlsZSwgIuWFiOeUqOOAjuW4q+WCheWP\no+WQu+OAj+e1puaIkeS4gOautSA2IOihjOWFp+eahOe4veiple+8mjHlj6Xp\nlovloLQrM+WAi+mHjem7nisx5Y+l5LiA6Yed6KaL6KGAKzHlj6Xlu7rorbDj\ngILopoHkurroqbHjgIHkuI3opoHplbfnr4fooZPoqp7jgIIiKTsKICAgIHF1\naWNrUmVhZGluZy50ZXh0Q29udGVudCA9IHBpY2tUZXh0KHRleHQpOwogIH1j\nYXRjaChlKXsKICAgIHF1aWNrUmVhZGluZy50ZXh0Q29udGVudCA9ICLvvIjn\nm67liY3nhKHms5XnlJ/miJDvvIkiOwogIH0KfQoKYXN5bmMgZnVuY3Rpb24g\nY2FsbEJhemlGdW5jdGlvbihwcm9maWxlLCB1c2VyUXVlc3Rpb24pewogIGNv\nbnN0IHBheWxvYWQgPSB7Li4ucHJvZmlsZSwgcXVlc3Rpb246dXNlclF1ZXN0\naW9ufTsKICBjb25zdCByZXMgPSBhd2FpdCBmZXRjaChmdW5jdGlvblVybCgp\nLCB7CiAgICBtZXRob2Q6IlBPU1QiLCBoZWFkZXJzOnsiQ29udGVudC1UeXBl\nIjoiYXBwbGljYXRpb24vanNvbiJ9LAogICAgYm9keTpKU09OLnN0cmluZ2lm\neShwYXlsb2FkKQogIH0pOwogIGlmKCFyZXMub2spewogICAgY29uc3QgdCA9\nIGF3YWl0IHJlcy50ZXh0KCkuY2F0Y2goKCk9PiIiKTsKICAgIHRocm93IG5l\ndyBFcnJvcigiSFRUUCAiK3Jlcy5zdGF0dXMrIiAiK3QpOwogIH0KICBjb25z\ndCBjdCA9IHJlcy5oZWFkZXJzLmdldCgiY29udGVudC10eXBlIil8fCIiOwog\nIGlmKGN0LmluY2x1ZGVzKCJhcHBsaWNhdGlvbi9qc29uIikpewogICAgY29u\nc3QgaiA9IGF3YWl0IHJlcy5qc29uKCk7CiAgICByZXR1cm4gai5yZXBseSB8\nfCBqLnRleHQgfHwgajsKICB9CiAgcmV0dXJuIGF3YWl0IHJlcy50ZXh0KCk7\nCn0KfSkoKTsK\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/a168009-debug/sunop-web/contents/assets/app.js?ref=main",
+    "git": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/a1c9d32995a81664854a8f0caeb7a3ceb7c9c28d",
+    "html": "https://github.com/a168009-debug/sunop-web/blob/main/assets/app.js"
   }
-  return String(v);
-}
 
-// ========== Share Functions ==========
-function getAnswerText(){
-  const el = $("answer");
-  if(!el) return "";
-  return (el.innerText || el.textContent || "").trim();
-}
-
-function buildShareText(answerText){
-  const url = "https://stunning-gecko-4a2c8b.netlify.app";
-  return "【MetaMind 智慧命理】\n\n" + answerText + "\n\n🔗 了解更多：" + url;
-}
-
-let toastTimer = null;
-function showToast(message){
-  const toast = $("toast");
-  if(!toast) return;
-  toast.textContent = message;
-  toast.classList.add("show");
-  if(toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2000);
-}
-
-async function copyToClipboard(text){
+// ========== Debug Report ==========
+function debugReport(){
+  const sheets = [];
   try{
-    if(navigator.clipboard && window.isSecureContext){
-      await navigator.clipboard.writeText(text);
-      return true;
+    for(let i=0; i<document.styleSheets.length; i++){
+      const s = document.styleSheets[i];
+      sheets.push({href: s.href, title: s.title});
     }
-  }catch(e){}
-  try{
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    document.body.removeChild(ta);
-    return true;
   }catch(e){
-    return false;
+    sheets.push({error: e.message});
   }
-}
-
-async function shareAnswer(){
-  const answerText = getAnswerText();
-  if(!answerText){
-    showToast("目前沒有可分享的內容");
-    return;
-  }
-  const shareText = buildShareText(answerText);
   
-  if(navigator.share){
-    try{
-      await navigator.share({text: shareText});
-      return;
-    }catch(err){}
-  }
-  const ok = await copyToClipboard(shareText);
-  showToast(ok ? "已複製到剪貼簿！" : "複製失敗");
-}
-window.shareAnswer = shareAnswer;
-
-// ========== History Functions ==========
-function addHistoryEntry(question, answer){
-  try{
-    let h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    h.unshift({ts:Date.now(), question:question, answer:answer});
-    if(h.length > 50) h = h.slice(0, 50);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-  }catch(e){}
-}
-
-function formatTime(ts){
-  const d = new Date(ts);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 86400000);
-  const dateOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const time = d.toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"});
-  if(dateOnly.getTime() === today.getTime()) return "今天 " + time;
-  if(dateOnly.getTime() === yesterday.getTime()) return "昨天 " + time;
-  return d.toLocaleDateString("zh-TW", {month:"numeric", day:"numeric"}) + " " + time;
-}
-
-function renderHistory(){
-  const list = $("qaHistoryList");
-  const empty = $("qaHistoryEmpty");
-  if(!list || !empty) return;
-  try{
-    const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-    if(h.length === 0){
-      empty.style.display = "block";
-      list.innerHTML = "";
-      return;
-    }
-    empty.style.display = "none";
-    list.innerHTML = h.map((item, i) => {
-      const preview = item.answer.substring(0, 50) + (item.answer.length > 50 ? "..." : "");
-      return '<div class="qa-card" data-index="'+i+'">'+
-        '<div class="qa-head"><span class="qa-time">'+formatTime(item.ts)+'</span>'+
-        '<button class="qa-toggle" onclick="toggleHistory('+i+')">'+(i===0?'收起':'展開')+'</button></div>'+
-        '<div class="qa-q">'+item.question+'</div>'+
-        '<div class="qa-a-preview">'+preview+'</div>'+
-        '<div class="qa-a" style="display:none;">'+item.answer+'</div>'+
-      '</div>';
-    }).join("");
-  }catch(e){}
-}
-
-function toggleHistory(i){
-  const cards = document.querySelectorAll(".qa-card");
-  const card = cards[i];
-  if(!card) return;
-  const a = card.querySelector(".qa-a");
-  const preview = card.querySelector(".qa-a-preview");
-  const btn = card.querySelector(".qa-toggle");
-  if(a.style.display === "none"){
-    a.style.display = "block";
-    preview.style.display = "none";
-    btn.textContent = "收起";
-  }else{
-    a.style.display = "none";
-    preview.style.display = "block";
-    btn.textContent = "展開";
+  const debug = {
+    url: window.location.href,
+    userAgent: navigator.userAgent,
+    screen: window.innerWidth + "x" + window.innerHeight,
+    online: navigator.onLine,
+    time: new Date().toISOString(),
+    stylesheets: sheets,
+    localStorage_keys: Object.keys(localStorage)
+  };
+  
+  const out = document.getElementById("debugOutput");
+  if(out){
+    out.textContent = JSON.stringify(debug, null, 2);
+    out.style.display = out.style.display === "none" ? "block" : "none";
   }
 }
-window.toggleHistory = toggleHistory;
+window.debugReport = debugReport;
 
-function clearHistory(){
-  if(confirm("確定要清空所有問答紀錄嗎？")){
-    localStorage.removeItem(HISTORY_KEY);
-    renderHistory();
+// Bind debug button
+(function(){
+  const btn = document.getElementById("debugBtn");
+  if(btn){
+    btn.addEventListener("click", debugReport);
   }
-}
+})();
 
-function initHistoryUI(){
-  renderHistory();
-  const clearBtn = $("qaHistoryClear");
-  if(clearBtn) clearBtn.addEventListener("click", clearHistory);
-  const shareBtn = $("shareBtn");
-  if(shareBtn) shareBtn.addEventListener("click", shareAnswer);
-}
-
-// ========== Daily Luck - Safe Version ==========
-function calculateDailyLuck(profile){
-  try{
-    if(!profile || !profile.year || !profile.month || !profile.day) return null;
-    if(typeof Solar === "undefined") return null;
-    
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayTs = today.getTime();
-    
-    try{
-      const cached = JSON.parse(localStorage.getItem("metamind_daily"));
-      if(cached && cached.profileTs === profile.ts && cached.date === todayTs) return cached;
-    }catch(e){}
-    
-    const y=parseInt(profile.year), m=parseInt(profile.month), d=parseInt(profile.day);
-    let h = 12;
-    const hbMap = {子:23, 丑:1, 寅:3, 卯:5, 辰:7, 巳:9, 午:11, 未:13, 申:15, 酉:17, 戌:19, 亥:21};
-    h = hbMap[profile.hourBranch] || 12;
-    
-    let solar = Solar.fromYmdHms(y, m, d, h, 0, 0);
-    let lunar = solar.getLunar();
-    
-    const dayGan = lunar.getDayGan();
-    const dayZhi = lunar.getDayZhi();
-    const ganColors = {甲:"青/綠", 乙:"青/綠", 丙:"紅/紫", 丁:"紅/紫", 戊:"黃/咖", 己:"黃/咖", 庚:"白/金", 辛:"白/金", 壬:"黑/藍", 癸:"黑/藍"};
-    const zhiNums = {子:1, 丑:2, 寅:3, 卯:4, 辰:5, 巳:6, 午:7, 未:8, 申:9, 酉:10, 戌:11, 亥:12};
-    const zhiDirs = {子:"北", 丑:"東北", 寅:"東北", 卯:"東", 辰:"東南", 巳:"東南", 午:"南", 未:"西南", 申:"西南", 酉:"西", 戌:"西北", 亥:"西北"};
-    const ganStrength = {甲:4, 乙:3, 丙:5, 丁:4, 戊:4, 己:3, 庚:5, 辛:4, 壬:4, 癸:3};
-    const aspects = {
-      甲:{love:"戀愛運不錯", career:"事業有衝勁", health:"多喝水"},
-      乙:{love:"感情細膩", career:"貴人幫忙", health:"注意腸胃"},
-      丙:{love:"桃花朵朵", career:"聲勢上漲", health:"小心火氣"},
-      丁:{love:"異性緣佳", career:"談判順利", health:"心血管"},
-      戊:{love:"穩定發展", career:"財運亨通", health:"脾胃"},
-      己:{love:"務實", career:"積少成多", health:"少熬夜"},
-      庚:{love:"果斷出擊", career:"業務強勁", health:"呼吸系統"},
-      辛:{love:"有魅力", career:"事業上升", health:"肺部"},
-      壬:{love:"理性", career:"財源廣進", health:"多喝水"},
-      癸:{love:"柔情", career:"後勁強", health:"腎臟"}
-    };
-    
-    const result = {
-      date: todayTs, profileTs: profile.ts,
-      stars: ganStrength[dayGan]||3,
-      love: aspects[dayGan]?.love||"",
-      career: aspects[dayGan]?.career||"",
-      health: aspects[dayGan]?.health||"",
-      luckyColor: ganColors[dayGan]||"白",
-      luckyNum: zhiNums[dayZhi]||1,
-      luckyDir: zhiDirs[dayZhi]||"北",
-      updatedAt: new Date().toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"})
-    };
-    localStorage.setItem("metamind_daily", JSON.stringify(result));
-    return result;
-  }catch(e){
-    console.log("Daily luck error:", e);
-    return null;
-  }
-}
-
-function renderDailyLuck(data){
-  const el = $("dailyLuck");
-  if(!el || !data) return;
-  try{
-    el.style.display = "block";
-    const timeEl = el.querySelector(".daily-time");
-    const starsEl = el.querySelector(".luck-stars");
-    const aspectsEl = el.querySelector(".luck-aspects");
-    const tagsEl = el.querySelector(".luck-tags");
-    if(timeEl) timeEl.textContent = "更新於 " + data.updatedAt;
-    if(starsEl) starsEl.innerHTML = "整體運勢 " + "★".repeat(data.stars) + "☆".repeat(5-data.stars);
-    if(aspectsEl) aspectsEl.innerHTML = "<div>💕 愛情："+data.love+"</div><div>💼 事業："+data.career+"</div><div>🏥 健康："+data.health+"</div>";
-    if(tagsEl) tagsEl.innerHTML = '<span class="tag">幸運色 '+data.luckyColor+'</span><span class="tag">幸運數 '+data.luckyNum+'</span><span class="tag">幸運方 '+data.luckyDir+'</span>';
-  }catch(e){}
-}
-
-// Init daily luck after page loads
-setTimeout(function(){
-  try{
-    const profile = loadProfile();
-    if(profile){
-      const data = calculateDailyLuck(profile);
-      if(data) renderDailyLuck(data);
-    }
-  }catch(e){}
-}, 100);
-
-// ========== Main Page ==========
-const form = $("baziForm");
-if(form){
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const profile = {
-      name: ($("name")?.value||"").trim(),
-      year: ($("year")?.value||"").trim(),
-      month: ($("month")?.value||"").trim(),
-      day: ($("day")?.value||"").trim(),
-      hourBranch: ($("hourBranch")?.value||"").trim(),
-      ts: Date.now()
-    };
-    if(!profile.name || !profile.year || !profile.month || !profile.day){
-      alert("請填寫姓名與出生年月日"); return;
-    }
-    saveProfile(profile);
-    const data = calculateDailyLuck(profile);
-    if(data) renderDailyLuck(data);
-    window.location.href = "./explore.html";
-  });
-  return;
-}
-
-// ========== Explore Page ==========
-initHistoryUI();
-
-const profileLine = $("profileLine");
-const quickReading = $("quickReading");
-const featureGrid = $("featureGrid");
-const askBtn = $("askBtn");
-const question = $("question");
-const answer = $("answer");
-const openSafariBtn = $("openSafariBtn");
-
-if(profileLine){
-  const profile = loadProfile();
-  if(!profile){
-    profileLine.textContent = "尚未輸入資料。請回首頁輸入後再進來。";
-    if(quickReading) quickReading.textContent = "（未輸入資料，無法生成）";
-  }else{
-    const hb = profile.hourBranch ? profile.hourBranch+"時" : "時辰未知（概略盤）";
-    profileLine.textContent = "已讀取命盤資料："+(profile.name||"未填姓名")+"｜"+profile.year+"-"+profile.month+"-"+profile.day+"｜"+hb+"。你可以直接在下方問 AI。";
-    generateQuickReading(profile).catch(() => { quickReading.textContent = "（目前無法生成，請稍後再試）"; });
-  }
-}
-
-const features = [
-  {key:"bazi",name:"八字命盤",desc:"抓重點、快狠準"},
-  {key:"name",name:"姓名分析",desc:"用字氣勢與避雷"},
-  {key:"love",name:"婚姻配對",desc:"適配度與相處雷點"},
-  {key:"word",name:"測字",desc:"一句字看當下局"},
-  {key:"career",name:"事業財運",desc:"今年/近期策略"},
-  {key:"fengshui",name:"風水建議",desc:"場域與動線"},
-];
-
-if(featureGrid){
-  featureGrid.innerHTML = features.map(f => '<div class="feature" data-key="'+f.key+'"><div><div class="name">'+f.name+'</div><div class="desc">'+f.desc+'</div></div><div>›</div></div>').join("");
-  featureGrid.addEventListener("click", (e) => {
-    const card = e.target.closest(".feature");
-    if(!card) return;
-    const key = card.getAttribute("data-key");
-    const prompts = {
-      bazi:"用一句話說穿我現在的狀態，並給我三個最重要的提醒。",
-      name:"我的名字氣場強弱在哪？會不會卡運？怎麼修？",
-      love:"我感情/婚姻的雷點是什麼？我適合什麼類型？",
-      word:"我想測字『泰』，你用師傅口吻直接給結論與建議。",
-      career:"我最近事業財務卡點在哪？怎麼破？用短句。",
-      fengshui:"我住/辦公室怎麼佈局能穩住財氣與人和？",
-    };
-    if(question) question.value = prompts[key] || "";
-    question?.focus();
-  });
-}
-
-if(openSafariBtn){
-  openSafariBtn.addEventListener("click", () => {
-    window.open(window.location.href, "_blank");
-    alert("若仍在內建瀏覽器，請點右上角「…」→ 用 Safari 開啟。");
-  });
-  if(isInAppBrowser()) openSafariBtn.style.display = "inline-block";
-}
-
-if(askBtn){
-  askBtn.addEventListener("click", async () => {
-    const profile = loadProfile();
-    const q = (question?.value||"").trim();
-    if(!profile){ answer.textContent = "你還沒輸入資料，請回首頁先輸入。"; return; }
-    if(!q){ answer.textContent = "先輸入你想問的問題。"; return; }
-    answer.textContent = "師傅正在看盤…";
-    try{
-      const text = await callBaziFunction(profile, q);
-      const result = pickText(text);
-      answer.textContent = result;
-      addHistoryEntry(q, result);
-      renderHistory();
-    }catch(err){
-      answer.textContent = "目前無法取得回覆：" + (err?.message||err);
-    }
-  });
-}
-
-async function generateQuickReading(profile){
-  if(!quickReading) return;
-  quickReading.textContent = "師傅看盤中…";
-  try{
-    const text = await callBaziFunction(profile, "先用『師傅口吻』給我一段 6 行內的總評：1句開場+3個重點+1句一針見血+1句建議。要人話、不要長篇術語。");
-    quickReading.textContent = pickText(text);
-  }catch(e){
-    quickReading.textContent = "（目前無法生成）";
-  }
-}
-
-async function callBaziFunction(profile, userQuestion){
-  const payload = {...profile, question:userQuestion};
-  const res = await fetch(functionUrl(), {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(payload)
-  });
-  if(!res.ok){
-    const t = await res.text().catch(()=>"");
-    throw new Error("HTTP "+res.status+" "+t);
-  }
-  const ct = res.headers.get("content-type")||"";
-  if(ct.includes("application/json")){
-    const j = await res.json();
-    return j.reply || j.text || j;
-  }
-  return await res.text();
-}
 })();
