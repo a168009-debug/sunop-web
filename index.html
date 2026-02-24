@@ -1,65 +1,121 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>MetaMind｜輸入資料</title>
-<!-- METAMIND_HTML_OK -->
-<link rel="stylesheet" href="/assets/style.css?v=LUX_004" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MetaMind｜黑金命理探索中心</title>
+<link rel="stylesheet" href="/assets/style.css?v=BLACK_GOLD_001">
 </head>
 <body>
-<main class="page">
+<div class="page">
 <header class="hero">
-<h1 class="brand">MetaMind</h1>
-<p class="sub">請輸入資料</p>
+<h1 class="brand">METAMIND</h1>
+<p class="sub">黑 金 命 理 探 索 中 心</p>
 </header>
-<section class="card">
-<h2 class="cardTitle">輸入您的資料</h2>
-<label class="field">
-<span>姓名</span>
-<input id="name" type="text" placeholder="例如：王小明" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-</label>
-<div class="grid3">
-<label class="field">
-<span>西元年</span>
-<input id="year" type="number" inputmode="numeric" placeholder="YYYY" autocomplete="off">
-</label>
-<label class="field">
-<span>月份</span>
-<input id="month" type="number" inputmode="numeric" placeholder="MM" autocomplete="off">
-</label>
-<label class="field">
-<span>日期</span>
-<input id="day" type="number" inputmode="numeric" placeholder="DD" autocomplete="off">
-</label>
+
+<!-- Feature Cards: 3x2 Grid -->
+<section class="feature-grid">
+<div class="feature-card" data-page="bazi">
+<span class="feature-icon">☯</span>
+<span class="feature-name">八字命盤</span>
 </div>
-<label class="field">
-<span>時辰</span>
+<div class="feature-card" data-page="ziwei">
+<span class="feature-icon">✦</span>
+<span class="feature-name">紫微斗數</span>
+</div>
+<div class="feature-card" data-page="lifescript">
+<span class="feature-icon">⟡</span>
+<span class="feature-name">生命靈數</span>
+</div>
+<div class="feature-card" data-page="name">
+<span class="feature-icon">筆</span>
+<span class="feature-name">姓名分析</span>
+</div>
+<div class="feature-card" data-page="cards">
+<span class="feature-icon">◈</span>
+<span class="feature-name">智慧卡</span>
+</div>
+<div class="feature-card" data-page="zici">
+<span class="feature-icon">□</span>
+<span class="feature-name">測字</span>
+</div>
+</section>
+
+<!-- Daily Guidance -->
+<section class="daily-card">
+<h3 class="daily-title">◈ 今日指引</h3>
+<div class="daily-item">1. 靜心凝神，觀照當下</div>
+<div class="daily-item">2. 顺势而为，切勿强求</div>
+<div class="daily-item">3. 戌時（19:00-21:00）利於决策</div>
+</section>
+
+<!-- Profile/Input Section -->
+<section class="card" id="profileSection">
+<h3 style="color:var(--mm-gold-light);margin-bottom:16px;font-size:14px;letter-spacing:2px;">輸入命盤資料</h3>
+<label style="display:block;margin-bottom:12px;">
+<input id="name" type="text" placeholder="姓名" style="margin-top:6px;">
+</label>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+<label><input id="year" type="number" placeholder="年"></label>
+<label><input id="month" type="number" placeholder="月"></label>
+<label><input id="day" type="number" placeholder="日"></label>
+</div>
+<label style="display:block;margin-bottom:16px;">
 <select id="hourBranch">
-<option value="">不確定 / 未知（先做概略盤）</option>
-<option value="子">子時（23:00–01:00）</option>
-<option value="丑">丑時（01:00–03:00）</option>
-<option value="寅">寅時（03:00–05:00）</option>
-<option value="卯">卯時（05:00–07:00）</option>
-<option value="辰">辰時（07:00–09:00）</option>
-<option value="巳">巳時（09:00–11:00）</option>
-<option value="午">午時（11:00–13:00）</option>
-<option value="未">未時（13:00–15:00）</option>
-<option value="申">申時（15:00–17:00）</option>
-<option value="酉">酉時（17:00–19:00）</option>
-<option value="戌">戌時（19:00–21:00）</option>
-<option value="亥">亥時（21:00–23:00）</option>
+<option value="">時辰（未知）</option>
+<option value="子">子時</option><option value="丑">丑時</option><option value="寅">寅時</option>
+<option value="卯">卯時</option><option value="辰">辰時</option><option value="巳">巳時</option>
+<option value="午">午時</option><option value="未">未時</option><option value="申">申時</option>
+<option value="酉">酉時</option><option value="戌">戌時</option><option value="亥">亥時</option>
 </select>
 </label>
-<p class="hint">不知道出生時辰也可以先做「概略盤」分析；之後補時辰，結果會更精準。</p>
-<div class="actions">
-<button id="startBtn" class="btn-primary" type="button">開始分析</button>
-<button id="clearBtn" class="btn-ghost" type="button">清除資料</button>
-</div>
-<p class="footnote">按下開始分析後，資料會先儲存在本機（localStorage），再進入探索中心。</p>
+<button class="btn-primary" id="saveProfileBtn">儲存命盤</button>
 </section>
-<footer class="copyright">© MetaMind</footer>
-</main>
-<script src="/assets/app.js?v=LUX_004" defer></script>
+
+<footer style="text-align:center;padding:40px 0 100px;color:var(--mm-text-muted);font-size:12px;">
+<p>METAMIND © 2026</p>
+<p style="margin-top:8px;opacity:0.6;">命理非宿命，僅供參考</p>
+</footer>
+</div>
+
+<!-- Floating AI Button -->
+<button class="ai-float-btn" id="aiBtn">🤖</button>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+<a href="#" class="nav-item active"><span class="nav-icon">◈</span><span>探索</span></a>
+<a href="#profileSection" class="nav-item"><span class="nav-icon">命</span><span>命盤</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">曆</span><span>日曆</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">藏</span><span>收藏</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">設</span><span>設定</span></a>
+</nav>
+
+<!-- Chat Modal -->
+<div class="chat-modal" id="chatModal">
+<div class="chat-content">
+<div class="chat-header">
+<span style="color:var(--mm-gold-light);font-weight:600;">AI 命理顧問</span>
+<button id="closeChat" style="background:none;border:none;color:var(--mm-text-muted);font-size:20px;cursor:pointer;">✕</button>
+</div>
+<div class="chat-messages" id="chatMessages">
+<div style="color:var(--mm-text-muted);font-size:13px;text-align:center;padding:20px;">
+◈ 請先輸入 API Key 開始對話
+</div>
+</div>
+<div class="chat-input-area">
+<div class="api-key-section">
+<input type="password" class="api-key-input" id="apiKeyInput" placeholder="OpenAI API Key (sk-...)">
+<p class="api-key-hint">密鑰僅存在本地，不會上傳</p>
+</div>
+<textarea class="chat-input" id="chatInput" placeholder="輸入你的問題..." rows="2"></textarea>
+<button class="btn-primary" id="sendChatBtn" style="margin-top:8px;">送出</button>
+</div>
+</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">已儲存</div>
+
+<script src="/assets/app.js?v=BLACK_GOLD_001" defer></script>
 </body>
 </html>
