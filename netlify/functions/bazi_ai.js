@@ -1,5 +1,4 @@
 // netlify/functions/bazi_ai.js
-// Node 18+ runtime (Netlify supports global fetch)
 const QUICK = { model: "gpt-4o-mini", max_tokens: 300, timeoutMs: 8000 };
 const DEEP = { model: "gpt-4o", max_tokens: 800, timeoutMs: 15000 };
 const corsHeaders = {
