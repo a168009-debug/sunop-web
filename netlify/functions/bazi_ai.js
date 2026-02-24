@@ -27,27 +27,30 @@ exports.handler = async (event) => {
     const y = Number(payload.year);
     const m = Number(payload.month);
     const d = Number(payload.day);
-    const hourBranch = payload.hourBranch || "子";
+    const hourBranch = payload.hourBranch;
     
-    const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
-    const hh = hourMap[hourBranch] || 12;
-
     if (!name || !y || !m || !d) return json(400, { ok: false, error: "Missing required fields" });
+
+    let hh = 12; // default
+    let hasHour = false;
+    if (hourBranch && hourBranch !== "未知") {
+      const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
+      hh = hourMap[hourBranch] || 12;
+      hasHour = true;
+    }
 
     const solar = Solar.fromYmdHms(y, m, d, hh, 0, 0);
     const lunar = solar.getLunar();
     const ec = lunar.getEightChar();
 
-    // 四柱
     const yearPillar = ec.getYear();
     const monthPillar = ec.getMonth();
     const dayPillar = ec.getDay();
-    const timePillar = ec.getTime();
+    const timePillar = hasHour ? ec.getTime() : "未知";
     
     const dayGan = dayPillar.charAt(0);
     const dayZhi = dayPillar.charAt(1);
 
-    // 十神計算
     const tenGodMap = {
       "甲": { "甲": "比肩", "乙": "劫財", "丙": "食神", "丁": "傷官", "戊": "偏財", "己": "正財", "庚": "七殺", "辛": "正官", "壬": "偏印", "癸": "正印" },
       "乙": { "甲": "劫財", "乙": "比肩", "丙": "傷官", "丁": "食神", "戊": "正財", "己": "偏財", "庚": "正官", "辛": "七殺", "壬": "正印", "癸": "偏印" },
@@ -62,35 +65,28 @@ exports.handler = async (event) => {
     };
     
     const getTenGod = (dayG, otherG) => tenGodMap[dayG]?.[otherG] || "";
-    
+    const wuxingMap = { "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水" };
+
     const yearGan = yearPillar.charAt(0);
     const monthGan = monthPillar.charAt(0);
-    const hourGan = timePillar.charAt(0);
-
-    // 五行
-    const wuxingMap = { "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水" };
+    const hourGan = hasHour ? timePillar.charAt(0) : "未知";
 
     const bazi = {
       name,
-      solar: { y, m, d, hh, hourBranch },
-      pillars: {
-        year: yearPillar,
-        month: monthPillar,
-        day: dayPillar,
-        time: timePillar
-      },
+      solar: { y, m, d, hasHour, hourBranch },
+      pillars: { year: yearPillar, month: monthPillar, day: dayPillar, time: timePillar },
       dayMaster: { gan: dayGan, zhi: dayZhi },
       tenGod: {
         year: getTenGod(dayGan, yearGan),
         month: getTenGod(dayGan, monthGan),
         day: getTenGod(dayGan, dayGan),
-        time: getTenGod(dayGan, hourGan)
+        time: hasHour ? getTenGod(dayGan, hourGan) : "未知"
       },
       wuxing: {
         year: wuxingMap[yearGan],
         month: wuxingMap[monthGan],
         day: wuxingMap[dayGan],
-        time: wuxingMap[hourGan]
+        time: hasHour ? wuxingMap[hourGan] : "未知"
       }
     };
 
@@ -99,7 +95,8 @@ exports.handler = async (event) => {
 1) 必須以「八字結構化數據」為依據，不能胡編具體事件。
 2) 不要指責當事人自私，不要情緒勒索，用"點到為止"的語氣。
 3) 輸出用繁體中文。
-4) 結構固定：①命局骨架 ②五行偏頗與用神傾向 ③人際/事業/財務/健康四項提醒（各2-3句）④一句"點醒"的斷語（短句）。`;
+4) 若無時辰資訊，需特別說明此限制，並基於年月，日三柱提供分析。
+5) 結構固定：①命局骨架 ②五行偏頗與用神傾向 ③人際/事業/財務/健康四項提醒（各2-3句）④一句"點醒"的斷語（短句）。`;
 
     const user = `以下是當事人的八字計算結果（結構化）：${JSON.stringify(bazi)}請按規則輸出。`;
 
