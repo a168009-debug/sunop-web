@@ -28,6 +28,10 @@ if(form){
       hourBranch: ($("hourBranch")?.value || "").trim(),
       ts: Date.now()
     };
+    if(!profile.name || !profile.year || !profile.month || !profile.day){
+      alert("請填寫姓名與出生年月日");
+      return;
+    }
     saveProfile(profile);
     window.location.href = "./explore.html";
   });
