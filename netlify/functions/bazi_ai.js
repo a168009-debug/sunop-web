@@ -9,7 +9,6 @@ function withTimeout(promise, ms) {
     new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
   ]);
 }
-}
 
 function calculateBazi(year, month, day, hourBranch) {
   const 天干 = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
