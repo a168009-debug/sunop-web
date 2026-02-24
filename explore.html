@@ -309,7 +309,7 @@ async function bootQuickOpening() {
     var res = await fetch('/.netlify/functions/bazi_ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourBranch: input.hourZhi })
+      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourBranch: input.hourBranch })
     });
     var data = await res.json();
     
@@ -517,7 +517,7 @@ function showAIChat(autoMsg) {
   // 顯示已讀取的 profile
   var profile = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
   if(profile && profile.name) {
-    var profileText = profile.name + '｜' + profile.year + '/' + String(profile.month).padStart(2,'0') + '/' + String(profile.day).padStart(2,'0') + '｜' + profile.hourZhi;
+    var profileText = profile.name + '｜' + profile.year + '/' + String(profile.month).padStart(2,'0') + '/' + String(profile.day).padStart(2,'0') + '｜' + profile.hourBranch;
     addAIMsg('meta', '已讀取：' + profileText);
   } else {
     addAIMsg('meta', '請先在首頁輸入出生資料');
@@ -559,7 +559,7 @@ async function sendAIMessage(autoMsg) {
         year: profile.year,
         month: profile.month,
         day: profile.day,
-        hourBranch: profile.hourZhi,
+        hourBranch: profile.hourBranch,
         mode: 'deep',
         question: text
       }), 
