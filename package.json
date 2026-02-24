@@ -1,0 +1,7 @@
+{
+  "name": "metamind-bazi",
+  "private": true,
+  "dependencies": {
+    "lunar-javascript": "^1.6.0"
+  }
+}
