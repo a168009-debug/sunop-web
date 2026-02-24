@@ -1,18 +1,15 @@
 const https = require("https");
 
-// ===== 統一 Schema =====
 const QUICK_CONFIG = { model: "gpt-4o-mini", max_tokens: 300, timeout: 8000 };
 const DEEP_CONFIG = { model: "gpt-4o", max_tokens: 800, timeout: 15000 };
 
-// ===== Timeout Utility =====
 function withTimeout(promise, ms) {
   return Promise.race([
     promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout"))), ms)
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)
   ]);
 }
 
-// ===== 八字計算 (Layer 0) =====
 function calculateBazi(year, month, day, hourBranch) {
   const 天干 = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
   const 地支 = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
@@ -27,7 +24,8 @@ function calculateBazi(year, month, day, hourBranch) {
   const 天數差 = Math.floor((new Date(year, month - 1, day) - 基準日) / (1000 * 60 * 60 * 24));
   const 日柱 = 天干[(天數差 % 10 + 10) % 10] + 地支[(天數差 % 12 + 12) % 12];
   const 日干索引 = 天干.indexOf(日柱[0]);
-  const 時柱 = 天干[([0,2,4,6,8][Math.floor(日干索引 / 2)] || 0) + 地支.indexOf(hourBranch)] + hourBranch;
+  const 時柱Index = 地支.indexOf(hourBranch);
+  const 時柱 = 天干[([0,2,4,6,8][Math.floor(日干索引 / 2)] || 0) + 時柱Index] + hourBranch;
   
   const allPillars = 年柱 + 月柱 + 日柱 + 時柱;
   const 五行統計 = { 木:0, 火:0, 土:0, 金:0, 水:0 };
@@ -43,10 +41,10 @@ function calculateBazi(year, month, day, hourBranch) {
   const 用神候選 = [];
   if (strengthLevel === "弱") {
     const 生扶 = { "木":"水", "火":"木", "土":"火", "金":"土", "水":"金" };
-    用神候選.push({五行:生扶[日主五行],理由:日主五行+"弱需"+生扶[日主五行]+"生扶"});
+    用神候選.push({五行:生扶[日主五行],理由:日主五行+"弱需"+生扶[日主五行]});
   } else {
     const 剋洩 = { "木":"金", "火":"水", "土":"木", "金":"火", "水":"土" };
-    用神候選.push({五行:剋洩[日主五行],理由:日主五行+"旺需"+剋洩[日主五行]+"剋洩"});
+    用神候選.push({五行:剋洩[日主五行],理由:日主五行+"旺需"+剋洩[日主五行]});
   }
   
   return {
@@ -56,19 +54,12 @@ function calculateBazi(year, month, day, hourBranch) {
     dayMaster: { stem: 日柱[0], element: 日主五行 },
     strength: strengthLevel,
     fiveElements: { 木:五行統計.木, 火:五行統計.火, 土:五行統計.土, 金:五行統計.金, 水:五行統計.水 },
-    usefulGod: { candidates: 用神候選.map(x => x.五行), reasoning: 用神候選.map(x => x.理由).join("、") },
-    disclaimers: ["此為程式計算結果，AI 推論必須以此為準"]
+    usefulGod: { candidates: 用神候選.map(x => x.五行), reasoning: 用神候選.map(x => x.理由).join("、") }
   };
 }
 
-// ===== Main Handler =====
 exports.handler = async (event) => {
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json; charset=utf-8",
-  };
-
+  const corsHeaders = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Content-Type": "application/json; charset=utf-8" };
   const json = (status, obj) => ({ statusCode: status, headers: corsHeaders, body: JSON.stringify(obj) });
 
   if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
@@ -77,90 +68,53 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
     let { name, year, month, day, hourBranch, mode = "quick", question = "", dryRun = false } = body;
-    
-    // 向後兼容：接受 hourZhi 並轉換為 hourBranch
-    if (!hourBranch && body.hourZhi) {
-      hourBranch = body.hourZhi;
-    }
-
-    if (!year || !month || !day || !hourBranch) {
-      return json(400, { error: "missing_input", message: "name/year/month/day/hourBranch required" });
-    }
+    if (!hourBranch && body.hour) hourBranch = body.hour;
+    if (!year || !month || !day || !hourBranch) return json(400, { error: "missing_input", message: "name/year/month/day/hourBranch required" });
 
     const baziProfile = calculateBazi(year, month, day, hourBranch);
     baziProfile.name = name || "訪客";
     
-    if (dryRun) {
-      return json(200, { ok: true, mode, baziProfile });
-    }
+    if (dryRun) return json(200, { ok: true, mode, baziProfile });
 
     const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return json(500, { error: "missing_server_key", message: "OPENAI_API_KEY not set on Netlify" });
-    }
+    if (!apiKey) return json(500, { error: "missing_server_key", message: "OPENAI_API_KEY not set" });
 
     const config = mode === "deep" ? DEEP_CONFIG : QUICK_CONFIG;
     const systemPrompt = getSystemPrompt(mode, baziProfile);
     const userPrompt = getUserPrompt(mode, baziProfile, question);
 
-    const aiResponse = await withTimeout(
-      callOpenAI(apiKey, systemPrompt, userPrompt, config),
-      config.timeout
-    );
-
+    const aiResponse = await withTimeout(callOpenAI(apiKey, systemPrompt, userPrompt, config), config.timeout);
     return json(200, { ok: true, mode, baziProfile, result: aiResponse });
 
   } catch (err) {
     const errorMsg = err.message || String(err);
     console.error("Error:", errorMsg);
     
-    // Timeout fallback
     if (errorMsg === "timeout") {
-      return json(200, { 
-        fallback: true,
-        summary: "目前能量場顯示近期壓力偏高，建議先從作息與情緒穩定開始調整。",
-        suggestions: [
-          "最近是否睡眠品質下降？",
-          "是否工作決策壓力增加？",
-          "是否有家庭責任壓力？"
-        ]
-      });
+      return json(200, { fallback: true, summary: "目前能量場顯示近期壓力偏高，建議先從作息與情緒穩定開始調整。", suggestions: ["最近是否睡眠品質下降？", "是否工作決策壓力增加？", "是否有家庭責任壓力？"] });
     }
     
-    let errorCode = "server_exception";
-    if (errorMsg.includes("quota") || errorMsg.includes("exceeded")) errorCode = "quota_exceeded";
-    
-    return json(500, { error: errorCode, message: errorMsg });
+    return json(500, { error: errorMsg.includes("quota") ? "quota_exceeded" : "server_exception", message: errorMsg });
   }
 };
 
 function getSystemPrompt(mode, profile) {
-  const base = `你是專業八字命理顧問（高階命理語氣）。嚴格遵守：只能依據 baziProfile 推論。不可捏造資訊。`;
-  
-  if (mode === "deep") {
-    return base + `\n\n【深度模式】請給出結構化分析：sections(標題/摘要/要點)、action_plan(3-7條建議)、next_questions(3個問題)。`;
-  }
-  return base + `\n\n【快速模式】請簡短回覆：opening(2-4句)、highlights(3-5點)、risk_flags、風險提示、suggested_questions(3個)。`;
+  const base = "你是專業八字命理顧問（高階命理語氣）。嚴格遵守：只能依據 baziProfile 推論。不可捏造資訊。";
+  if (mode === "deep") return base + "\n\n【深度模式】請給出結構化分析：sections(標題/摘要/要點)、action_plan(3-7條建議)、next_questions(3個問題)。";
+  return base + "\n\n【快速模式】請簡短回覆：opening(2-4句)、highlights(3-5點)、risk_flags、suggested_questions(3個)。";
 }
 
 function getUserPrompt(mode, profile, question) {
-  const profileJson = JSON.stringify(profile, null, 2);
-  
-  if (mode === "deep") {
-    return `根據以下八字資料${question ? "回答：「" + question + "」" : "做完整深度解析"}：\n\n${profileJson}\n\n輸出 JSON：{ sections: [{title, summary, bullets}], action_plan: [], next_questions: [] }`;
-  }
-  
-  return `根據以下八字資料產生快速解讀：\n\n${profileJson}\n\n輸出 JSON：{ opening, highlights, risk_flags, suggested_questions }`;
+  const pj = JSON.stringify(profile, null, 2);
+  if (mode === "deep") return `根據以下八字資料${question ? "回答：「" + question + "」" : "做完整深度解析"}：\n\n${pj}\n\n輸出 JSON：{ sections: [{title, summary, bullets}], action_plan: [], next_questions: [] }`;
+  return `根據以下八字資料產生快速解讀：\n\n${pj}\n\n輸出 JSON：{ opening, highlights, risk_flags, suggested_questions }`;
 }
 
 function callOpenAI(apiKey, system, user, config) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
       model: config.model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user }
-      ],
+      messages: [{ role: "system", content: system }, { role: "user", content: user }],
       max_tokens: config.max_tokens,
       temperature: 0.6
     });
@@ -169,11 +123,7 @@ function callOpenAI(apiKey, system, user, config) {
       hostname: "api.openai.com",
       path: "/v1/chat/completions",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Length": Buffer.byteLength(data),
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}`, "Content-Length": Buffer.byteLength(data) },
       timeout: config.timeout,
     };
 
@@ -187,15 +137,8 @@ function callOpenAI(apiKey, system, user, config) {
           if (!res.statusCode || res.statusCode >= 400) reject(new Error(`HTTP ${res.statusCode}`));
           const content = json?.choices?.[0]?.message?.content;
           if (!content) reject(new Error("回應為空"));
-          
-          try {
-            resolve(JSON.parse(content));
-          } catch(e) {
-            resolve({ opening: content });
-          }
-        } catch (e) {
-          reject(new Error("解析失敗"));
-        }
+          try { resolve(JSON.parse(content)); } catch(e) { resolve({ opening: content }); }
+        } catch (e) { reject(new Error("解析失敗")); }
       });
     });
 
