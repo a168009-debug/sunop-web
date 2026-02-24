@@ -40,17 +40,18 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(21
 <body>
 <div class="wrap">
 <div class="title">探索中心</div>
-<div class="subtitle" id="welcomeName">請輸入資料</div>
+<div class="subtitle" id="welcomeName">緣起</div>
 
-<!-- 資料輸入區 -->
+<!-- 資料輸入區（初始顯示） -->
 <div class="panel" id="inputPanel">
-<h3>輸入您的資料</h3>
+<h3>請開示</h3>
+<p style="opacity:.8;margin-bottom:16px;font-size:14px;">填寫出生資訊，方可窺見命局端倪。</p>
 <input id="userName" type="text" placeholder="姓名"/>
 <input id="year" type="number" placeholder="西元年" />
 <input id="month" type="number" placeholder="月份" />
 <input id="day" type="number" placeholder="日期" />
 <select id="hourBranch">
-<option value="">選擇時辰</option>
+<option value="">選擇時辰（可略過）</option>
 <option value="子">子時 (23:00-01:00)</option>
 <option value="丑">丑時 (01:00-03:00)</option>
 <option value="寅">寅時 (03:00-05:00)</option>
@@ -63,16 +64,18 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(21
 <option value="酉">酉時 (17:00-19:00)</option>
 <option value="戌">戌時 (19:00-21:00)</option>
 <option value="亥">亥時 (21:00-23:00)</option>
+<option value="未知">未知（不確定出生時辰）</option>
 </select>
-<button class="btn" onclick="saveAndFetch()">開始分析</button>
+<button class="btn" onclick="saveAndFetch()">起盤</button>
 </div>
 
-<!-- AI 分析結果區 -->
+<!-- AI 分析結果區（初始隱藏） -->
 <div id="resultPanel" style="display:none;">
 <div class="result" id="aiResult">正在起盤...</div>
 </div>
 
-<div class="grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;">
+<!-- 功能區塊（初始隱藏） -->
+<div id="funcPanel" style="display:none;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;">
 <div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">📜</div><div class="label" style="font-size:13px;">八字命盤</div></div>
 <div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">✍️</div><div class="label" style="font-size:13px;">姓名分析</div></div>
 <div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">📊</div><div class="label" style="font-size:13px;">情緒曲線</div></div>
@@ -86,7 +89,7 @@ input,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(21
 <div class="modalMask" id="modalMask">
 <div class="modal">
 <div class="modalHead">
-<div class="modalTitle">AI 命理顧問</div>
+<div class="modalTitle">命理顧問</div>
 <button class="closeBtn" onclick="closeAI()">關閉</button>
 </div>
 <div class="chat" id="chat"></div>
@@ -112,12 +115,18 @@ async function saveAndFetch(){
   const day = Number(document.getElementById("day").value);
   const hourBranch = document.getElementById("hourBranch").value;
   
-  if(!name || !year || !month || !day || !hourBranch){
-    alert("請完整填寫");
+  if(!name || !year || !month || !day){
+    alert("請填寫姓名與出生年月日");
     return;
   }
   
-  PROFILE = { name, year, month, day, hourBranch };
+  // 如果選擇"未知"或空白，不傳時辰
+  const profile = { name, year, month, day };
+  if(hourBranch && hourBranch !== "未知"){
+    profile.hourBranch = hourBranch;
+  }
+  
+  PROFILE = profile;
   localStorage.setItem(LS_KEY, JSON.stringify(PROFILE));
   
   document.getElementById("inputPanel").style.display = "none";
@@ -136,6 +145,7 @@ async function fetchIntro(){
   
   document.getElementById("resultPanel").style.display = "block";
   document.getElementById("aiResult").innerText = "正在起盤...";
+  document.getElementById("funcPanel").style.display = "grid";
   
   try{
     const r = await fetch("/.netlify/functions/bazi_ai",{
@@ -162,7 +172,7 @@ function openAI(){
     return;
   }
   if(document.getElementById("chat").children.length === 0){
-    pushAI("我是 AI 命理顧問。直接問我任何問題。");
+    pushAI("我是命理顧問。請問。");
   }
 }
 function closeAI(){ document.getElementById("modalMask").style.display = "none"; }
