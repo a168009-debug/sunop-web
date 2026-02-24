@@ -49,14 +49,17 @@
 </select>
 <div class="hint">不知道出生時辰也可以先做「概略盤」分析；之後補時辰，結果會更精準。</div>
 <button class="btn" type="submit">開始分析</button>
-<button type="button" class="btn btn-ghost" onclick="clearData()">清除資料</button>
+<button type="button" class="btn btn-ghost" onclick="clearAll()">清除資料</button>
 <div class="fineprint">按下開始分析後，資料會先儲存在本機（localStorage），再進入探索中心。</div>
 </form>
 <div class="footerline">© MetaMind</div>
 </main>
 </div>
 <script>
-function clearData(){
+// Auto-clear localStorage on page load for index page
+localStorage.removeItem("metamind_profile");
+localStorage.removeItem("baziData");
+function clearAll(){
   localStorage.removeItem("metamind_profile");
   localStorage.removeItem("baziData");
   document.getElementById("baziForm").reset();
