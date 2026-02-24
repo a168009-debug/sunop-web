@@ -27,15 +27,15 @@ exports.handler = async (event) => {
     const y = Number(payload.year);
     const m = Number(payload.month);
     const d = Number(payload.day);
-    const hourBranch = payload.hourBranch;
+    const shichen = payload.shichen;
     
     if (!name || !y || !m || !d) return json(400, { ok: false, error: "Missing required fields" });
 
-    let hh = 12; // default
+    let hh = 12;
     let hasHour = false;
-    if (hourBranch && hourBranch !== "未知") {
+    if (shichen && shichen !== "不確定（可略過）" && shichen !== "") {
       const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
-      hh = hourMap[hourBranch] || 12;
+      hh = hourMap[shichen] || 12;
       hasHour = true;
     }
 
@@ -73,7 +73,7 @@ exports.handler = async (event) => {
 
     const bazi = {
       name,
-      solar: { y, m, d, hasHour, hourBranch },
+      solar: { y, m, d, hasHour, shichen },
       pillars: { year: yearPillar, month: monthPillar, day: dayPillar, time: timePillar },
       dayMaster: { gan: dayGan, zhi: dayZhi },
       tenGod: {
@@ -90,15 +90,26 @@ exports.handler = async (event) => {
       }
     };
 
-    const system = `你是一位老派但精準的命理師兼風水師，講話克制、深沉、像在點破天機。
-規則：
-1) 必須以「八字結構化數據」為依據，不能胡編具體事件。
-2) 不要指責當事人自私，不要情緒勒索，用"點到為止"的語氣。
-3) 輸出用繁體中文。
-4) 若無時辰資訊，需特別說明此限制，並基於年月，日三柱提供分析。
-5) 結構固定：①命局骨架 ②五行偏頗與用神傾向 ③人際/事業/財務/健康四項提醒（各2-3句）④一句"點醒"的斷語（短句）。`;
+    // 新的風格：像真人算命師
+    const system = `你是一位看過上萬命盤的命理師。你講話簡單直接，不講理論，不炫技。你用白話抓重點。你會從八字分析出性格與近期狀態，但輸出必須簡潔、有力、像真人。
 
-    const user = `以下是當事人的八字計算結果（結構化）：${JSON.stringify(bazi)}請按規則輸出。`;
+限制：
+• 不超過 300 字
+• 不列理論公式
+• 不解釋五行計算過程
+• 重點導向
+• 用「你」稱呼對方
+• 像朋友在說話，不是老師在教課
+
+輸出格式：
+【性格核心】3～4句話講重點，不超過120字
+【你現在卡的點】講目前可能狀態
+【一句命中】一句話直戳痛點
+【提醒】1～2個實際建議`;
+
+    const user = `以下是八字結構化資料：${JSON.stringify(bazi)}
+
+請用命理老師白話風格輸出，抓重點，不要理論。像真人在說話。`;
 
     const resp = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
