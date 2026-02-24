@@ -1,5 +1,4 @@
-const { Lunar, LunarUtil } = require("lunar");
-
+// 內建八字計算（不需要額外套件）
 const QUICK = { model: "gpt-4o-mini", max_tokens: 350, timeoutMs: 8000 };
 const DEEP = { model: "gpt-4o", max_tokens: 900, timeoutMs: 15000 };
 const corsHeaders = {
@@ -11,12 +10,10 @@ const corsHeaders = {
 function json(statusCode, obj) {
   return { statusCode, headers: corsHeaders, body: JSON.stringify(obj) };
 }
-
 function safeParse(body) {
   try { return JSON.parse(body || "{}"); }
   catch { return null; }
 }
-
 function normalizeProfile(body) {
   return {
     name: (body.name || "").toString().trim(),
@@ -26,7 +23,6 @@ function normalizeProfile(body) {
     hourBranch: (body.hourBranch || "").toString().trim(),
   };
 }
-
 function validateProfile(p) {
   if (!p.name) return "缺少 name";
   if (!p.year || !p.month || !p.day) return "缺少 year/month/day";
@@ -34,25 +30,46 @@ function validateProfile(p) {
   return null;
 }
 
+// 天干地支對照表
+const TIANGAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+const DIZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+const WUXING = { "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水", "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火", "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水" };
+
+// 計算天干序號（甲=0）
+function getTianganIndex(tg) { return TIANGAN.indexOf(tg); }
+// 計算地支序號（子=0）
+function getDizhiIndex(dz) { return DIZHI.indexOf(dz); }
+
 // 計算八字
 function calculateBazi(year, month, day, hourBranch) {
-  const hourMap = {
-    "子": 23, "丑": 1, "寅": 3, "卯": 5,
-    "辰": 7, "巳": 9, "午": 11, "未": 13,
-    "申": 15, "酉": 17, "戌": 19, "亥": 21
-  };
-  const hour = hourMap[hourBranch] || 12;
-  
   try {
-    const lunar = Lunar.fromYmdHms(year, month, day, hour, 0, 0);
-    const bazi = lunar.getBaZi();
-    const tiangan = bazi.getTianGan();
-    const dizhi = bazi.getDiZhi();
+    // 以農曆年為基礎計算（簡化版）
+    const yearGanIdx = (year - 4) % 10;
+    const yearZhiIdx = (year - 4) % 12;
     
-    const dayMaster = tiangan[0];
-    const dayStem = tiangan[1];
-    const dayZhi = dizhi[1];
+    // 月柱：年干 + 月份（起月公式）
+    const monthGanIdx = (yearGanIdx * 2 + month) % 10;
+    const monthZhiIdx = (month + 1) % 12;
     
+    // 日柱：使用蔡勒公式簡化計算
+    const y = year, m = month;
+    let d = day;
+    if (m < 3) { y--; m += 12; }
+    const c = Math.floor(y / 100);
+    const y_ = y % 100;
+    const d_ = Math.floor(c / 4) - 2 * c + y_ + Math.floor(y_ / 4) + Math.floor(13 * (m + 1) / 5) + d - 1;
+    const dayGanIdx = ((d_ % 10) + 10) % 10;
+    const dayZhiIdx = ((d_ % 12) + 12) % 12;
+    
+    // 時柱：日干 + 時辰
+    const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
+    const hour = hourMap[hourBranch] || 12;
+    const hourZhiIdx = Math.floor((hour + 1) / 2) % 12;
+    const hourGanIdx = (dayGanIdx * 2 + hourZhiIdx) % 10;
+    
+    const dayMaster = TIANGAN[dayGanIdx];
+    
+    // 十神計算
     const tenGodMap = {
       "甲": { "甲": "比肩", "乙": "劫財", "丙": "食神", "丁": "傷官", "戊": "偏財", "己": "正財", "庚": "七殺", "辛": "正官", "壬": "偏印", "癸": "正印" },
       "乙": { "甲": "劫財", "乙": "比肩", "丙": "傷官", "丁": "食神", "戊": "正財", "己": "偏財", "庚": "正官", "辛": "七殺", "壬": "正印", "癸": "偏印" },
@@ -65,28 +82,20 @@ function calculateBazi(year, month, day, hourBranch) {
       "壬": { "甲": "食神", "乙": "傷官", "丙": "偏財", "丁": "正財", "戊": "七殺", "己": "正官", "庚": "偏印", "辛": "正印", "壬": "比肩", "癸": "劫財" },
       "癸": { "甲": "傷官", "乙": "食神", "丙": "正財", "丁": "偏財", "戊": "正官", "己": "七殺", "庚": "正印", "辛": "偏印", "壬": "劫財", "癸": "比肩" }
     };
-    
     const getTenGod = (dayG, otherG) => tenGodMap[dayG]?.[otherG] || "";
     
-    const wuxingMap = {
-      "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
-      "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水"
-    };
-    
     return {
-      yearGan: tiangan[0], yearZhi: dizhi[0],
-      monthGan: tiangan[1], monthZhi: dizhi[1],
-      dayGan: dayStem, dayZhi: dayZhi,
-      hourGan: tiangan[2], hourZhi: dizhi[2],
+      yearGan: TIANGAN[yearGanIdx], yearZhi: DIZHI[yearZhiIdx],
+      monthGan: TIANGAN[monthGanIdx], monthZhi: DIZHI[monthZhiIdx],
+      dayGan: TIANGAN[dayGanIdx], dayZhi: DIZHI[dayZhiIdx],
+      hourGan: TIANGAN[hourGanIdx], hourZhi: DIZHI[hourZhiIdx],
       dayMaster: dayMaster,
-      yearWu: wuxingMap[tiangan[0]],
-      monthWu: wuxingMap[tiangan[1]],
-      dayWu: wuxingMap[dayStem],
-      hourWu: wuxingMap[tiangan[2]],
-      yearShi: getTenGod(dayMaster, tiangan[0]),
-      monthShi: getTenGod(dayMaster, tiangan[1]),
-      dayShi: getTenGod(dayMaster, dayStem),
-      hourShi: getTenGod(dayMaster, tiangan[2])
+      yearWu: WUXING[TIANGAN[yearGanIdx]], monthWu: WUXING[TIANGAN[monthGanIdx]],
+      dayWu: WUXING[TIANGAN[dayGanIdx]], hourWu: WUXING[TIANGAN[hourGanIdx]],
+      yearShi: getTenGod(dayMaster, TIANGAN[yearGanIdx]),
+      monthShi: getTenGod(dayMaster, TIANGAN[monthGanIdx]),
+      dayShi: getTenGod(dayMaster, TIANGAN[dayGanIdx]),
+      hourShi: getTenGod(dayMaster, TIANGAN[hourGanIdx])
     };
   } catch (e) {
     return null;
@@ -99,31 +108,16 @@ function buildSystemPrompt(mode) {
 語氣要求：
 - 高深莫測、內斂、含蓄
 - 帶有命理洞察，但不直白批評
-- 不要情緒分析師的口吻
-
 `;
   if (mode === "deep") {
-    return base + `
-深度模式：
-1. 一句引導式判語
-2. 體用分析
-3. 近半年運勢
-4. 宜注意之事
-5. 建議方向
-`;
+    return base + `\n深度模式：一句判語 → 體用分析 → 近半年運勢 → 宜注意之事 → 建議方向`;
   }
-  return base + `
-快速模式：
-1. 一句命理判語
-2. 日主特質與最近運勢
-3. 兩個建議方向
-`;
+  return base + `\n快速模式：一句判語 → 日主特質 → 兩個建議方向`;
 }
 
 function buildUserPrompt(profile, bazi, question) {
   const { name, year, month, day, hourBranch } = profile;
   const b = bazi || {};
-  
   const baziInfo = `
 八字資訊：
 - 年柱：${b.yearGan}${b.yearZhi}（${b.yearWu}，${b.yearShi}）
@@ -132,118 +126,48 @@ function buildUserPrompt(profile, bazi, question) {
 - 時柱：${b.hourGan}${b.hourZhi}（${b.hourWu}，${b.hourShi}）
 - 日主：${b.dayMaster}
 `;
-
   if (question === "__INTRO__") {
-    return `
-姓名：${name}
-出生：${year}-${month}-${day}（${hourBranch}時）
-
-${baziInfo}
-
-請用命理師口吻對他開口：
-1. 先給一句「點醒式」判語
-2. 根據八字結構點出他最近可能在糾結的方向
-3. 給一個建議方向
-`;
+    return `姓名：${name} 出生：${year}-${month}-${day}（${hourBranch}時）${baziInfo}請用命理師口吻：1.一句點醒判語 2.根據八字點出最近糾結方向 3.給一個建議`;
   }
-  return `
-姓名：${name}
-出生：${year}-${month}-${day}（${hourBranch}時）
-
-${baziInfo}
-
-問題：${question}
-
-請用含蓄的命理師口吻回答。
-`;
+  return `姓名：${name} 出生：${year}-${month}-${day}（${hourBranch}時）${baziInfo}問題：${question}請用含蓄命理師口吻回答`;
 }
 
-async function callOpenAI({ apiKey, model, max_tokens, timeoutMs, systemPrompt, userPrompt }) {
+async function callOpenAI(cfg, systemPrompt, userPrompt) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), cfg.timeoutMs);
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return { ok: false, error: "no api key" };
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "Authorization": "Bearer " + apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        max_tokens,
-        temperature: 0.8,
-      }),
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST", signal: controller.signal,
+      headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: cfg.model, messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }], max_tokens: cfg.max_tokens, temperature: 0.8 })
     });
-    const data = await response.json();
-    if (!response.ok) {
-      return { ok: false, error: data };
-    }
-    const text = data?.choices?.[0]?.message?.content?.trim() || "";
-    return { ok: true, text };
-  }
-  catch (e) {
-    return { ok: false, error: e.message };
-  }
+    const d = await r.json();
+    if (!r.ok) return { ok: false, error: d };
+    return { ok: true, text: d?.choices?.[0]?.message?.content?.trim() || "" };
+  } catch (e) { return { ok: false, error: e.message }; }
   finally { clearTimeout(timeout); }
 }
 
 function fallbackReply(profile, question) {
   const name = profile?.name || "閣下";
-  if (question === "__INTRO__") {
-    return {
-      text: "「緣起而聚，氣隨心轉。」" + name + "，你今日到此，必有惑。欲知前路，且道來。",
-      fallback: true
-    };
-  }
-  return {
-    text: "天機不可盡洩。你且說，最在意的是「財」還是「情」？",
-    fallback: true
-  };
+  return { text: question === "__INTRO__" ? "「緣起而聚，氣隨心轉。」" + name + "，你今日到此，必有惑。" : "天機不可盡洩。你且說，最在意的是「財」還是「情」？" };
 }
 
 exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") {
-    return json(200, { ok: true });
-  }
-  if (event.httpMethod !== "POST") {
-    return json(405, { error: "Method Not Allowed" });
-  }
+  if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
+  if (event.httpMethod !== "POST") return json(405, { error: "Method Not Allowed" });
   const body = safeParse(event.body);
-  if (!body) {
-    return json(400, { error: "JSON 解析失敗" });
-  }
+  if (!body) return json(400, { error: "JSON 解析失敗" });
   const profile = normalizeProfile(body);
   const err = validateProfile(profile);
-  if (err) {
-    return json(400, { error: err });
-  }
+  if (err) return json(400, { error: err });
   const mode = body.mode === "deep" ? "deep" : "quick";
   const question = (body.question || "__INTRO__").toString().trim();
-  
   const bazi = calculateBazi(profile.year, profile.month, profile.day, profile.hourBranch);
-  
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    const fb = fallbackReply(profile, question);
-    return json(200, { ok: true, mode, reply: fb, fallback: true });
-  }
   const cfg = mode === "deep" ? DEEP : QUICK;
-  const result = await callOpenAI({
-    apiKey,
-    model: cfg.model,
-    max_tokens: cfg.max_tokens,
-    timeoutMs: cfg.timeoutMs,
-    systemPrompt: buildSystemPrompt(mode),
-    userPrompt: buildUserPrompt(profile, bazi, question),
-  });
-  if (!result.ok || !result.text) {
-    const fb = fallbackReply(profile, question);
-    return json(200, { ok: true, mode, reply: fb, fallback: true });
-  }
+  const result = await callOpenAI(cfg, buildSystemPrompt(mode), buildUserPrompt(profile, bazi, question));
+  if (!result.ok || !result.text) return json(200, { ok: true, mode, reply: fallbackReply(profile, question), fallback: true });
   return json(200, { ok: true, mode, reply: { text: result.text }, bazi });
 };
