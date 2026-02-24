@@ -1,6 +1,6 @@
 [build]
   command = ""
-  publish = "index.html"
+  publish = "."
 
 [functions]
   directory = "netlify/functions"
