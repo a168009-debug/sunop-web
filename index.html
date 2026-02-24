@@ -296,15 +296,20 @@ var CONTEXTS = {
 };
 
 function setContext(ctx) { currentContext = ctx; }
+// 首頁載入時隱藏 AI 按鈕
+window.addEventListener('DOMContentLoaded', function() {
+  var aiBtn = document.getElementById('askAiBtn');
+  if(aiBtn) aiBtn.style.display = 'none';
+});
+
 function showPage(id) { 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
   document.getElementById(id).classList.add('active'); 
-  // 控制問AI按鈕顯示
   var aiBtn = document.getElementById('askAiBtn');
   if (id === 'homePage') {
-    aiBtn.style.display = 'none';
+    if(aiBtn) aiBtn.style.display = 'none';
   } else {
-    aiBtn.style.display = 'flex';
+    if(aiBtn) aiBtn.style.display = 'flex';
   }
 }
 function goHome() { loadUserData(); showPage('homePage'); }
@@ -319,14 +324,13 @@ function startAnalysis() {
   if (!name || !year || !month || !day) { alert('請完整填寫！'); return; }
   window.userData = { name, year, month, day, hour };
   localStorage.setItem('metamind_user', JSON.stringify(window.userData));
-  document.getElementById('welcomeMsg').innerText = '歡迎 · ' + name;
-  calculateBazi();
-  analyzeName();
-  initMoodChart();
-  renderSoulPortrait('water');
-  initOracleCard();
-  initZiGrid();
-  showPage('menuPage');
+  
+  // 儲存給 explore.html 使用的資料
+  var baziInput = { name: name, year: Number(year), month: Number(month), day: Number(day), hourBranch: hour };
+  localStorage.setItem('bazi_input', JSON.stringify(baziInput));
+  
+  // 跳轉到探索頁面
+  window.location.href = 'explore.html';
 }
 
 function calculateBazi() {
