@@ -2,41 +2,38 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MetaMind｜輸入資料</title>
-<link rel="stylesheet" href="./styles.css" />
+<link rel="stylesheet" href="./assets/style.css" />
 </head>
 <body>
-<main class="page">
-<header class="top">
+<div class="page">
+<header class="hero">
 <div class="brand">MetaMind</div>
 <div class="subtitle">請輸入資料</div>
 </header>
-<section class="card">
-<h1 class="h1">輸入您的資料</h1>
-<form id="profileForm" class="form">
-<label class="field">
-<span>姓名</span>
-<input id="name" type="text" placeholder="例如：莊曜瑋" autocomplete="name" required />
-</label>
-<div class="row">
-<label class="field">
-<span>西元年</span>
-<input id="year" type="number" inputmode="numeric" placeholder="1987" min="1900" max="2100" required />
-</label>
-<label class="field">
-<span>月份</span>
-<input id="month" type="number" inputmode="numeric" placeholder="10" min="1" max="12" required />
-</label>
-<label class="field">
-<span>日期</span>
-<input id="day" type="number" inputmode="numeric" placeholder="14" min="1" max="31" required />
-</label>
+<main class="card">
+<h1 class="card-title">輸入您的資料</h1>
+<form id="baziForm" class="form">
+<label class="label">姓名</label>
+<input class="input" id="name" name="name" placeholder="例如：莊曜瑋" autocomplete="name" />
+<div class="grid3">
+<div>
+<label class="label">西元年</label>
+<input class="input" id="year" name="year" inputmode="numeric" placeholder="1987" />
 </div>
-<label class="field">
-<span>時辰</span>
-<select id="shichen">
-<option value="">不確定（可略過）</option>
+<div>
+<label class="label">月份</label>
+<input class="input" id="month" name="month" inputmode="numeric" placeholder="10" />
+</div>
+<div>
+<label class="label">日期</label>
+<input class="input" id="day" name="day" inputmode="numeric" placeholder="14" />
+</div>
+</div>
+<label class="label">時辰</label>
+<select class="select" id="hourBranch" name="hourBranch">
+<option value="">不確定 / 未知（先做概略盤）</option>
 <option value="子">子時（23:00–01:00）</option>
 <option value="丑">丑時（01:00–03:00）</option>
 <option value="寅">寅時（03:00–05:00）</option>
@@ -50,14 +47,13 @@
 <option value="戌">戌時（19:00–21:00）</option>
 <option value="亥">亥時（21:00–23:00）</option>
 </select>
-<small class="hint">不知道出生時辰也可以先做「概略盤」分析。</small>
-</label>
+<div class="hint">不知道出生時辰也可以先做「概略盤」分析；之後補時辰，結果會更精準。</div>
 <button class="btn" type="submit">開始分析</button>
-<p class="muted" id="msg"></p>
+<div class="fineprint">按下開始分析後，資料會先儲存在本機（localStorage），再進入探索中心。</div>
 </form>
-</section>
-<footer class="foot">© MetaMind</footer>
+<div class="footerline">© MetaMind</div>
 </main>
-<script src="./app.js"></script>
+</div>
+<script src="./assets/app.js"></script>
 </body>
 </html>
