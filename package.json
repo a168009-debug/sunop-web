@@ -1,7 +1,0 @@
-{
-  "name": "metamind",
-  "version": "1.0.0",
-  "dependencies": {
-    "lunar": "^3.3.0"
-  }
-}
