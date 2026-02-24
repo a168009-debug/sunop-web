@@ -52,21 +52,24 @@ function showToast(message){
 }
 
 async function copyToClipboard(text){
-  if(navigator.clipboard && window.isSecureContext){
-    await navigator.clipboard.writeText(text);
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
     return true;
+  }catch(e){
+    return false;
   }
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  ta.setAttribute("readonly", "");
-  ta.style.position = "fixed";
-  ta.style.left = "-9999px";
-  document.body.appendChild(ta);
-  ta.select();
-  const ok = document.execCommand("copy");
-  document.body.removeChild(ta);
-  if(!ok) throw new Error("copy failed");
-  return true;
 }
 
 async function shareAnswer(){
@@ -81,16 +84,10 @@ async function shareAnswer(){
     try{
       await navigator.share({text: shareText});
       return;
-    }catch(err){
-      // Fall through to clipboard
-    }
+    }catch(err){}
   }
-  try{
-    await copyToClipboard(shareText);
-    showToast("已複製到剪貼簿！");
-  }catch(err){
-    showToast("複製失敗，請手動長按複製");
-  }
+  const ok = await copyToClipboard(shareText);
+  showToast(ok ? "已複製到剪貼簿！" : "複製失敗");
 }
 window.shareAnswer = shareAnswer;
 
@@ -175,75 +172,93 @@ function initHistoryUI(){
   if(shareBtn) shareBtn.addEventListener("click", shareAnswer);
 }
 
-// ========== Daily Luck ==========
+// ========== Daily Luck - Safe Version ==========
 function calculateDailyLuck(profile){
-  if(!profile || !profile.year || !profile.month || !profile.day) return null;
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayTs = today.getTime();
   try{
-    const cached = JSON.parse(localStorage.getItem("metamind_daily"));
-    if(cached && cached.profileTs === profile.ts && cached.date === todayTs) return cached;
-  }catch(e){}
-  const y=parseInt(profile.year), m=parseInt(profile.month), d=parseInt(profile.day);
-  let h = 12;
-  const hbMap = {子:23, 丑:1, 寅:3, 卯:5, 辰:7, 巳:9, 午:11, 未:13, 申:15, 酉:17, 戌:19, 亥:21};
-  h = hbMap[profile.hourBranch] || 12;
-  let solar, lunar;
-  try{
-    solar = Solar.fromYmdHms(y, m, d, h, 0, 0);
-    lunar = solar.getLunar();
-  }catch(e){ return null; }
-  const dayGan = lunar.getDayGan();
-  const dayZhi = lunar.getDayZhi();
-  const ganColors = {甲:"青/綠", 乙:"青/綠", 丙:"紅/紫", 丁:"紅/紫", 戊:"黃/咖", 己:"黃/咖", 庚:"白/金", 辛:"白/金", 壬:"黑/藍", 癸:"黑/藍"};
-  const zhiNums = {子:1, 丑:2, 寅:3, 卯:4, 辰:5, 巳:6, 午:7, 未:8, 申:9, 酉:10, 戌:11, 亥:12};
-  const zhiDirs = {子:"北", 丑:"東北", 寅:"東北", 卯:"東", 辰:"東南", 巳:"東南", 午:"南", 未:"西南", 申:"西南", 酉:"西", 戌:"西北", 亥:"西北"};
-  const ganStrength = {甲:4, 乙:3, 丙:5, 丁:4, 戊:4, 己:3, 庚:5, 辛:4, 壬:4, 癸:3};
-  const aspects = {
-    甲:{love:"戀愛運不錯，身邊有貴人", career:"事業有衝勁，適合主動出擊", health:"肝火旺，多喝水休息"},
-    乙:{love:"感情細膩，適合慢火燉煮", career:"彈性好，貴人暗中幫忙", health:"注意腸胃消化"},
-    丙:{love:"魅力全開，桃花朵朵", career:"事業火紅，聲勢上漲", health:"小心火氣，多吃蔬果"},
-    丁:{love:"溫柔體貼，異性緣佳", career:"頭腦清晰，談判順利", health:"注意心血管"},
-    戊:{love:"穩定發展，適合長期關係", career:"財運亨通，地盤穩固", health:"注意脾胃"},
-    己:{love:"務實平凡才是真", career:"按部就班，積少成多", health:"少熬夜"},
-    庚:{love:"果斷出擊，別猶豫", career:"大刀闊斧，業務強勁", health:"注意呼吸系統"},
-    辛:{love:"有魅力但別太計較", career:"精打細算，事業上升", health:"肺部呼吸"},
-    壬:{love:"智慧取勝，理性看感情", career:"靈活變通，財源廣進", health:"多喝水"},
-    癸:{love:"柔情似水，適合培育", career:"耐力驚人，後勁強", health:"注意腎臟"}
-  };
-  const result = {
-    date: todayTs, profileTs: profile.ts,
-    stars: ganStrength[dayGan]||3,
-    love: aspects[dayGan]?.love||"",
-    career: aspects[dayGan]?.career||"",
-    health: aspects[dayGan]?.health||"",
-    luckyColor: ganColors[dayGan]||"白",
-    luckyNum: zhiNums[dayZhi]||1,
-    luckyDir: zhiDirs[dayZhi]||"北",
-    updatedAt: new Date().toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"})
-  };
-  localStorage.setItem("metamind_daily", JSON.stringify(result));
-  return result;
+    if(!profile || !profile.year || !profile.month || !profile.day) return null;
+    if(typeof Solar === "undefined") return null;
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayTs = today.getTime();
+    
+    try{
+      const cached = JSON.parse(localStorage.getItem("metamind_daily"));
+      if(cached && cached.profileTs === profile.ts && cached.date === todayTs) return cached;
+    }catch(e){}
+    
+    const y=parseInt(profile.year), m=parseInt(profile.month), d=parseInt(profile.day);
+    let h = 12;
+    const hbMap = {子:23, 丑:1, 寅:3, 卯:5, 辰:7, 巳:9, 午:11, 未:13, 申:15, 酉:17, 戌:19, 亥:21};
+    h = hbMap[profile.hourBranch] || 12;
+    
+    let solar = Solar.fromYmdHms(y, m, d, h, 0, 0);
+    let lunar = solar.getLunar();
+    
+    const dayGan = lunar.getDayGan();
+    const dayZhi = lunar.getDayZhi();
+    const ganColors = {甲:"青/綠", 乙:"青/綠", 丙:"紅/紫", 丁:"紅/紫", 戊:"黃/咖", 己:"黃/咖", 庚:"白/金", 辛:"白/金", 壬:"黑/藍", 癸:"黑/藍"};
+    const zhiNums = {子:1, 丑:2, 寅:3, 卯:4, 辰:5, 巳:6, 午:7, 未:8, 申:9, 酉:10, 戌:11, 亥:12};
+    const zhiDirs = {子:"北", 丑:"東北", 寅:"東北", 卯:"東", 辰:"東南", 巳:"東南", 午:"南", 未:"西南", 申:"西南", 酉:"西", 戌:"西北", 亥:"西北"};
+    const ganStrength = {甲:4, 乙:3, 丙:5, 丁:4, 戊:4, 己:3, 庚:5, 辛:4, 壬:4, 癸:3};
+    const aspects = {
+      甲:{love:"戀愛運不錯", career:"事業有衝勁", health:"多喝水"},
+      乙:{love:"感情細膩", career:"貴人幫忙", health:"注意腸胃"},
+      丙:{love:"桃花朵朵", career:"聲勢上漲", health:"小心火氣"},
+      丁:{love:"異性緣佳", career:"談判順利", health:"心血管"},
+      戊:{love:"穩定發展", career:"財運亨通", health:"脾胃"},
+      己:{love:"務實", career:"積少成多", health:"少熬夜"},
+      庚:{love:"果斷出擊", career:"業務強勁", health:"呼吸系統"},
+      辛:{love:"有魅力", career:"事業上升", health:"肺部"},
+      壬:{love:"理性", career:"財源廣進", health:"多喝水"},
+      癸:{love:"柔情", career:"後勁強", health:"腎臟"}
+    };
+    
+    const result = {
+      date: todayTs, profileTs: profile.ts,
+      stars: ganStrength[dayGan]||3,
+      love: aspects[dayGan]?.love||"",
+      career: aspects[dayGan]?.career||"",
+      health: aspects[dayGan]?.health||"",
+      luckyColor: ganColors[dayGan]||"白",
+      luckyNum: zhiNums[dayZhi]||1,
+      luckyDir: zhiDirs[dayZhi]||"北",
+      updatedAt: new Date().toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"})
+    };
+    localStorage.setItem("metamind_daily", JSON.stringify(result));
+    return result;
+  }catch(e){
+    console.log("Daily luck error:", e);
+    return null;
+  }
 }
 
 function renderDailyLuck(data){
   const el = $("dailyLuck");
   if(!el || !data) return;
-  el.style.display = "block";
-  el.querySelector(".daily-time").textContent = "更新於 " + data.updatedAt;
-  el.querySelector(".luck-stars").innerHTML = "整體運勢 " + "★".repeat(data.stars) + "☆".repeat(5-data.stars);
-  el.querySelector(".luck-aspects").innerHTML = "<div>💕 愛情："+data.love+"</div><div>💼 事業："+data.career+"</div><div>🏥 健康："+data.health+"</div>";
-  el.querySelector(".luck-tags").innerHTML = '<span class="tag">幸運色 '+data.luckyColor+'</span><span class="tag">幸運數 '+data.luckyNum+'</span><span class="tag">幸運方 '+data.luckyDir+'</span>';
+  try{
+    el.style.display = "block";
+    const timeEl = el.querySelector(".daily-time");
+    const starsEl = el.querySelector(".luck-stars");
+    const aspectsEl = el.querySelector(".luck-aspects");
+    const tagsEl = el.querySelector(".luck-tags");
+    if(timeEl) timeEl.textContent = "更新於 " + data.updatedAt;
+    if(starsEl) starsEl.innerHTML = "整體運勢 " + "★".repeat(data.stars) + "☆".repeat(5-data.stars);
+    if(aspectsEl) aspectsEl.innerHTML = "<div>💕 愛情："+data.love+"</div><div>💼 事業："+data.career+"</div><div>🏥 健康："+data.health+"</div>";
+    if(tagsEl) tagsEl.innerHTML = '<span class="tag">幸運色 '+data.luckyColor+'</span><span class="tag">幸運數 '+data.luckyNum+'</span><span class="tag">幸運方 '+data.luckyDir+'</span>';
+  }catch(e){}
 }
 
-(function initDailyLuck(){
-  const profile = loadProfile();
-  if(profile){
-    const data = calculateDailyLuck(profile);
-    if(data) renderDailyLuck(data);
-  }
-})();
+// Init daily luck after page loads
+setTimeout(function(){
+  try{
+    const profile = loadProfile();
+    if(profile){
+      const data = calculateDailyLuck(profile);
+      if(data) renderDailyLuck(data);
+    }
+  }catch(e){}
+}, 100);
 
 // ========== Main Page ==========
 const form = $("baziForm");
@@ -350,8 +365,12 @@ if(askBtn){
 async function generateQuickReading(profile){
   if(!quickReading) return;
   quickReading.textContent = "師傅看盤中…";
-  const text = await callBaziFunction(profile, "先用『師傅口吻』給我一段 6 行內的總評：1句開場+3個重點+1句一針見血+1句建議。要人話、不要長篇術語。");
-  quickReading.textContent = pickText(text);
+  try{
+    const text = await callBaziFunction(profile, "先用『師傅口吻』給我一段 6 行內的總評：1句開場+3個重點+1句一針見血+1句建議。要人話、不要長篇術語。");
+    quickReading.textContent = pickText(text);
+  }catch(e){
+    quickReading.textContent = "（目前無法生成）";
+  }
 }
 
 async function callBaziFunction(profile, userQuestion){
