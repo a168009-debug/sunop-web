@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetaMind 智慧命理 - Updated 20260224</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Noto Sans TC', sans-serif; }
+body { background: linear-gradient(180deg, #1a1a2e, #2d2d4a); min-height: 100vh; padding: 20px; }
+.container { width: 100%; max-width: 420px; margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; }
+.page { display: none; padding: 24px; min-height: 500px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h1 { color: #1a1a2e; font-size: 24px; text-align: center; margin-bottom: 20px; }
+h2 { font-size: 18px; color: #2d2d4a; margin-bottom: 15px; }
+.welcome-text { color: #6c5ce7; font-size: 16px; font-weight: 500; margin-bottom: 20px; }
+.form-group { margin-bottom: 12px; }
+label { display: block; font-size: 13px; color: #666; margin-bottom: 4px; margin-left: 4px; }
+input, select { width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; outline: none; }
+input:focus, select:focus { border-color: #6c5ce7; }
+.btn-primary { width: 100%; background-color: #6c5ce7; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary { background: #f8f9ff; border: 2px solid #6c5ce7; color: #6c5ce7; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.menu-item { background: #f8f9ff; border: 2px solid #eee; border-radius: 14px; padding: 16px 8px; text-align: center; cursor: pointer; transition: all 0.3s; }
+.menu-item:hover { border-color: #6c5ce7; background: #f0edff; transform: translateY(-2px); }
+.menu-item .icon { font-size: 28px; margin-bottom: 6px; }
+.menu-item span { font-weight: 500; color: #2d2d4a; font-size: 14px; }
+/* 命理分析結果 */
+.bazi-result { background: #f8f9ff; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.bazi-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+.bazi-item:last-child { border-bottom: none; }
+.bazi-label { color: #666; }
+.bazi-value { color: #6c5ce7; font-weight: 700; }
+.health-tip { background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 14px; }
+/* 情緒圖表 */
+#chart-container { background: white; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+.mood-buttons { display: flex; justify-content: space-around; margin-top: 10px; }
+.mood-btn { font-size: 24px; padding: 8px 12px; cursor: pointer; background: #f8f9ff; border: 2px solid #eee; border-radius: 8px; }
+.mood-btn:hover { border-color: #6c5ce7; }
+/* AI畫像 */
+.soul-canvas { position: relative; width: 100%; height: 200px; border-radius: 16px; background: #1a1a2e; overflow: hidden; margin-bottom: 15px; }
+.soul-orb { position: absolute; border-radius: 999px; mix-blend-mode: screen; animation: soul-float var(--dur, 16s) ease-in-out infinite; }
+@keyframes soul-float { 0%{ transform: translate3d(0, 0, 0); } 50%{ transform: translate3d(var(--dx, 20px), var(--dy, -14px), 0); } 100%{ transform: translate3d(0, 0, 0); } }
+.soul-vignette { pointer-events: none; position: absolute; inset: 0; border-radius: 16px; background: radial-gradient(120% 100% at 50% 40%, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.25) 75%); }
+/* 智慧卡 */
+.card-wrap{ width: 100%; margin: 0 auto 15px; }
+.oracle-card{ width: 100%; height: 180px; padding: 0; border: 0; background: transparent; cursor: pointer; border-radius: 16px; outline: none; user-select: none; transition: transform 140ms ease; }
+.oracle-card:active{ transform: scale(1.02); }
+.card-inner{ width: 100%; height: 100%; position: relative; border-radius: 16px; background: #ffffff; box-shadow: 0 10px 24px rgba(0,0,0,0.14); overflow: hidden; transform-style: preserve-3d; transition: transform 600ms cubic-bezier(.2,.8,.2,1); }
+.oracle-card.is-flipped .card-inner{ transform: rotateY(180deg); }
+.card-face{ position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; padding: 18px; backface-visibility: hidden; }
+.card-front{ background: radial-gradient(120% 120% at 30% 20%, rgba(116,185,255,.25), rgba(255,255,255,1) 60%); }
+.front-title{ font-size: 20px; font-weight: 800; }
+.front-sub{ margin-top: 8px; font-size: 13px; opacity: .75; }
+.card-back{ transform: rotateY(180deg); background: radial-gradient(130% 130% at 50% 10%, rgba(255,118,117,.18), rgba(255,255,255,1) 60%); }
+.back-title{ font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+.back-msg{ font-size: 14px; line-height: 1.55; color: #374151; }
+.back-hint{ margin-top: 14px; font-size: 12px; opacity: .65; }
+/* 測字 */
+.zi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+.zi-btn { aspect-ratio: 1; font-size: 24px; background: white; border: 2px solid #e0d9ff; border-radius: 10px; cursor: pointer; }
+.zi-btn:hover { border-color: #6c5ce7; transform: translateY(-2px); }
+.zi-input-area { text-align: center; margin-bottom: 15px; }
+.zi-input-area input { width: 100px; padding: 8px; border: 2px solid #d1c4ff; border-radius: 8px; }
+.zi-input-area button { padding: 8px 16px; background: #6c5ce7; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 8px; }
+.zi-result { background: white; border-left: 4px solid #6c5ce7; border-radius: 10px; padding: 14px; display: none; }
+.zi-result.show { display: block; }
+.zi-result .element { color: #e17055; font-weight: bold; }
+/* 姓名分析 */
+.name-result { background: #f8f9ff; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+.name-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+.name-item:last-child { border-bottom: none; }
+.name-label { color: #666; }
+.name-value { color: #6c5ce7; font-weight: 700; }
+.name-advice { background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+<!-- 首頁 -->
+<div id="homePage" class="page active">
+<h1>✨ MetaMind 智慧命理 - Updated 20260224 ✨</h1>
+<div class="form-group"><label>您的名字</label><input type="text" id="userName" placeholder="請輸入名字"></div>
+<div class="form-group"><label>西元年</label><input type="number" id="year" placeholder="1995"></div>
+<div class="form-group"><label>月份</label><input type="number" id="month" placeholder="1" min="1" max="12"></div>
+<div class="form-group"><label>日期</label><input type="number" id="day" placeholder="1" min="1" max="31"></div>
+<div class="form-group"><label>出生時辰</label><select id="hour"><option value="子">子時 (23:00-01:00)</option><option value="丑">丑時 (01:00-03:00)</option><option value="寅">寅時 (03:00-05:00)</option><option value="卯">卯時 (05:00-07:00)</option><option value="辰">辰時 (07:00-09:00)</option><option value="巳">巳時 (09:00-11:00)</option><option value="午">午時 (11:00-13:00)</option><option value="未">未時 (13:00-15:00)</option><option value="申">申時 (15:00-17:00)</option><option value="酉">酉時 (17:00-19:00)</option><option value="戌">戌時 (19:00-21:00)</option><option value="亥">亥時 (21:00-23:00)</option></select></div>
+<button class="btn-primary" onclick="startAnalysis()">開始分析</button>
+</div>
+
+<!-- 選單頁 -->
+<div id="menuPage" class="page">
+<h1>探索中心</h1>
+<div class="welcome-text" id="welcomeMsg">歡迎</div>
+<div class="menu-grid">
+<div class="menu-item" onclick="showPage('baziPage')"><div class="icon">🧭</div><span>命理分析</span></div>
+<div class="menu-item" onclick="showPage('namePage')"><div class="icon">✍️</div><span>姓名分析</span></div>
+<div class="menu-item" onclick="showPage('moodPage')"><div class="icon">📊</div><span>情緒曲線</span></div>
+<div class="menu-item" onclick="showPage('artPage')"><div class="icon">🎨</div><span>AI畫像</span></div>
+<div class="menu-item" onclick="showPage('cardPage')"><div class="icon">🎴</div><span>智慧卡</span></div>
+<div class="menu-item" onclick="showPage('ziPage')"><div class="icon">🖊️</div><span>測字</span></div>
+</div>
+<button class="btn-primary" style="margin-top:20px;background:#999" onclick="showPage('homePage')">重新輸入</button>
+<button class="btn-secondary" style="margin-top:10px;width:100%" onclick="speak('歡迎使用MetaMind智慧命理，請選擇您想要的功能。')">🔊 語音導航</button>
+</div>
+
+<!-- 命理分析頁 -->
+<div id="baziPage" class="page">
+<h2>🧭 命理分析</h2>
+<div id="baziResult"></div>
+<button class="btn-secondary" onclick="speak(document.getElementById('baziResult').innerText)">🔊 朗讀</button>
+<button class="btn-secondary" style="margin-left:10px" onclick="showPage('menuPage')">返回</button>
+</div>
+
+<!-- 姓名分析頁 -->
+<div id="namePage" class="page">
+<h2>✍️ 姓名分析</h2>
+<div id="nameResult"></div>
+<button class="btn-secondary" onclick="speak(document.getElementById('nameResult').innerText)">🔊 朗讀</button>
+<button class="btn-secondary" style="margin-left:10px" onclick="showPage('menuPage')">返回</button>
+</div>
+
+<!-- 情緒曲線頁 -->
+<div id="moodPage" class="page">
+<h2>📊 情緒曲線</h2>
+<div id="chart-container"><canvas id="moodChart"></canvas></div>
+<div class="mood-buttons">
+<button class="mood-btn" data-mood="5">😊</button>
+<button class="mood-btn" data-mood="4">🙂</button>
+<button class="mood-btn" data-mood="3">😐</button>
+<button class="mood-btn" data-mood="2">😟</button>
+<button class="mood-btn" data-mood="1">😫</button>
+</div>
+<button class="btn-secondary" style="margin-top:15px" onclick="showPage('menuPage')">返回</button>
+</div>
+
+<!-- AI畫像頁 -->
+<div id="artPage" class="page">
+<h2>🎨 AI 靈魂畫像</h2>
+<div id="soulCanvas" class="soul-canvas"></div>
+<div id="artInfo" style="text-align:center;margin-bottom:15px"></div>
+<button class="btn-secondary" onclick="showPage('menuPage')">返回</button>
+</div>
+
+<!-- 智慧卡頁 -->
+<div id="cardPage" class="page">
+<h2>🎴 智慧卡</h2>
+<div class="card-wrap">
+<button id="oracleCard" class="oracle-card" type="button">
+<div class="card-inner">
+<div class="card-face card-front">
+<div class="front-title">點我抽一張</div>
+<div class="front-sub">（翻開看今日訊息）</div>
+</div>
+<div class="card-face card-back">
+<div class="back-title" id="cardTitle"></div>
+<div class="back-msg" id="cardMsg"></div>
+<div class="back-hint">再點一次可重抽</div>
+</div>
+</div>
+</button>
+</div>
+<button class="btn-secondary" style="margin-top:15px" onclick="showPage('menuPage')">返回</button>
+</div>
+
+<!-- 測字頁 -->
+<div id="ziPage" class="page">
+<h2>🖊️ 測字</h2>
+<div class="zi-grid" id="ziGrid"></div>
+<div class="zi-input-area">
+<input type="text" id="ziInput" maxlength="1" placeholder="輸入字">
+<button onclick="showZiResult()">解讀</button>
+</div>
+<div class="zi-result" id="ziResult"></div>
+<button class="btn-secondary" style="margin-top:15px" onclick="showPage('menuPage')">返回</button>
+</div>
+</div>
+
+<script>
+// ===== 頁面切換 =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function startAnalysis() {
+  var name = document.getElementById('userName').value.trim();
+  var year = document.getElementById('year').value;
+  var month = document.getElementById('month').value;
+  var day = document.getElementById('day').value;
+  var hour = document.getElementById('hour').value;
+  
+  if (!name || !year || !month || !day) {
+    alert('請完整填寫名字及出生年月日！');
+    return;
+  }
+  
+  window.userData = { name: name, year: year, month: month, day: day, hour: hour };
+  document.getElementById('welcomeMsg').innerText = '歡迎，' + name;
+  
+  // 初始化所有功能
+  calculateBazi();
+  analyzeName();
+  initMoodChart();
+  renderSoulPortrait('water');
+  initOracleCard();
+  initZiGrid();
+  
+  showPage('menuPage');
+}
+
+// ===== 語音朗讀 =====
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-TW';
+  utter.rate = 0.9;
+  speechSynthesis.speak(utter);
+}
+
+// ===== 八字計算 =====
+function calculateBazi() {
+  var year = parseInt(window.userData.year);
+  var month = parseInt(window.userData.month);
+  var day = parseInt(window.userData.day);
+  var hour = window.userData.hour;
+  
+  var 天干表 = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+  var 地支表 = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+  var 地支五行 = { "子":"水", "亥":"水", "寅":"木", "卯":"木", "巳":"火", "午":"火", "申":"金", "酉":"金", "丑":"土", "辰":"土", "未":"土", "戌":"土" };
+  var 五行健康 = { "火":"脾氣火爆，注意心臟健康", "水":"容易焦慮，注意腎功能", "木":"肝火旺盛，注意肝臟", "金":"呼吸系統弱，注意肺部", "土":"消化系統弱，注意腸胃" };
+  
+  var 年柱 = 天干表[(year - 4) % 10] + 地支表[(year - 4) % 12];
+  var 年干索引 = 天干表.indexOf(年柱[0]);
+  var 起始索引 = [2,4,6,8,0][Math.floor(年干索引/2)] || 0;
+  var 月干 = 天干表[(起始索引 + month - 1) % 10];
+  var 月地支 = ["寅","卯","辰","巳","午","未","申","酉","戌","亥","子","丑"][month-1];
+  var 月柱 = 月干 + 月地支;
+  
+  var 基準日 = new Date(1900, 2, 1);
+  var 輸入日 = new Date(year, month-1, day);
+  var 天數差 = Math.floor((輸入日 - 基準日) / (1000*60*60*24));
+  var 日柱 = 天干表[(天數差 % 10 + 10) % 10] + 地支表[(天數差 % 12 + 12) % 12];
+  
+  var 日干索引 = 天干表.indexOf(日柱[0]);
+  var 時干起始 = [0,2,4,6,8][Math.floor(日干索引/2)] || 0;
+  var 時支索引 = 地支表.indexOf(hour);
+  var 時柱 = 天干表[(時干起始 + 時支索引) % 10] + hour;
+  
+  var 日五行 = 地支五行[日柱[1]];
+  
+  var html = '<div class="bazi-result">';
+  html += '<div class="bazi-item"><span class="bazi-label">年柱</span><span class="bazi-value">' + 年柱 + '</span></div>';
+  html += '<div class="bazi-item"><span class="bazi-label">月柱</span><span class="bazi-value">' + 月柱 + '</span></div>';
+  html += '<div class="bazi-item"><span class="bazi-label">日柱</span><span class="bazi-value">' + 日柱 + '</span></div>';
+  html += '<div class="bazi-item"><span class="bazi-label">時柱</span><span class="bazi-value">' + 時柱 + '</span></div>';
+  html += '</div>';
+  html += '<div class="health-tip"><strong>望診提醒：</strong>' + 五行健康[日五行] + '</div>';
+  
+  document.getElementById('baziResult').innerHTML = html;
+  
+  // 更新AI畫像
+  setTimeout(function() {
+    var wuxingMap = { "木":"wood", "火":"fire", "土":"earth", "金":"metal", "水":"water" };
+    renderSoulPortrait(wuxingMap[日五行] || 'water');
+  }, 100);
+}
+
+// ===== 姓名分析 =====
+function analyzeName() {
+  var name = window.userData.name;
+  var HEAVENLY_STEMS = ["", "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+  var STEM_TO_ELEMENT = { "甲":"木", "乙":"木", "丙":"火", "丁":"火", "戊":"土", "己":"土", "庚":"金", "辛":"金", "壬":"水", "癸":"水" };
+  var ELEMENT_ADVICE = {
+    "木": "木主生發：適合啟動新計畫、學習成長。建議多接觸自然綠意、規律運動。",
+    "火": "火主熱情：適合曝光、表達與行動。建議保持專注、避免衝動。",
+    "土": "土主穩定：適合整理、建立制度與累積。建議先把基礎打好。",
+    "金": "金主決斷：適合斷捨離、訂規則。建議聚焦核心、減少雜訊。",
+    "水": "水主流動：適合交流、人脈與調整策略。建議多蒐集資訊、保持彈性。"
+  };
+  
+  // 取第一個字
+  var firstChar = name.charAt(0);
+  // 簡易筆畫估算（用charCode模擬）
+  var strokes = (firstChar.charCodeAt(0) % 10) + 1;
+  var stemIndex = strokes % 10;
+  if (stemIndex === 0) stemIndex = 10;
+  var stem = HEAVENLY_STEMS[stemIndex];
+  var element = STEM_TO_ELEMENT[stem];
+  
+  var html = '<div class="name-result">';
+  html += '<div class="name-item"><span class="name-label">姓名</span><span class="name-value">' + name + '</span></div>';
+  html += '<div class="name-item"><span class="name-label">首字</span><span class="name-value">' + firstChar + '</span></div>';
+  html += '<div class="name-item"><span class="name-label">筆畫</span><span class="name-value">' + strokes + '畫</span></div>';
+  html += '<div class="name-item"><span class="name-label">天干</span><span class="name-value">' + stem + '</span></div>';
+  html += '<div class="name-item"><span class="name-label">五行</span><span class="name-value">' + element + '</span></div>';
+  html += '</div>';
+  html += '<div class="name-advice"><strong>建議：</strong>' + ELEMENT_ADVICE[element] + '</div>';
+  
+  document.getElementById('nameResult').innerHTML = html;
+}
+
+// ===== 情緒圖表 =====
+var moodChart;
+function initMoodChart() {
+  var ctx = document.getElementById('moodChart').getContext('2d');
+  var days = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push(d.getDate() + '日');
+  }
+  var moodData = [3, 4, 2, 5, 3, 4, 0];
+  
+  if (moodChart) moodChart.destroy();
+  
+  moodChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{ label: '情緒', data: moodData, borderColor: '#6c5ce7', backgroundColor: 'rgba(108,92,231,0.1)', fill: true, tension: 0.4 }]
+    },
+    options: { scales: { y: { min: 1, max: 5, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
+  });
+  
+  document.querySelectorAll('.mood-btn').forEach(function(btn) {
+    btn.onclick = function() {
+      var mood = parseInt(this.dataset.mood);
+      moodData[6] = mood;
+      moodChart.update();
+    };
+  });
+}
+
+// ===== AI畫像 =====
+var WUXING = { wood:{c:["#55efc4","#00b894"]}, fire:{c:["#ff7675","#d63031"]}, earth:{c:["#ffeaa7","#fdcb6e"]}, metal:{c:["#dfe6e9","#b2bec3"]}, water:{c:["#74b9ff","#0984e3"]} };
+function renderSoulPortrait(key) {
+  var canvas = document.getElementById('soulCanvas');
+  canvas.innerHTML = '';
+  var theme = WUXING[key] || WUXING.water;
+  var count = 5 + Math.floor(Math.random() * 4);
+  for (var i = 0; i < count; i++) {
+    var orb = document.createElement('div');
+    orb.className = 'soul-orb';
+    var size = 50 + Math.random() * 80;
+    orb.style.width = size + 'px';
+    orb.style.height = size + 'px';
+    orb.style.left = Math.random() * 200 + 'px';
+    orb.style.top = Math.random() * 100 + 'px';
+    orb.style.opacity = 0.3 + Math.random() * 0.3;
+    orb.style.filter = 'blur(' + (10 + Math.random() * 15) + 'px)';
+    orb.style.background = 'radial-gradient(circle, ' + theme.c[Math.floor(Math.random()*2)] + ', transparent)';
+    orb.style.setProperty('--dur', (12 + Math.random()*10) + 's');
+    orb.style.setProperty('--dx', (Math.random()*40-20) + 'px');
+    orb.style.setProperty('--dy', (Math.random()*30-15) + 'px');
+    canvas.appendChild(orb);
+  }
+  var vg = document.createElement('div');
+  vg.className = 'soul-vignette';
+  canvas.appendChild(vg);
+  document.getElementById('artInfo').innerHTML = '五行屬性：<strong>' + {wood:'木',fire:'火',earth:'土',metal:'金',water:'水'}[key] + '</strong>';
+}
+
+// ===== 智慧卡 =====
+var CARDS = [
+{ title: "🌟 幸運降臨", msg: "今天是你幸運的一天！把握機會，宇宙正在支持你。" },
+{ title: "💪 能量覺醒", msg: "你的內在力量正在覺醒。信任自己的能力。" },
+{ title: "🌈 彩虹出現", msg: "雨過天晴！困難即將過去，美好的事物正在等著你。" },
+{ title: "🔮 智慧啟示", msg: "今天適合靜下心來思考。答案就在你心裡。" },
+{ title: "❤️ 愛的流動", msg: "關係將有新進展。敞開心扉，接受他人的善意。" },
+{ title: "🚀 行動時刻", msg: "不要只是想了！今天適合開始行動。" }
+];
+var isFlipped = false;
+var lastIndex = -1;
+var locked = false;
+
+function initOracleCard() {
+  var cardBtn = document.getElementById('oracleCard');
+  var titleEl = document.getElementById('cardTitle');
+  var msgEl = document.getElementById('cardMsg');
+  
+  function randomIndexAvoidRepeat(max, last) {
+    if (max <= 1) return 0;
+    var i = Math.floor(Math.random() * max);
+    if (i === last) i = (i + 1 + Math.floor(Math.random() * (max - 1))) % max;
+    return i;
+  }
+  
+  function setCardContent(card) {
+    titleEl.textContent = card.title;
+    msgEl.textContent = card.msg;
+  }
+  
+  function drawAndFlip() {
+    var i = randomIndexAvoidRepeat(CARDS.length, lastIndex);
+    lastIndex = i;
+    setCardContent(CARDS[i]);
+    cardBtn.classList.add('is-flipped');
+    isFlipped = true;
+  }
+  
+  function flipBackThenRedraw() {
+    cardBtn.classList.remove('is-flipped');
+    isFlipped = false;
+    var inner = cardBtn.querySelector('.card-inner');
+    var onEnd = function() {
+      inner.removeEventListener('transitionend', onEnd);
+      drawAndFlip();
+      locked = false;
+    };
+    inner.addEventListener('transitionend', onEnd, { once: true });
+  }
+  
+  cardBtn.onclick = function() {
+    if (locked) return;
+    locked = true;
+    if (!isFlipped) {
+      drawAndFlip();
+      setTimeout(function() { locked = false; }, 720);
+      return;
+    }
+    flipBackThenRedraw();
+  };
+}
+
+// ===== 測字 =====
+var wordLib = {
+  "愛":{e:"木",d:"代表付出與關懷",a:"今天適合表達愛意。"},
+  "夢":{e:"木",d:"代表願望與可能性",a:"今天適合規劃未來。"},
+  "光":{e:"火",d:"代表希望與智慧",a:"保持樂觀，光明就在前方。"},
+  "心":{e:"火",d:"代表情感與直覺",a:"今天適合傾聽內心。"},
+  "運":{e:"水",d:"代表運勢與機會",a:"保持開放，機會隨時出現。"},
+  "福":{e:"水",d:"代表福氣與滿足",a:"珍惜當下，感恩現在。"},
+  "貴":{e:"土",d:"代表貴人與價值",a:"今天可能遇到貴人。"},
+  "安":{e:"土",d:"代表安全與平靜",a:"今天適合放慢腳步。"}
+};
+function initZiGrid() {
+  var grid = document.getElementById('ziGrid');
+  grid.innerHTML = '';
+  Object.keys(wordLib).forEach(function(char) {
+    var btn = document.createElement('button');
+    btn.className = 'zi-btn';
+    btn.textContent = char;
+    btn.onclick = function() { showZiResultChar(char); };
+    grid.appendChild(btn);
+  });
+}
+function showZiResult() {
+  var c = document.getElementById('ziInput').value.trim();
+  if (c) showZiResultChar(c);
+}
+function showZiResultChar(char) {
+  var result = document.getElementById('ziResult');
+  if (!wordLib[char]) {
+    result.innerHTML = '目前字庫尚未收錄此字～';
+    result.classList.add('show');
+    return;
+  }
+  var data = wordLib[char];
+  result.innerHTML = '五行屬<span class="element">' + data.e + '</span><br>' + data.d + '。<br>' + data.a;
+  result.classList.add('show');
+}
+</script>
+</body>
+</html>
