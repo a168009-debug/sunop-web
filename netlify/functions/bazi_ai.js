@@ -1,77 +1,173 @@
-const https = require("https");
-const Q = {m:"gpt-4o-mini",t:300,x:8000};
-const D = {m:"gpt-4o",t:800,x:15000};
+/**
+ * MetaMind AI Bazi
+ * - Quick: <= 8s, max_tokens 300
+ * - Deep : <= 15s, max_tokens 800
+ * - 超時/錯誤：回 fallback summary，不讓前端爆掉
+ *
+ * Netlify 環境變數必須設定：
+ * OPENAI_API_KEY = 你的 OpenAI Key
+ */
+const QUICK = { model: "gpt-4o-mini", max_tokens: 300, timeout_ms: 8000 };
+const DEEP = { model: "gpt-4o", max_tokens: 800, timeout_ms: 15000 };
 
-exports.handler = async function(e) {
-  var h = {"Access-Control-Allow-Origin":"*","Content-Type":"application/json"};
-  var r = function(s,o){return{statusCode:s,headers:h,body:JSON.stringify(o)}};
-  if(e.httpMethod==="OPTIONS")return r(200,{ok:true});
-  if(e.httpMethod!=="POST")return r(405,{e:"Method Not Allowed"});
+const corsHeaders = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "POST, OPTIONS", "Content-Type": "application/json; charset=utf-8" };
+
+function json(statusCode, obj){
+  return { statusCode, headers: corsHeaders, body: JSON.stringify(obj) };
+}
+
+function safeParse(body){
+  try { return JSON.parse(body || "{}"); }
+  catch(e){ return null; }
+}
+
+function buildSystemPrompt(mode){
+  const base = `
+你是「高階八字命理顧問」，語氣要像資深老師：精煉，直接、帶判斷，不要廢話。
+你會用八字的術語（用神、喜忌，十神、格局、旺衰，流年、運勢節點）來說明，但不要堆滿名詞。
+重要：你不知道使用者真實生活事件，不可編造具體事件（例如「你上週跟誰吵架」）。只能用「高概率傾向」+「可驗證提問」來呈現專業感。
+輸出格式：
+- opening：一段 120~220 字，像算命師第一句開口（先抓主軸：性格/近期卡點/身體壓力方向）
+- answer：回答使用者問題（若沒有問題，給 3 個最可能想問的方向）
+- followups：3 個可追問的問題（短句）
+`;
+  if(mode === "deep"){
+    return base + `
+Deep 模式要求：
+- 更結構化：先結論→再理由→再建議
+- 至少給：1) 用神/喜忌方向（用語要保守）
+  2) 近一年注意點（健康/情緒/關係/金錢）
+- 字數可到 500~900 字，但不要無限膨脹
+`;
+  }
+  return base + `
+Quick 模式要求：
+- 以「一刀切重點」為主，總字數 220~380 字
+- 不做長篇論證，先給方向與建議
+`;
+}
+
+function buildUserPrompt(profile, question){
+  const p = `
+使用者資料：
+- 姓名：${profile.name}
+- 生日：${profile.year}-${profile.month}-${profile.day}
+- 時辰：${profile.hourBranch}時
+
+限制：
+- 若八字排盤細節不足，你可以用「以日主與五行平衡的通用判讀」給方向，並在 followups 提問補齊（例如：出生地/是否跨日/是否確定時辰）。
+`;
+  if(question && question.trim()){
+    return p + "\n使用者問題：" + question + "\n請直接回答。";
+  }
+  return p + "\n使用者沒有問問題：請用 opening 先抓主軸，answer 給 3 個最可能想問的方向。";
+}
+
+async function callOpenAI({apiKey, model, max_tokens, timeout_ms, systemPrompt, userPrompt}){
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeout_ms);
   try{
-    var b = JSON.parse(e.body||"{}");
-    var n = b.name, y=b.year, mo=b.month, d=b.day, hb=b.hourBranch||b.hour;
-    if(!y||!mo||!d||!hb)return r(400,{e:"missing_input"});
-    var p = calc(y,mo,d,hb); p.name=n||"訪客";
-    if(b.dryRun)return r(200,{ok:true,baziProfile:p});
-    var k = process.env.OPENAI_API_KEY;
-    if(!k)return r(500,{e:"no_key"});
-    var c = b.mode==="deep"?D:Q;
-    var sys = b.mode==="deep"?"你是專業八字命理顧問":"你是專業八字命理顧問";
-    var usr = "資料:"+JSON.stringify(p);
-    var res = await ai(k,c.m,[{role:"system",content:sys},{role:"user",content:usr}],c.t,c.x);
-    return r(200,{ok:true,mode:b.mode||"quick",baziProfile:p,result:res});
-  }catch(err){
-    var m = err.message||String(err);
-    console.error("E:",m);
-    if(m==="timeout")return r(200,{fallback:true,sum:"近期壓力偏高",sug:["睡","工作"]});
-    return r(500,{e:m.indexOf("quota")>-1?"quota":"error",msg:m});
-  }
-};
-
-function calc(y,m,d,h){
-  var tg="甲乙丙丁戊己庚辛壬癸".split("");
-  var dz="子丑寅卯辰巳午未申酉戌亥".split("");
-  var wx={子:"水",亥:"水",寅:"木",卯:"木",巳:"火",午:"火",申:"金",酉:"金",丑:"土",辰:"土",未:"土",戌:"土"};
-  var nz=tg[(y-4)%10]+dz[(y-4)%12];
-  var q=[2,4,6,8,0][Math.floor(tg.indexOf(nz[0])/2)]||0;
-  var yz=tg[(q+m-1)%10]+dz[m-1];
-  var base=new Date(1900,1,15);
-  var days=Math.floor((new Date(y,m-1,d)-base)/86400000);
-  var rz=tg[(days%10+10)%10]+dz[(days%12+12)%12];
-  var ri=tg.indexOf(rz[0]);
-  var sz=tg[([0,2,4,6,8][Math.floor(ri/2)]||0)+dz.indexOf(h)%10]+h;
-  var all=nz+yz+rz+sz;
-  var ws={木:0,火:0,土:0,金:0,水:0};
-  for(var i=0;i<all.length;i++){
-    var e=wx[all[i]];
-    if(e)ws[e]++;
-  }
-  var rzwx=wx[rz[1]];
-  var str=ws[rzwx]>=3?"強":ws[rzwx]>=2?"中等":"弱";
-  return{name:"",birth:{year:y,month:m,day:d,hourBranch:h},pillars:{year:{stem:nz[0],branch:nz[1]},month:{stem:yz[0],branch:yz[1]},day:{stem:rz[0],branch:rz[1]}},dayMaster:{stem:rz[0],element:rzwx},strength:str,fiveElements:ws};
-}
-
-function ai(key,model,msgs,tokens,timeout){
-  return new Promise(function(resolve,reject){
-    var data=JSON.stringify({model:model,messages:msgs,max_tokens:tokens,temperature:0.6});
-    var opts={hostname:"api.openai.com",path:"/v1/chat/completions",method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key,"Content-Length":Buffer.byteLength(data)},timeout:timeout};
-    var req=https.request(opts,function(resp){
-      var body="";
-      resp.on("data",function(c){body+=c});
-      resp.on("end",function(){
-        try{
-          var j=JSON.parse(body);
-          if(j.error)reject(new Error(j.error.message));
-          if(resp.statusCode>=400)reject(new Error("HTTP"+resp.statusCode));
-          var c=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-          if(!c)reject(new Error("空"));
-          try{resolve(JSON.parse(c));}catch(e){resolve({opening:c});}
-        }catch(e){reject(new Error("解析失敗"));}
-      });
+    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Authorization": "Bearer " + apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        max_tokens,
+        temperature: 0.7
+      })
     });
-    req.on("error",function(e){reject(new Error("網路"))});
-    req.setTimeout(timeout,function(){req.destroy();reject(new Error("timeout"))});
-    req.write(data);
-    req.end();
-  });
+    const data = await resp.json();
+    if(!resp.ok){
+      return { ok:false, error:"OpenAI error " + resp.status, raw:data };
+    }
+    const text = data?.choices?.[0]?.message?.content || "";
+    return { ok:true, text };
+  }
+  catch(e){
+    const msg = (e && e.name === "AbortError") ? "timeout" : (e.message || "unknown_error");
+    return { ok:false, error: msg };
+  }
+  finally { clearTimeout(t); }
 }
+
+function parseStructuredText(text){
+  const out = { opening:"", answer:"", followups:[] };
+  const norm = (text || "").trim();
+  if(!norm){ out.answer = ""; return out; }
+
+  const openingMatch = norm.match(/opening\s*[:：]\s*([\s\S]*?)(\n{2,}|answer\s*[:：])/i);
+  const answerMatch = norm.match(/answer\s*[:：]\s*([\s\S]*?)(\n{2,}|followups\s*[:：]|$)/i);
+  const followMatch = norm.match(/followups\s*[:：]\s*([\s\S]*?)$/i);
+
+  if(openingMatch) out.opening = openingMatch[1].trim();
+  if(answerMatch) out.answer = answerMatch[1].trim();
+  if(followMatch){
+    const lines = followMatch[1]
+      .split("\n")
+      .map(s => s.replace(/^\s*[-•\d.]+\s*/,"").trim())
+      .filter(Boolean);
+    out.followups = lines.slice(0,3);
+  }
+
+  if(!out.opening && !out.answer){ out.answer = norm; }
+  return out;
+}
+
+exports.handler = async (event) => {
+  if(event.httpMethod === "OPTIONS") return json(200, { ok:true });
+  if(event.httpMethod !== "POST") return json(405, { ok:false, error:"Method Not Allowed" });
+
+  const body = safeParse(event.body);
+  if(!body) return json(400, { ok:false, error:"bad_json" });
+
+  const name = (body.name || "").trim();
+  const year = Number(body.year);
+  const month = Number(body.month);
+  const day = Number(body.day);
+  const hourBranch = (body.hourBranch || body.hourZhi || "").trim();
+  const mode = (body.mode === "deep") ? "deep" : "quick";
+  const question = (body.question || "").trim();
+
+  if(!name || !year || !month || !day || !hourBranch){
+    return json(400, { ok:false, error:"missing_fields", message:"需要 name/year/month/day/hourBranch" });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if(!apiKey){
+    return json(500, { ok:false, error:"missing_api_key", message:"Netlify 未設定 OPENAI_API_KEY" });
+  }
+
+  const cfg = (mode === "deep") ? DEEP : QUICK;
+  const systemPrompt = buildSystemPrompt(mode);
+  const userPrompt = buildUserPrompt({name, year, month, day, hourBranch}, question);
+
+  const r = await callOpenAI({ apiKey, model: cfg.model, max_tokens: cfg.max_tokens, timeout_ms: cfg.timeout_ms, systemPrompt, userPrompt });
+
+  if(!r.ok){
+    const fallback = {
+      ok:true,
+      fallback:true,
+      mode,
+      opening: "莊嚴地說一句：你今天會點進來，不是「好奇」，而是你心裡其實已經在找一個方向。先把你最卡的一題丟出來：是錢、是人、還是身體？（目前系統連線不穩，我先給你能落地的方向。）",
+      answer: "系統連線暫時不穩（" + r.error + "）。你先用這三題自我定位：\n1) 最近最耗你的是「關係」還是「責任」？\n2) 睡眠/腸胃/肩頸哪個最明顯？\n3) 你要的是「翻身」還是「止血」？\n你回我一題，我會用 Deep 模式補完整結論。",
+      followups: ["你最近最卡的是錢，人、還是身體？", "你的時辰有多確定？是否可能跨日？", "你希望我優先看事業還是感情？"]
+    };
+    return json(200, fallback);
+  }
+
+  const parsed = parseStructuredText(r.text);
+
+  if(!parsed.opening){
+    parsed.opening = "你好。我先不跟你客氣：你進來通常只有兩種人——一種是想驗證自己，另一種是已經被現實逼到要做取捨。你是哪一種？你先丟一題最想問的，我直接切重點。";
+  }
+
+  return json(200, { ok:true, fallback:false, mode, opening: parsed.opening, answer: parsed.answer, followups: parsed.followups });
+};
