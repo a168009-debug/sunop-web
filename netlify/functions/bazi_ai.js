@@ -1,4 +1,5 @@
-// 內建八字計算（不需要額外套件）
+const { Lunar, LunarUtil } = require("lunar-javascript");
+
 const QUICK = { model: "gpt-4o-mini", max_tokens: 350, timeoutMs: 8000 };
 const DEEP = { model: "gpt-4o", max_tokens: 900, timeoutMs: 15000 };
 const corsHeaders = {
@@ -30,46 +31,21 @@ function validateProfile(p) {
   return null;
 }
 
-// 天干地支對照表
-const TIANGAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-const DIZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-const WUXING = { "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水", "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火", "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水" };
-
-// 計算天干序號（甲=0）
-function getTianganIndex(tg) { return TIANGAN.indexOf(tg); }
-// 計算地支序號（子=0）
-function getDizhiIndex(dz) { return DIZHI.indexOf(dz); }
-
-// 計算八字
+// 使用 lunar-javascript 計算八字
 function calculateBazi(year, month, day, hourBranch) {
+  const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
+  const hour = hourMap[hourBranch] || 12;
+  
   try {
-    // 以農曆年為基礎計算（簡化版）
-    const yearGanIdx = (year - 4) % 10;
-    const yearZhiIdx = (year - 4) % 12;
+    const lunar = Lunar.fromYmdHms(year, month, day, hour, 0, 0);
+    const bazi = lunar.getBaZi();
+    const tiangan = bazi.getTianGan();
+    const dizhi = bazi.getDiZhi();
     
-    // 月柱：年干 + 月份（起月公式）
-    const monthGanIdx = (yearGanIdx * 2 + month) % 10;
-    const monthZhiIdx = (month + 1) % 12;
+    const dayMaster = tiangan[1];
+    const dayStem = tiangan[1];
+    const dayZhi = dizhi[1];
     
-    // 日柱：使用蔡勒公式簡化計算
-    const y = year, m = month;
-    let d = day;
-    if (m < 3) { y--; m += 12; }
-    const c = Math.floor(y / 100);
-    const y_ = y % 100;
-    const d_ = Math.floor(c / 4) - 2 * c + y_ + Math.floor(y_ / 4) + Math.floor(13 * (m + 1) / 5) + d - 1;
-    const dayGanIdx = ((d_ % 10) + 10) % 10;
-    const dayZhiIdx = ((d_ % 12) + 12) % 12;
-    
-    // 時柱：日干 + 時辰
-    const hourMap = { "子": 23, "丑": 1, "寅": 3, "卯": 5, "辰": 7, "巳": 9, "午": 11, "未": 13, "申": 15, "酉": 17, "戌": 19, "亥": 21 };
-    const hour = hourMap[hourBranch] || 12;
-    const hourZhiIdx = Math.floor((hour + 1) / 2) % 12;
-    const hourGanIdx = (dayGanIdx * 2 + hourZhiIdx) % 10;
-    
-    const dayMaster = TIANGAN[dayGanIdx];
-    
-    // 十神計算
     const tenGodMap = {
       "甲": { "甲": "比肩", "乙": "劫財", "丙": "食神", "丁": "傷官", "戊": "偏財", "己": "正財", "庚": "七殺", "辛": "正官", "壬": "偏印", "癸": "正印" },
       "乙": { "甲": "劫財", "乙": "比肩", "丙": "傷官", "丁": "食神", "戊": "正財", "己": "偏財", "庚": "正官", "辛": "七殺", "壬": "正印", "癸": "偏印" },
@@ -84,18 +60,20 @@ function calculateBazi(year, month, day, hourBranch) {
     };
     const getTenGod = (dayG, otherG) => tenGodMap[dayG]?.[otherG] || "";
     
+    const wuxingMap = { "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土", "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水" };
+    
     return {
-      yearGan: TIANGAN[yearGanIdx], yearZhi: DIZHI[yearZhiIdx],
-      monthGan: TIANGAN[monthGanIdx], monthZhi: DIZHI[monthZhiIdx],
-      dayGan: TIANGAN[dayGanIdx], dayZhi: DIZHI[dayZhiIdx],
-      hourGan: TIANGAN[hourGanIdx], hourZhi: DIZHI[hourZhiIdx],
+      yearGan: tiangan[0], yearZhi: dizhi[0],
+      monthGan: tiangan[1], monthZhi: dizhi[1],
+      dayGan: dayStem, dayZhi: dayZhi,
+      hourGan: tiangan[2], hourZhi: dizhi[2],
       dayMaster: dayMaster,
-      yearWu: WUXING[TIANGAN[yearGanIdx]], monthWu: WUXING[TIANGAN[monthGanIdx]],
-      dayWu: WUXING[TIANGAN[dayGanIdx]], hourWu: WUXING[TIANGAN[hourGanIdx]],
-      yearShi: getTenGod(dayMaster, TIANGAN[yearGanIdx]),
-      monthShi: getTenGod(dayMaster, TIANGAN[monthGanIdx]),
-      dayShi: getTenGod(dayMaster, TIANGAN[dayGanIdx]),
-      hourShi: getTenGod(dayMaster, TIANGAN[hourGanIdx])
+      yearWu: wuxingMap[tiangan[0]], monthWu: wuxingMap[tiangan[1]],
+      dayWu: wuxingMap[dayStem], hourWu: wuxingMap[tiangan[2]],
+      yearShi: getTenGod(dayMaster, tiangan[0]),
+      monthShi: getTenGod(dayMaster, tiangan[1]),
+      dayShi: getTenGod(dayMaster, dayStem),
+      hourShi: getTenGod(dayMaster, tiangan[2])
     };
   } catch (e) {
     return null;
@@ -103,33 +81,17 @@ function calculateBazi(year, month, day, hourBranch) {
 }
 
 function buildSystemPrompt(mode) {
-  const base = `
-你是一位閱歷深厚的命理師，風格類似資深風水師或命理前輩。
-語氣要求：
-- 高深莫測、內斂、含蓄
-- 帶有命理洞察，但不直白批評
-`;
-  if (mode === "deep") {
-    return base + `\n深度模式：一句判語 → 體用分析 → 近半年運勢 → 宜注意之事 → 建議方向`;
-  }
+  const base = `你是一位閱歷深厚的命理師，風格類似資深風水師或命理前輩。語氣要求：高深莫測、內斂、含蓄，帶有命理洞察，但不直白批評。`;
+  if (mode === "deep") return base + `\n深度模式：一句判語 → 體用分析 → 近半年運勢 → 宜注意之事 → 建議方向`;
   return base + `\n快速模式：一句判語 → 日主特質 → 兩個建議方向`;
 }
 
 function buildUserPrompt(profile, bazi, question) {
   const { name, year, month, day, hourBranch } = profile;
   const b = bazi || {};
-  const baziInfo = `
-八字資訊：
-- 年柱：${b.yearGan}${b.yearZhi}（${b.yearWu}，${b.yearShi}）
-- 月柱：${b.monthGan}${b.monthZhi}（${b.monthWu}，${b.monthShi}）
-- 日柱：${b.dayGan}${b.dayZhi}（${b.dayWu}，${b.dayShi}）
-- 時柱：${b.hourGan}${b.hourZhi}（${b.hourWu}，${b.hourShi}）
-- 日主：${b.dayMaster}
-`;
-  if (question === "__INTRO__") {
-    return `姓名：${name} 出生：${year}-${month}-${day}（${hourBranch}時）${baziInfo}請用命理師口吻：1.一句點醒判語 2.根據八字點出最近糾結方向 3.給一個建議`;
-  }
-  return `姓名：${name} 出生：${year}-${month}-${day}（${hourBranch}時）${baziInfo}問題：${question}請用含蓄命理師口吻回答`;
+  const baziInfo = `八字：年 ${b.yearGan}${b.yearZhi} ${b.yearShi} | 月 ${b.monthGan}${b.monthZhi} ${b.monthShi} | 日 ${b.dayGan}${b.dayZhi} ${b.dayShi} | 時 ${b.hourGan}${b.hourZhi} ${b.hourShi}。日主${b.dayMaster}。`;
+  if (question === "__INTRO__") return `姓名${name}，${year}-${month}-${day}（${hourBranch}時）。${baziInfo}請用命理師口吻：1.一句點醒判語 2.最近糾結方向 3.一個建議`;
+  return `姓名${name}，${year}-${month}-${day}（${hourBranch}時）。${baziInfo}問題：${question}請用含蓄命理師口吻回答`;
 }
 
 async function callOpenAI(cfg, systemPrompt, userPrompt) {
