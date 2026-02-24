@@ -17,7 +17,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { message, context: ctx, history, baziData } = JSON.parse(event.body || "{}");
+    const { message, context: ctx, history, mode, baziData } = JSON.parse(event.body || "{}");
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
@@ -28,7 +28,9 @@ exports.handler = async (event) => {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "缺少 message" }) };
     }
 
-    const systemPrompt = getContextPrompt(ctx, baziData);
+    // Determine mode: fast or deep
+    const analysisMode = mode || "fast";
+    const systemPrompt = getContextPrompt(ctx, analysisMode, baziData);
     const safeHistory = Array.isArray(history) ? history : [];
     const trimmedHistory = safeHistory
       .filter(m => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
@@ -40,21 +42,20 @@ exports.handler = async (event) => {
       { role: "user", content: message },
     ];
 
-    const reply = await callOpenAI(apiKey, messages);
+    const reply = await callOpenAI(apiKey, messages, analysisMode);
 
     return {
       statusCode: 200,
       headers: corsHeaders,
-      body: JSON.stringify({ reply }),
+      body: JSON.stringify({ reply, mode: analysisMode }),
     };
   } catch (err) {
     const errorMsg = err.message || String(err);
     let statusCode = 500;
     
-    // Detect quota errors
-    if (errorMsg.includes("quota") || errorMsg.includes("exceeded") || errorMsg.includes("billing")) {
+    if (errorMsg.includes("quota") || errorMsg.includes("exceeded")) {
       statusCode = 402;
-    } else if (errorMsg.includes("timeout") || errorMsg.includes("timeout")) {
+    } else if (errorMsg.includes("timeout") || errorMsg.includes("超時")) {
       statusCode = 504;
     }
     
@@ -62,82 +63,69 @@ exports.handler = async (event) => {
   }
 };
 
-function getContextPrompt(ctx, baziData) {
+function getContextPrompt(ctx, mode, baziData) {
+  const isDeep = mode === "deep";
+  const maxTokens = isDeep ? 2000 : 800;
+  
   const prompts = {
-    "命理分析": `你是八字命理專家。用繁體中文詳細回答。
+    "命理分析": `你是專業八字命理大師，具備結構化推理能力。
 
-請按照以下結構分析：
-1. 命盤結構分析：說明年、月、日、時四柱的天干地支組合
-2. 用神分析：根據日主五行，分析哪些五行能夠幫助命主
-3. 十神解讀：說明主要十神的含義與影響
-4. 大運流年：根據目前年齡說明近幾年運勢
-5. 事業建議：適合的職業方向與發展建議
-6. 健康建議：需要注意的身體部位與保健方式
-
-請用詳細、專業但淺顯易懂的方式解釋，盡量用列表呈現。`,
+分析原則：
+• 先分析結構（年、月、日、時四柱組合）
+• 判斷日主強弱
+• 邏輯性推斷用神
+• 避免神祕化語言
+• 用專業但淺顯易懂的方式解釋
+• 用繁體中文回答
+${isDeep ? `
+【深度分析模式】
+請提供完整結構化分析：
+1. 命盤結構分析：四柱天干地支組合
+2. 日主強弱分析
+3. 用神邏輯推斷
+4. 十神解讀
+5. 10年大運概覽
+6. 事業策略建議
+7. 財富結構
+8. 情感模式
+9. 健康結構
+10. 風險警示
+11. 策略性生活建議
+` : `
+【快速解讀模式】
+請簡潔回答（600-800字）：
+1. 整體結構強度
+2. 用神建議
+3. 健康趨勢
+4. 事業建議
+5. 情感趨勢
+6. 簡短總結
+`}`,
     
-    "姓名分析": `你是姓名學專家。用繁體中文回答。
-
-請分析：
-1. 姓名格局：總格、天格、人格、地格、外格的影響
-2. 五行配置：姓名筆畫對應的五行是否平衡
-3. 音義分析：名字的發音與含義
-4. 補運建議：可以如何透過姓名調整運勢
-5. 適配建議：適合的職業與發展方向
-
-請詳細說明，用列表呈現。`,
+    "姓名分析": `你是姓名學專家。用繁體中文${isDeep ? "詳細" : "簡潔"}分析。`,
     
-    "智慧卡": `你是塔羅/智慧卡解讀專家。用繁體中文回答。
-
-請給出：
-1. 牌義解說：這張牌的核心含義
-2. 正位/逆位解釋（如適用）
-3. 對問者的建議：具體可行的行動建議
-4. 能量提示：這張牌給予的提醒
-
-請溫和但具體，避免過度神祕化。`,
+    "智慧卡": `你是塔羅/智慧卡解讀專家。用繁體中文${isDeep ? "詳細" : "簡潔"}回答。`,
     
-    "測字": `你是測字解讀專家。用繁體中文回答。
-
-請分析：
-1. 字形拆解：这个字可以如何分解
-2. 意象解讀：每個部分的象徵意義
-3. 對應情境：這個字與問事內容的關聯
-4. 建議指引：具體可行的建議
-
-請用簡單明白的方式解釋。`,
+    "測字": `你是測字解讀專家。用繁體中文${isDeep ? "詳細" : "簡潔"}回答。`,
     
-    "情緒曲線": `你是情緒管理顧問。用繁體中文回答。
-
-請根據對方的情緒狀態：
-1. 分析可能的原因
-2. 提供情緒調節建議
-3. 建議適合的活動或方法
-4. 長期建議
-
-請溫和且實用。`,
+    "情緒曲線": `你是情緒管理顧問。用繁體中文${isDeep ? "詳細" : "簡潔"}回答。`,
     
-    "AI畫像": `你是五行能量解讀專家。用繁體中文回答。
-
-請解讀：
-1. 五行能量分析：這個人主要的五行特質
-2. 性格特點：詳細說明優勢與特質
-3. 幸運元素：幸運色、幸運數字、幸運方位
-4. 發展建議：如何在生活中平衡五行
-
-請用淺顯易懂的方式解釋。`
+    "AI畫像": `你是五行能量解讀專家。用繁體中文${isDeep ? "詳細" : "簡潔"}回答。`
   };
   
   return prompts[ctx] || prompts["命理分析"];
 }
 
-function callOpenAI(apiKey, messages) {
+function callOpenAI(apiKey, messages, mode) {
+  const maxTokens = mode === "deep" ? 2000 : 800;
+  const temperature = mode === "deep" ? 0.6 : 0.7;
+  
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages,
-      temperature: 0.5,
-      max_tokens: 800,
+      temperature,
+      max_tokens: maxTokens,
     });
 
     const options = {
@@ -149,7 +137,7 @@ function callOpenAI(apiKey, messages) {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Length": Buffer.byteLength(data),
       },
-      timeout: 10000,
+      timeout: mode === "deep" ? 20000 : 10000,
     };
 
     const req = https.request(options, (res) => {
@@ -164,8 +152,7 @@ function callOpenAI(apiKey, messages) {
           }
           
           if (!res.statusCode || res.statusCode >= 400) {
-            const msg = json?.error?.message || `HTTP ${res.statusCode}`;
-            return reject(new Error(msg));
+            return reject(new Error(`HTTP ${res.statusCode}`));
           }
           
           const content = json?.choices?.[0]?.message?.content;
@@ -178,7 +165,10 @@ function callOpenAI(apiKey, messages) {
     });
 
     req.on("error", (e) => reject(new Error("網路錯誤")));
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error("超時（10秒）")); });
+    req.setTimeout(mode === "deep" ? 20000 : 10000, () => { 
+      req.destroy(); 
+      reject(new Error("超時")); 
+    });
     req.write(data);
     req.end();
   });
