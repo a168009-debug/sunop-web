@@ -12,6 +12,18 @@
 <div class="brand">MetaMind</div>
 <div class="subtitle">請輸入資料</div>
 </header>
+
+<!-- 今日運勢區塊 -->
+<section id="dailyLuck" class="daily-luck" style="display:none;">
+<div class="daily-header">
+<span class="daily-title">今日運勢</span>
+<span class="daily-time"></span>
+</div>
+<div class="luck-stars"></div>
+<div class="luck-aspects"></div>
+<div class="luck-tags"></div>
+</section>
+
 <main class="card">
 <h1 class="card-title">輸入您的資料</h1>
 <form id="baziForm" class="form" autocomplete="off">
@@ -61,9 +73,12 @@ localStorage.removeItem("baziData");
 function clearAll(){
   localStorage.removeItem("metamind_profile");
   localStorage.removeItem("baziData");
+  localStorage.removeItem("metamind_daily");
   document.getElementById("baziForm").reset();
+  document.getElementById("dailyLuck").style.display = "none";
 }
 </script>
+<script src="./assets/lunar.min.js"></script>
 <script src="./assets/app.js"></script>
 </body>
 </html>
