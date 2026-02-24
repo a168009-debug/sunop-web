@@ -325,7 +325,8 @@ function initMoodChart() {
   var moodData = [3,4,2,5,3,4,0];
   if (moodChart) moodChart.destroy();
   moodChart = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: '情緒', data: moodData, borderColor: '#d6b15e', backgroundColor: 'rgba(214,177,94,0.1)', fill: true, tension: 0.4 }] }, options: { scales: { y: { min: 1, max: 5 } }, plugins: { legend: { display: false } } } });
-  document.querySelectorAll('.mood-btn').forEach(function(btn) { btn
+  document.querySelectorAll('.mood-btn').forEach(function(btn) { btn.addEventListener('click', function() { var m = parseInt(this.getAttribute('data-mood')); moodChart.data.datasets[0].data[moodChart.data.datasets[0].data.length-1] = m; moodChart.update(); }); }); }
+
 // ========== AI Chat Functions ==========
 function showAIChat() { document.getElementById('aiOverlay').classList.add('open'); document.getElementById('apiKeyInput').value = apiKey || ''; if(document.getElementById('aiMessages').children.length === 0) { addAIMsg('meta', '請先輸入 OpenAI API Key (sk-...)，然後問我任何問題！'); } setTimeout(function(){document.getElementById('aiInput').focus()}, 100); }
 function closeAIChat() { document.getElementById('aiOverlay').classList.remove('open'); }
