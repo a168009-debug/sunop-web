@@ -154,7 +154,7 @@ function callOpenAI(apiKey, system, user, mode) {
         { role: "system", content: system },
         { role: "user", content: user }
       ],
-      max_output_tokens: mode === "quick" ? 900 : 1600,
+      max_tokens: mode === "quick" ? 900 : 1600,
       temperature: 0.6
     });
 
