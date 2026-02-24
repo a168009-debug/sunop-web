@@ -44,6 +44,8 @@
 .form-group input:focus,.form-group select:focus{border-color:var(--gold);background:rgba(255,255,255,.08)}
 .btn-primary{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:14px;color:#000;font-size:15px;font-weight:bold;letter-spacing:.15em;cursor:pointer;transition:.3s}
 .btn-primary:active{transform:scale(0.98)}
+.ask-ai-small{display:block;width:100%;margin-top:12px;padding:12px;background:rgba(214,177,94,.15);border:1px solid var(--gold);border-radius:12px;color:var(--gold);font-size:14px;cursor:pointer;text-align:center}
+.ask-ai-small:hover{background:rgba(214,177,94,.25)}
 /* Result boxes */
 .result-box{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:16px;padding:16px;margin-bottom:14px}
 .result-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gold-dim)}
@@ -326,7 +328,7 @@ function calculateBazi() {
   var 日干索引 = 天干表.indexOf(日柱[0]);
   var 時柱 = 天干表[([0,2,4,6,8][Math.floor(日干索引/2)]||0) + 地支表.indexOf(hour)%10] + hour;
   var 日五行 = 地支五行[日柱[1]];
-  document.getElementById('baziResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">年柱</span><span class="result-value">'+年柱+'</span></div><div class="result-row"><span class="result-label">月柱</span><span class="result-value">'+月柱+'</span></div><div class="result-row"><span class="result-label">日柱</span><span class="result-value">'+日柱+'</span></div><div class="result-row"><span class="result-label">時柱</span><span class="result-value">'+時柱+'</span></div></div><div class="health-tip"><strong>望診提醒：</strong>'+五行健康[日五行]+'</div>';
+  document.getElementById('baziResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">年柱</span><span class="result-value">'+年柱+'</span></div><div class="result-row"><span class="result-label">月柱</span><span class="result-value">'+月柱+'</span></div><div class="result-row"><span class="result-label">日柱</span><span class="result-value">'+日柱+'</span></div><div class="result-row"><span class="result-label">時柱</span><span class="result-value">'+時柱+'</span></div></div><div class="health-tip"><strong>望診提醒：</strong>'+五行健康[日五行]+'</div><button class="ask-ai-small" onclick="setContext(\'命理分析\');showAIChat()">💬 問AI</button>';
   setTimeout(function() { renderSoulPortrait({木:'wood',火:'fire',土:'earth',金:'metal',水:'water'}[日五行] || 'water'); }, 100);
 }
 
@@ -337,7 +339,7 @@ function analyzeName() {
   var 天干表 = ["","甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
   var stem = 天干表[strokes % 10] || 天干表[10];
   var element = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[stem];
-  document.getElementById('nameResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+firstChar+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div><div class="health-tip"><strong>建議：</strong>'+element+'代表特質</div>';
+  document.getElementById('nameResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+firstChar+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div><div class="health-tip"><strong>建議：</strong>'+element+'代表特質</div><button class="ask-ai-small" onclick="setContext(\'姓名分析\');showAIChat()">💬 問AI</button>';
 }
 
 var moodChart;
