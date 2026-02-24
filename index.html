@@ -1,95 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>MetaMind 智慧命理</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"/>
-<style>
-:root{ --gold:#d6b15e; --gold2:#b8923a; --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); }
-*{box-sizing:border-box}
-body{margin:0;font-family:"Noto Serif TC",serif;color:var(--text);background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-.wrap{max-width:520px;margin:0 auto;padding:28px 18px 40px;}
-.title{font-size:40px;letter-spacing:2px;text-align:center;color:var(--gold);margin:12px 0 6px;}
-.sub{opacity:.85;text-align:center;margin:0 0 18px;}
-.panel{border:1px solid var(--stroke);background:var(--card);border-radius:18px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.35);}
-.group{margin:12px 0;}
-label{display:block;font-size:13px;opacity:.9;margin:0 0 6px;}
-input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(214,177,94,.25);background:rgba(0,0,0,.25);color:var(--text);outline:none;font-family:"Noto Serif TC",serif;}
-.btn{width:100%;margin-top:14px;padding:14px 12px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#1b1207;font-weight:800;letter-spacing:2px;}
-.hint{opacity:.75;font-size:12px;margin-top:10px;line-height:1.6;}
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MetaMind｜輸入資料</title>
+<link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-<div class="wrap">
-<div class="title">MetaMind</div>
-<div class="sub">智慧命理</div>
-<div class="panel">
-<div class="group">
-<label>您的名字</label>
-<input id="userName" type="text" placeholder="例如：莊曜瑋" autocomplete="name"/>
+<main class="page">
+<header class="top">
+<div class="brand">MetaMind</div>
+<div class="subtitle">請輸入資料</div>
+</header>
+<section class="card">
+<h1 class="h1">輸入您的資料</h1>
+<form id="profileForm" class="form">
+<label class="field">
+<span>姓名</span>
+<input id="name" type="text" placeholder="例如：莊曜瑋" autocomplete="name" required />
+</label>
+<div class="row">
+<label class="field">
+<span>西元年</span>
+<input id="year" type="number" inputmode="numeric" placeholder="1987" min="1900" max="2100" required />
+</label>
+<label class="field">
+<span>月份</span>
+<input id="month" type="number" inputmode="numeric" placeholder="10" min="1" max="12" required />
+</label>
+<label class="field">
+<span>日期</span>
+<input id="day" type="number" inputmode="numeric" placeholder="14" min="1" max="31" required />
+</label>
 </div>
-<div class="group">
-<label>西元年</label>
-<input id="year" type="number" placeholder="1987" min="1" max="3000"/>
-</div>
-<div class="group">
-<label>月份</label>
-<input id="month" type="number" placeholder="10" min="1" max="12"/>
-</div>
-<div class="group">
-<label>日期</label>
-<input id="day" type="number" placeholder="14" min="1" max="31"/>
-</div>
-<div class="group">
-<label>出生時辰</label>
-<select id="hourBranch">
-<option value="子">子時 (23:00-01:00)</option>
-<option value="丑">丑時 (01:00-03:00)</option>
-<option value="寅">寅時 (03:00-05:00)</option>
-<option value="卯">卯時 (05:00-07:00)</option>
-<option value="辰">辰時 (07:00-09:00)</option>
-<option value="巳">巳時 (09:00-11:00)</option>
-<option value="午">午時 (11:00-13:00)</option>
-<option value="未">未時 (13:00-15:00)</option>
-<option value="申">申時 (15:00-17:00)</option>
-<option value="酉">酉時 (17:00-19:00)</option>
-<option value="戌">戌時 (19:00-21:00)</option>
-<option value="亥">亥時 (21:00-23:00)</option>
+<label class="field">
+<span>時辰</span>
+<select id="shichen">
+<option value="">不確定（可略過）</option>
+<option value="子">子時（23:00–01:00）</option>
+<option value="丑">丑時（01:00–03:00）</option>
+<option value="寅">寅時（03:00–05:00）</option>
+<option value="卯">卯時（05:00–07:00）</option>
+<option value="辰">辰時（07:00–09:00）</option>
+<option value="巳">巳時（09:00–11:00）</option>
+<option value="午">午時（11:00–13:00）</option>
+<option value="未">未時（13:00–15:00）</option>
+<option value="申">申時（15:00–17:00）</option>
+<option value="酉">酉時（17:00–19:00）</option>
+<option value="戌">戌時（19:00–21:00）</option>
+<option value="亥">亥時（21:00–23:00）</option>
 </select>
-</div>
-<button class="btn" onclick="startAnalysis()">開始分析</button>
-<div class="hint">會將資料儲存在本機（localStorage：metamind_profile），進入探索中心後 AI 會自動讀取並開口。</div>
-</div>
-</div>
-<script>
-const LS_KEY = "metamind_profile";
-function startAnalysis(){
-const name = (document.getElementById("userName").value || "").trim();
-const year = Number(document.getElementById("year").value);
-const month = Number(document.getElementById("month").value);
-const day = Number(document.getElementById("day").value);
-const hourBranch = document.getElementById("hourBranch").value || "子";
-if(!name || !year || !month || !day || !hourBranch){
-alert("請完整填寫姓名 / 年 / 月 / 日 / 時辰");
-return;
-}
-const profile = { name, year, month, day, hourBranch };
-localStorage.setItem(LS_KEY, JSON.stringify(profile));
-window.location.href = "explore.html";
-}
-window.addEventListener("DOMContentLoaded", () => {
-try{
-const p = JSON.parse(localStorage.getItem(LS_KEY) || "null");
-if(p){
-document.getElementById("userName").value = p.name || "";
-document.getElementById("year").value = p.year || "";
-document.getElementById("month").value = p.month || "";
-document.getElementById("day").value = p.day || "";
-document.getElementById("hourBranch").value = p.hourBranch || "子";
-}
-}catch(e){}
-});
-</script>
+<small class="hint">不知道出生時辰也可以先做「概略盤」分析。</small>
+</label>
+<button class="btn" type="submit">開始分析</button>
+<p class="muted" id="msg"></p>
+</form>
+</section>
+<footer class="foot">© MetaMind</footer>
+</main>
+<script src="./app.js"></script>
 </body>
 </html>
