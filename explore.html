@@ -2,50 +2,39 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MetaMind｜探索中心</title>
-<link rel="stylesheet" href="./styles.css" />
+<link rel="stylesheet" href="./assets/style.css" />
 </head>
 <body>
-<main class="page">
-<header class="top">
+<div class="page">
+<header class="hero">
 <div class="brand">MetaMind</div>
 <div class="subtitle">探索中心</div>
 </header>
-<section class="card">
-<p class="muted" id="welcome"></p>
-<div class="divider"></div>
-<div id="openingBox" class="opening">
-<div class="skeleton" id="openingLoading"> 正在讀取命盤與推演中… </div>
-<div id="openingText" class="openingText" hidden></div>
+<main class="card">
+<h1 class="card-title">探索中心</h1>
+<div id="profileLine" class="profileline">正在讀取命盤資料…</div>
+<div class="section">
+<div class="section-title">師傅先給你一句話</div>
+<div id="quickReading" class="quickbox">（尚未生成）</div>
 </div>
-<div class="divider"></div>
-<h2 class="h2">問 AI</h2>
-<div class="qa">
-<textarea id="question" rows="3" placeholder="直接問：財運/事業/感情/健康/流年..."></textarea>
+<div class="section">
+<div class="section-title">功能</div>
+<div class="grid2" id="featureGrid"></div>
+</div>
+<div class="section">
+<div class="section-title">問 AI（像現場問師傅）</div>
+<textarea id="question" class="textarea" placeholder="例如：我最近的阻力在哪？要怎麼破局？"></textarea>
 <button id="askBtn" class="btn">送出</button>
-<p class="muted" id="qaMsg">="answer" class</p>
-<div id="answer" hidden></div>
-</div>
-</section>
-<div class="features">
-<div class="feature-grid">
-<div class="feature-item"><span class="feature-icon">📜</span><span class="feature-label">八字命盤</span></div>
-<div class="feature-item"><span class="feature-icon">✍️</span><span class="feature-label">姓名分析</span></div>
-<div class="feature-item"><span class="feature-icon">💑</span><span class="feature-label">婚姻配對</span></div>
-<div class="feature-item"><span class="feature-icon">📈</span><span class="feature-label">流年分析</span></div>
-<div class="feature-item"><span class="feature-icon">💰</span><span class="feature-label">財運</span></div>
-<div class="feature-item"><span class="feature-icon">💼</span><span class="feature-label">事業</span></div>
-<div class="feature-item"><span class="feature-icon">❤️</span><span class="feature-label">感情</span></div>
-<div class="feature-item"><span class="feature-icon">🏥</span><span class="feature-label">健康</span></div>
-<div class="feature-item"><span class="feature-icon">🃏</span><span class="feature-label">智慧卡</span></div>
-<div class="feature-item"><span class="feature-icon">🖋️</span><span class="feature-label">測字</span></div>
-</div>
-</div>
-<footer class="foot">
+<div id="answer" class="answer"></div>
+<div class="minor-actions">
+<button id="openSafariBtn" class="btn btn-ghost" type="button">用 Safari 開啟（避免白屏）</button>
 <a class="link" href="./index.html">← 回首頁重新輸入</a>
-</footer>
+</div>
+</div>
 </main>
-<script src="./app.js"></script>
+</div>
+<script src="./assets/app.js"></script>
 </body>
 </html>
