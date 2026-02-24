@@ -339,8 +339,11 @@ function calculateBazi() {
 }
 
 async function generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行) {
+  // 儲存上下文供後續使用
+  window.baziContext = '我的八字：年柱' + 年柱 + '、月柱' + 月柱 + '、日柱' + 日柱 + '、時柱' + 時柱 + '。日主五行為' + 日五行 + '。';
+  
   try {
-    var prompt = '你是八字命理專家。請根據以下資訊生成詳細分析：\n年柱：'+年柱+'\n月柱：'+月柱+'\n日柱：'+日柱+'\n時柱：'+時柱+'\n日主五行：'+日五行+'\n\n請用以下格式回覆：\n1. 可能體質原因：\n2. 五行關聯：\n3. 生活建議：\n4. 飲食建議：';
+    var prompt = '你是八字命理專家。請根據以下資訊生成詳細分析：\n年柱：'+年柱+'\n月柱：'+月柱+'\n日柱：'+日柱+'\n時柱：'+時柱+'\n日主五行：'+日五行+'\n\n請用以下格式回覆（用markdown）：\n1. 可能體質原因：\n2. 五行關聯：\n3. 生活建議：\n4. 飲食建議：';
     var resp = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -348,15 +351,17 @@ async function generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行) {
     });
     var data = await resp.json();
     if (data.reply) {
-      var lines = data.reply.split('\n').filter(l => l.trim());
-      var html = '<div class="ai-analysis"><strong>✨ AI 解析</strong>';
-      lines.forEach(function(line) { html += '<p>'+line+'</p>'; });
-      html += '</div><button class="ask-ai-small" onclick="setContext(\'命理分析\');showAIChat()">💬 繼續問AI</button>';
+      var html = '<div class="ai-analysis"><strong>✨ AI 解析</strong><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div><button class="ask-ai-small" onclick="askAIWithContext()">💬 繼續問AI</button>';
       document.getElementById('aiAnalysis').innerHTML = html;
     }
   } catch(e) {
     document.getElementById('aiAnalysis').innerHTML = '<div class="ai-error">解析稍後可用</div>';
   }
+}
+
+function askAIWithContext() {
+  var contextMsg = window.baziContext || '';
+  showAIChat('請根據我的八字命盤：' + contextMsg + ' 給我更多建議');
 }
 
 function analyzeName() {
@@ -380,13 +385,48 @@ function initMoodChart() {
   document.querySelectorAll('.mood-btn').forEach(function(btn) { btn.addEventListener('click', function() { var m = parseInt(this.getAttribute('data-mood')); moodChart.data.datasets[0].data[moodChart.data.datasets[0].data.length-1] = m; moodChart.update(); }); }); }
 
 // ========== AI Chat Functions ==========
-function showAIChat() { document.getElementById('aiOverlay').classList.add('open'); if(document.getElementById('aiMessages').children.length === 0) { addAIMsg('meta', '你好！我是 AI 命理助理，有任何問題都可以問我～'); } setTimeout(function(){document.getElementById('aiInput').focus()}, 100); }
+function showAIChat(autoMsg) { 
+  document.getElementById('aiOverlay').classList.add('open'); 
+  if(document.getElementById('aiMessages').children.length === 0) { 
+    addAIMsg('meta', '你好！我是 AI 命理助理，有任何問題都可以問我～'); 
+  } 
+  setTimeout(function(){
+    document.getElementById('aiInput').focus(); 
+    if (autoMsg) {
+      sendAIMessage(autoMsg);
+    }
+  }, 100); 
+}
 function closeAIChat() { document.getElementById('aiOverlay').classList.remove('open'); }
 function saveApiKey() { var v = document.getElementById('apiKeyInput').value.trim(); if(v) { apiKey = v; localStorage.setItem('openai_api_key', apiKey); addAIMsg('meta', 'API Key 已儲存！'); } }
 function clearApiKey() { apiKey = ''; localStorage.removeItem('openai_api_key'); document.getElementById('apiKeyInput').value = ''; addAIMsg('meta', 'API Key 已清除。'); }
 function esc(s) { return s.replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]}); }
 function addAIMsg(type, text) { var m = document.getElementById('aiMessages'); var row = document.createElement('div'); row.className = 'msg ' + type; if(type === 'ai') row.innerHTML = '<div class="avatar">AI</div><div class="bubble">'+esc(text)+'</div>'; else if(type === 'user') row.innerHTML = '<div class="bubble">'+esc(text)+'</div>'; else if(type === 'error') row.innerHTML = '<div class="avatar">!</div><div class="bubble">'+esc(text)+'</div>'; else row.innerHTML = '<div class="avatar">i</div><div class="bubble">'+esc(text)+'</div>'; m.appendChild(row); m.scrollTop = m.scrollHeight; }
-async function sendAIMessage() { var input = document.getElementById('aiInput'); var text = input.value.trim(); if(!text) return; addAIMsg('user', text); chatHistory.push({role:'user',content:text}); input.value = ''; document.getElementById('aiSend').disabled = true; addAIMsg('ai', '...'); var loadingMsg = document.getElementById('aiMessages').lastChild; try { var url = '/.netlify/functions/chat'; console.time('AI'); var resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:text, context:currentContext, history:chatHistory}), signal:AbortSignal.timeout(25000) }); console.log('status', resp.status); var txt = await resp.text(); console.log('raw', txt); console.timeEnd('AI'); if(!resp.ok) throw new Error('API 錯誤: ' + resp.status); var data = JSON.parse(txt); if(data.error) throw new Error(data.error); loadingMsg.querySelector('.bubble').textContent = data.reply; chatHistory.push({role:'assistant',content:data.reply}); } catch(e) { console.error('fetch error', e); loadingMsg.querySelector('.bubble').textContent = '錯誤: ' + e.message; addAIMsg('error', e.message); } finally { document.getElementById('aiSend').disabled = false; input.focus(); } }
+async function sendAIMessage(autoMsg) { 
+  var input = document.getElementById('aiInput'); 
+  var text = autoMsg || input.value.trim(); 
+  if(!text) return; 
+  addAIMsg('user', text); 
+  chatHistory.push({role:'user',content:text}); 
+  if(!autoMsg) input.value = ''; 
+  document.getElementById('aiSend').disabled = true; 
+  addAIMsg('ai', '...'); 
+  var loadingMsg = document.getElementById('aiMessages').lastChild; 
+  try { 
+    var url = '/.netlify/functions/chat'; 
+    var resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message:text, context:currentContext, history:chatHistory}), signal:AbortSignal.timeout(30000) }); 
+    var data = await resp.json(); 
+    if(!resp.ok) throw new Error(data.error || 'API 錯誤: ' + resp.status); 
+    loadingMsg.querySelector('.bubble').innerHTML = data.reply.replace(/\n/g, '<br>'); 
+    chatHistory.push({role:'assistant',content:data.reply}); 
+  } catch(e) { 
+    loadingMsg.querySelector('.bubble').textContent = '錯誤: ' + e.message; 
+    addAIMsg('error', e.message); 
+  } finally { 
+    document.getElementById('aiSend').disabled = false; 
+    input.focus(); 
+  } 
+}
 
 // ========== Oracle Card ==========
 var ORACLE_CARDS = [{title:'覺醒',msg:'是時候覺醒你內在的力量了。'},{title:'平衡',msg:'生活需要平衡。'},{title:'行動',msg:'不要猶豫，行動吧！'},{title:'靜心',msg:'給自己一個喘息的空間。'},{title:'轉變',msg:'改變即將到來。'},{title:'智慧',msg:'聆聽內心的聲音。'}];
