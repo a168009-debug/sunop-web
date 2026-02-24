@@ -177,3 +177,20 @@ button:active, .btn:active{ transform: translateY(2px); box-shadow: 0 12px 30px 
 @media (max-width: 520px){ body{ padding: 18px; } main > *:first-child, .container > *:first-child, .wrap > *:first-child{ border-radius: 24px; } }
 /* 外層透明 */
 html, body{ background-color: transparent; }
+
+
+/* =============================== MetaMind — LUX WHITE GLASS =============================== */
+:root{ --mm-bg1:#F7F4EC; --mm-bg2:#EDE7D7; --mm-ink:#0E1A2B; --mm-muted:rgba(14,26,43,.62); --mm-gold1:#F3E3B2; --mm-gold2:#C9A24A; --mm-line:rgba(14,26,43,.10); --mm-glass:rgba(255,255,255,.62); --mm-shadow:rgba(10,20,40,.18); }
+body{ color: var(--mm-ink) !important; background: radial-gradient(900px 600px at 15% 10%, rgba(201,162,74,.14) 0%, transparent 60%), radial-gradient(900px 600px at 85% 15%, rgba(90,130,210,.14) 0%, transparent 60%), radial-gradient(900px 600px at 50% 90%, rgba(140,180,255,.10) 0%, transparent 60%), linear-gradient(180deg, var(--mm-bg1) 0%, var(--mm-bg2) 100%) !important; }
+body::before{ opacity:.18 !important; filter: blur(.4px) !important; }
+main > *:first-child, .container > *:first-child, .wrap > *:first-child, .mm-card{ background: var(--mm-glass) !important; border: 1px solid rgba(255,255,255,.75) !important; box-shadow: 0 30px 70px var(--mm-shadow), 0 10px 24px rgba(10,20,40,.10), inset 0 1px 0 rgba(255,255,255,.75) !important; backdrop-filter: blur(18px) saturate(120%) !important; }
+main > *:first-child::before, .container > *:first-child::before, .wrap > *:first-child::before, .mm-card::before{ opacity:.35 !important; filter: blur(14px) !important; background: linear-gradient(135deg, rgba(201,162,74,.00) 0%, rgba(243,227,178,.42) 20%, rgba(140,180,255,.22) 55%, rgba(201,162,74,.38) 78%, rgba(201,162,74,.00) 100%) !important; }
+h1, h2, .title, .brand{ color: var(--mm-ink) !important; background: none !important; text-shadow: 0 10px 30px rgba(10,20,40,.08) !important; letter-spacing: .6px; }
+h1 + *, .subtitle, small, .sub{ color: rgba(201,162,74,.88) !important; }
+p, label, .hint, .desc{ color: var(--mm-muted) !important; }
+input, select, textarea{ color: var(--mm-ink) !important; background: rgba(255,255,255,.78) !important; border: 1px solid var(--mm-line) !important; box-shadow: inset 0 10px 18px rgba(10,20,40,.06), inset 0 1px 0 rgba(255,255,255,.75), 0 10px 24px rgba(10,20,40,.08) !important; }
+input::placeholder{ color: rgba(14,26,43,.38) !important; }
+input:focus, select:focus, textarea:focus{ border-color: rgba(201,162,74,.45) !important; box-shadow: 0 0 0 4px rgba(201,162,74,.14), inset 0 10px 18px rgba(10,20,40,.06), 0 18px 40px rgba(10,20,40,.10) !important; }
+button, .btn{ color: #F7FAFF !important; border: 1px solid rgba(201,162,74,.30) !important; background: linear-gradient(145deg, #0E1A2B 0%, #162A45 55%, #0B1423 100%) !important; box-shadow: 0 26px 60px rgba(10,20,40,.25), 0 12px 22px rgba(10,20,40,.18), inset 0 1px 0 rgba(255,255,255,.14) !important; }
+button::before, .btn::before{ opacity:.40 !important; background: radial-gradient(circle at 25% 20%, rgba(243,227,178,.20) 0%, transparent 55%), radial-gradient(circle at 80% 70%, rgba(140,180,255,.14) 0%, transparent 60%) !important; }
+button:active, .btn:active{ transform: translateY(2px); box-shadow: 0 14px 30px rgba(10,20,40,.22), inset 0 10px 18px rgba(0,0,0,.22) !important; }
