@@ -1,226 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>MetaMind｜探索中心</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"/>
-<style>
-:root{ --gold:#d6b15e; --gold2:#b8923a; --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); }
-*{box-sizing:border-box}
-body{margin:0;font-family:"Noto Serif TC",serif;color:var(--text);background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-.wrap{max-width:520px;margin:0 auto;padding:26px 16px 60px;}
-.title{font-size:38px;letter-spacing:4px;text-align:center;color:var(--gold);margin:6px 0 6px;}
-.subtitle{opacity:.85;text-align:center;margin:0 0 18px;}
-.panel{border:1px solid var(--stroke);background:var(--card);border-radius:18px;padding:16px;margin-bottom:16px;}
-.panel h3{margin:0 0 10px;color:var(--gold);letter-spacing:2px}
-input,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(214,177,94,.3);background:rgba(0,0,0,.3);color:var(--text);margin-bottom:10px;font-family:"Noto Serif TC",serif;}
-.btn{width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#1b1207;font-weight:900;letter-spacing:2px;}
-.result{ border:1px solid var(--stroke); background:var(--card); border-radius:14px; padding:16px; margin-top:14px; line-height:1.7; white-space:pre-wrap; }
-.aiFab{position:fixed;right:18px;bottom:24px;width:70px;height:70px;border-radius:50%;border:2px solid rgba(214,177,94,.5);background:radial-gradient(circle,rgba(214,177,94,.3),rgba(0,0,0,.4));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer;}
-.aiFab span{color:var(--gold);font-weight:900;font-size:12px}
-/* Modal */
-.modalMask{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;}
-.modal{width:100%;max-width:480px;background:rgba(18,12,7,.98);border:1px solid var(--stroke);border-radius:16px;padding:16px;}
-.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.modalTitle{color:var(--gold);font-weight:900}
-.closeBtn{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:6px 12px;cursor:pointer;}
-.chat{height:50vh;overflow:auto;border:1px solid rgba(214,177,94,.2);border-radius:12px;padding:10px;margin-bottom:10px;background:rgba(0,0,0,.2);}
-.msg{margin:8px 0}
-.msg.ai{text-align:left}
-.msg.user{text-align:right}
-.bubble{display:inline-block;padding:10px 14px;border-radius:14px;max-width:85%;line-height:1.5;white-space:pre-wrap;}
-.ai .bubble{background:rgba(255,255,255,.08);border:1px solid rgba(214,177,94,.2)}
-.user .bubble{background:rgba(214,177,94,.15)}
-.inputRow{display:flex;gap:8px}
-.inputRow input{flex:1;margin:0}
-.inputRow button{padding:10px 16px;border:none;border-radius:10px;background:var(--gold);color:#1b1207;font-weight:900}
-</style>
+<link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-<div class="wrap">
-<div class="title">探索中心</div>
-<div class="subtitle" id="welcomeName">緣起</div>
-
-<!-- 資料輸入區（初始顯示） -->
-<div class="panel" id="inputPanel">
-<h3>請開示</h3>
-<p style="opacity:.8;margin-bottom:16px;font-size:14px;">填寫出生資訊，方可窺見命局端倪。</p>
-<input id="userName" type="text" placeholder="姓名"/>
-<input id="year" type="number" placeholder="西元年" />
-<input id="month" type="number" placeholder="月份" />
-<input id="day" type="number" placeholder="日期" />
-<select id="hourBranch">
-<option value="">選擇時辰（可略過）</option>
-<option value="子">子時 (23:00-01:00)</option>
-<option value="丑">丑時 (01:00-03:00)</option>
-<option value="寅">寅時 (03:00-05:00)</option>
-<option value="卯">卯時 (05:00-07:00)</option>
-<option value="辰">辰時 (07:00-09:00)</option>
-<option value="巳">巳時 (09:00-11:00)</option>
-<option value="午">午時 (11:00-13:00)</option>
-<option value="未">未時 (13:00-15:00)</option>
-<option value="申">申時 (15:00-17:00)</option>
-<option value="酉">酉時 (17:00-19:00)</option>
-<option value="戌">戌時 (19:00-21:00)</option>
-<option value="亥">亥時 (21:00-23:00)</option>
-<option value="未知">未知（不確定出生時辰）</option>
-</select>
-<button class="btn" onclick="saveAndFetch()">起盤</button>
+<main class="page">
+<header class="top">
+<div class="brand">MetaMind</div>
+<div class="subtitle">探索中心</div>
+</header>
+<section class="card">
+<h1 class="h1">探索中心</h1>
+<p class="muted" id="welcome"></p>
+<div class="divider"></div>
+<div id="openingBox" class="opening">
+<div class="skeleton" id="openingLoading"> 正在讀取命盤與推演中… </div>
+<div id="openingText" class="openingText" hidden></div>
 </div>
-
-<!-- AI 分析結果區（初始隱藏） -->
-<div id="resultPanel" style="display:none;">
-<div class="result" id="aiResult">正在起盤...</div>
+<div class="divider"></div>
+<h2 class="h2">問 AI</h2>
+<div class="qa">
+<textarea id="question" rows="4" placeholder="例如：我最近的阻力在哪？要怎麼破局？"></textarea>
+<button id="askBtn" class="btn">送出</button>
+<p class="muted" id="qaMsg"></p>
+<div id="answer" class="answer" hidden></div>
 </div>
-
-<!-- 功能區塊（初始隱藏） -->
-<div id="funcPanel" style="display:none;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;">
-<div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">📜</div><div class="label" style="font-size:13px;">八字命盤</div></div>
-<div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">✍️</div><div class="label" style="font-size:13px;">姓名分析</div></div>
-<div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">📊</div><div class="label" style="font-size:13px;">情緒曲線</div></div>
-<div class="card" style="border:1px solid var(--stroke);background:var(--card);border-radius:14px;padding:16px;text-align:center;"><div class="icon">🎨</div><div class="label" style="font-size:13px;">AI畫像</div></div>
-</div>
-</div>
-
-<div class="aiFab" onclick="openAI()"><span>問AI</span></div>
-
-<!-- AI Modal -->
-<div class="modalMask" id="modalMask">
-<div class="modal">
-<div class="modalHead">
-<div class="modalTitle">命理顧問</div>
-<button class="closeBtn" onclick="closeAI()">關閉</button>
-</div>
-<div class="chat" id="chat"></div>
-<div class="inputRow">
-<input id="chatInput" placeholder="問：財運/感情/事業..."/>
-<button onclick="sendChat()">送出</button>
-</div>
-</div>
-</div>
-
-<script>
-const LS_KEY = "metamind_profile";
-let PROFILE = null;
-
-function getProfile(){
-  try{ return JSON.parse(localStorage.getItem(LS_KEY)); }catch(e){ return null; }
-}
-
-async function saveAndFetch(){
-  const name = document.getElementById("userName").value.trim();
-  const year = Number(document.getElementById("year").value);
-  const month = Number(document.getElementById("month").value);
-  const day = Number(document.getElementById("day").value);
-  const hourBranch = document.getElementById("hourBranch").value;
-  
-  if(!name || !year || !month || !day){
-    alert("請填寫姓名與出生年月日");
-    return;
-  }
-  
-  // 如果選擇"未知"或空白，不傳時辰
-  const profile = { name, year, month, day };
-  if(hourBranch && hourBranch !== "未知"){
-    profile.hourBranch = hourBranch;
-  }
-  
-  PROFILE = profile;
-  localStorage.setItem(LS_KEY, JSON.stringify(PROFILE));
-  
-  document.getElementById("inputPanel").style.display = "none";
-  document.getElementById("welcomeName").innerText = "歡迎・" + name;
-  await fetchIntro();
-}
-
-async function fetchIntro(){
-  if(!PROFILE) PROFILE = getProfile();
-  
-  if(!PROFILE || !PROFILE.name){
-    document.getElementById("resultPanel").style.display = "block";
-    document.getElementById("aiResult").innerText = "請先輸入資料";
-    return;
-  }
-  
-  document.getElementById("resultPanel").style.display = "block";
-  document.getElementById("aiResult").innerText = "正在起盤...";
-  document.getElementById("funcPanel").style.display = "grid";
-  
-  try{
-    const r = await fetch("/.netlify/functions/bazi_ai",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({...PROFILE, mode:"quick", question:"__INTRO__"})
-    });
-    const data = await r.json();
-    if(data && data.reply && data.reply.text){
-      document.getElementById("aiResult").innerText = data.reply.text;
-    }else{
-      document.getElementById("aiResult").innerText = "系統忙碌，請直接問 AI";
-    }
-  }catch(e){
-    document.getElementById("aiResult").innerText = "連線失敗，請直接問 AI";
-  }
-}
-
-function openAI(){
-  document.getElementById("modalMask").style.display = "flex";
-  if(!PROFILE) PROFILE = getProfile();
-  if(!PROFILE || !PROFILE.name){
-    pushAI("請先在上方輸入您的出生資料");
-    return;
-  }
-  if(document.getElementById("chat").children.length === 0){
-    pushAI("我是命理顧問。請問。");
-  }
-}
-function closeAI(){ document.getElementById("modalMask").style.display = "none"; }
-function pushAI(t){
-  const c = document.getElementById("chat");
-  c.innerHTML += '<div class="msg ai"><div class="bubble">'+t+'</div></div>';
-  c.scrollTop = c.scrollHeight;
-}
-function pushUser(t){
-  const c = document.getElementById("chat");
-  c.innerHTML += '<div class="msg user"><div class="bubble">'+t+'</div></div>';
-  c.scrollTop = c.scrollHeight;
-}
-
-async function sendChat(){
-  const input = document.getElementById("chatInput");
-  const q = input.value.trim();
-  if(!q) return;
-  if(!PROFILE) PROFILE = getProfile();
-  pushUser(q);
-  input.value = "";
-  pushAI("待我細細推敲...");
-  
-  try{
-    const r = await fetch("/.netlify/functions/bazi_ai",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({...PROFILE, mode:"quick", question:q})
-    });
-    const data = await r.json();
-    const last = document.querySelector("#chat .msg.ai:last-child .bubble");
-    if(last) last.textContent = (data?.reply?.text || "天機難測，請再試一次");
-  }catch(e){
-    const last = document.querySelector("#chat .msg.ai:last-child .bubble");
-    if(last) last.textContent = "網路不暢，稍後再試";
-  }
-}
-
-// Init - auto fetch if profile exists
-window.addEventListener("DOMContentLoaded", async () => {
-  const p = getProfile();
-  if(p && p.name){
-    PROFILE = p;
-    document.getElementById("welcomeName").innerText = "歡迎・" + p.name;
-    document.getElementById("inputPanel").style.display = "none";
-    await fetchIntro();
-  }
-});
-</script>
+</section>
+<footer class="foot">
+<a class="link" href="./index.html">← 回首頁重新輸入</a>
+</footer>
+</main>
+<script src="./app.js"></script>
 </body>
 </html>
