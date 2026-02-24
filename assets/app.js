@@ -24,6 +24,127 @@ function pickText(v){
   }
   return String(v);
 }
+
+// 今日運勢計算
+function calculateDailyLuck(profile){
+  if(!profile || !profile.year || !profile.month || !profile.day) return null;
+  
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayTs = today.getTime();
+  
+  // 檢查緩存
+  try{
+    const cached = JSON.parse(localStorage.getItem("metamind_daily"));
+    if(cached && cached.profileTs === profile.ts && cached.date === todayTs){
+      return cached;
+    }
+  }catch(e){}
+  
+  // 計算八字
+  const y = parseInt(profile.year), m = parseInt(profile.month), d = parseInt(profile.day);
+  let h = 12; // 預設午時
+  const hb = profile.hourBranch;
+  if(hb){
+    const hbMap = {子:23, 丑:1, 寅:3, 卯:5, 辰:7, 巳:9, 午:11, 未:13, 申:15, 酉:17, 戌:19, 亥:21};
+    h = hbMap[hb] || 12;
+  }
+  
+  let solar, lunar;
+  try{
+    solar = Solar.fromYmdHms(y, m, d, h, 0, 0);
+    lunar = solar.getLunar();
+  }catch(e){
+    return null;
+  }
+  
+  const dayGan = lunar.getDayGan(); // 日干
+  const dayZhi = lunar.getDayZhi(); // 日支
+  
+  // 幸運色
+  const ganColors = {
+    甲:"青/綠", 乙:"青/綠", 丙:"紅/紫", 丁:"紅/紫",
+    戊:"黃/咖", 己:"黃/咖", 庚:"白/金", 辛:"白/金",
+    壬:"黑/藍", 癸:"黑/藍"
+  };
+  
+  // 幸運數字
+  const zhiNums = {
+    子:1, 丑:2, 寅:3, 卯:4, 辰:5, 巳:6, 午:7, 未:8, 申:9, 酉:10, 戌:11, 亥:12
+  };
+  
+  // 幸運方位
+  const zhiDirs = {
+    子:"北", 丑:"東北", 寅:"東北", 卯:"東", 辰:"東南", 巳:"東南",
+    午:"南", 未:"西南", 申:"西南", 酉:"西", 戌:"西北", 亥:"西北"
+  };
+  
+  // 整體運勢（根據日干強弱）
+  const ganStrength = {甲:4, 乙:3, 丙:5, 丁:4, 戊:4, 己:3, 庚:5, 辛:4, 壬:4, 癸:3};
+  const stars = ganStrength[dayGan] || 3;
+  
+  // 運勢評語
+  const aspects = {
+    甲:{love:"戀愛運不錯，身邊有貴人", career:"事業有衝勁，適合主動出擊", health:"肝火旺，多喝水休息"},
+    乙:{love:"感情細膩，適合慢火燉煮", career:"彈性好，貴人暗中幫忙", health:"注意腸胃消化"},
+    丙:{love:"魅力全開，桃花朵朵", career:"事業火紅，聲勢上漲", health:"小心火氣，多吃蔬果"},
+    丁:{love:"溫柔體貼，異性緣佳", career:"頭腦清晰，談判順利", health:"注意心血管"},
+    戊:{love:"穩定發展，適合長期關係", career:"財運亨通，地盤穩固", health:"注意脾胃"},
+    己:{love:"務實平凡才是真", career:"按部就班，積少成多", health:"少熬夜"},
+    庚:{love:"果斷出擊，別猶豫", career:"大刀闊斧，業務強勁", health:"注意呼吸系統"},
+    辛:{love:"有魅力但別太計較", career:"精打細算，事業上升", health:"肺部呼吸"},
+    壬:{love:"智慧取勝，理性看感情", career:"靈活變通，財源廣進", health:"多喝水"},
+    癸:{love:"柔情似水，適合培育", career:"耐力驚人，後勁強", health:"注意腎臟"}
+  };
+  
+  const a = aspects[dayGan] || aspects["甲"];
+  
+  const result = {
+    date: todayTs,
+    profileTs: profile.ts,
+    stars: stars,
+    love: a.love,
+    career: a.career,
+    health: a.health,
+    luckyColor: ganColors[dayGan] || "白",
+    luckyNum: zhiNums[dayZhi] || 1,
+    luckyDir: zhiDirs[dayZhi] || "北",
+    updatedAt: new Date().toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"})
+  };
+  
+  // 儲存
+  localStorage.setItem("metamind_daily", JSON.stringify(result));
+  return result;
+}
+
+function renderDailyLuck(data){
+  const el = $("dailyLuck");
+  if(!el || !data) return;
+  
+  el.style.display = "block";
+  el.querySelector(".daily-time").textContent = "更新於 " + data.updatedAt;
+  el.querySelector(".luck-stars").innerHTML = "整體運勢 " + "★".repeat(data.stars) + "☆".repeat(5-data.stars);
+  el.querySelector(".luck-aspects").innerHTML = `
+    <div>💕 愛情：${data.love}</div>
+    <div>💼 事業：${data.career}</div>
+    <div>🏥 健康：${data.health}</div>
+  `;
+  el.querySelector(".luck-tags").innerHTML = `
+    <span class="tag">幸運色 ${data.luckyColor}</span>
+    <span class="tag">幸運數 ${data.luckyNum}</span>
+    <span class="tag">幸運方 ${data.luckyDir}</span>
+  `;
+}
+
+// 自動載入今日運勢
+(function initDailyLuck(){
+  const profile = loadProfile();
+  if(profile){
+    const data = calculateDailyLuck(profile);
+    if(data) renderDailyLuck(data);
+  }
+})();
+
 const form = $("baziForm");
 if(form){
   form.addEventListener("submit", (e) => {
@@ -41,10 +162,14 @@ if(form){
       return;
     }
     saveProfile(profile);
+    // 重新計算今日運勢
+    const data = calculateDailyLuck(profile);
+    if(data) renderDailyLuck(data);
     window.location.href = "./explore.html";
   });
   return;
 }
+
 const profileLine = $("profileLine");
 const quickReading = $("quickReading");
 const featureGrid = $("featureGrid");
@@ -117,11 +242,24 @@ if(askBtn){
     try{
       const text = await callBaziFunction(profile, q);
       answer.textContent = pickText(text);
+      // 儲存歷史
+      saveHistory(q, pickText(text));
     }catch(err){
       answer.textContent = "目前無法取得回覆：" + (err?.message || err);
     }
   });
 }
+
+// 歷史儲存
+function saveHistory(q, a){
+  try{
+    let h = JSON.parse(localStorage.getItem("metamind_history") || "[]");
+    h.unshift({ts:Date.now(), question:q, answer:a});
+    if(h.length > 50) h = h.slice(0, 50);
+    localStorage.setItem("metamind_history", JSON.stringify(h));
+  }catch(e){}
+}
+
 async function generateQuickReading(profile){
   if(!quickReading) return;
   quickReading.textContent = "師傅看盤中…";
