@@ -1,4 +1,4 @@
-const { Lunar, LunarUtil } = require("lunar-javascript");
+const { Lunar, LunarUtil } = require("lunar");
 
 const QUICK = { model: "gpt-4o-mini", max_tokens: 350, timeoutMs: 8000 };
 const DEEP = { model: "gpt-4o", max_tokens: 900, timeoutMs: 15000 };
@@ -49,11 +49,10 @@ function calculateBazi(year, month, day, hourBranch) {
     const tiangan = bazi.getTianGan();
     const dizhi = bazi.getDiZhi();
     
-    const dayMaster = tiangan[0]; // 日主
+    const dayMaster = tiangan[0];
     const dayStem = tiangan[1];
     const dayZhi = dizhi[1];
     
-    // 十神
     const tenGodMap = {
       "甲": { "甲": "比肩", "乙": "劫財", "丙": "食神", "丁": "傷官", "戊": "偏財", "己": "正財", "庚": "七殺", "辛": "正官", "壬": "偏印", "癸": "正印" },
       "乙": { "甲": "劫財", "乙": "比肩", "丙": "傷官", "丁": "食神", "戊": "正財", "己": "偏財", "庚": "正官", "辛": "七殺", "壬": "正印", "癸": "偏印" },
@@ -69,7 +68,6 @@ function calculateBazi(year, month, day, hourBranch) {
     
     const getTenGod = (dayG, otherG) => tenGodMap[dayG]?.[otherG] || "";
     
-    // 五行
     const wuxingMap = {
       "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
       "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水"
@@ -102,28 +100,23 @@ function buildSystemPrompt(mode) {
 - 高深莫測、內斂、含蓄
 - 帶有命理洞察，但不直白批評
 - 不要情緒分析師的口吻
-- 不要太自我中心
-
-範例：
-不要說：「你最近壓力大」
-要說：「氣場略顯浮動，心念未定，外境之壓未必來自他人，或許源自內在未決之言」
 
 `;
   if (mode === "deep") {
     return base + `
 深度模式：
-1. 一句引導式判語（帶玄機但不空泛）
-2. 體用分析（日主強弱、五行喜忌）
-3. 近半年運勢走向（事業/財富/感情各一句）
-4. 宜注意之事（以勸誡語氣）
-5. 建議方向（點到為止）
+1. 一句引導式判語
+2. 體用分析
+3. 近半年運勢
+4. 宜注意之事
+5. 建議方向
 `;
   }
   return base + `
 快速模式：
-1. 一句命理判語（20字內，含蓄點醒）
+1. 一句命理判語
 2. 日主特質與最近運勢
-3. 兩個建議方向（短句）
+3. 兩個建議方向
 `;
 }
 
@@ -150,7 +143,7 @@ ${baziInfo}
 請用命理師口吻對他開口：
 1. 先給一句「點醒式」判語
 2. 根據八字結構點出他最近可能在糾結的方向
-3. 給一個建議方向（不要多）
+3. 給一個建議方向
 `;
   }
   return `
@@ -161,7 +154,7 @@ ${baziInfo}
 
 問題：${question}
 
-請用含蓄的命理師口吻回答，點到為止，不要長篇分析。
+請用含蓄的命理師口吻回答。
 `;
 }
 
@@ -232,7 +225,6 @@ exports.handler = async (event) => {
   const mode = body.mode === "deep" ? "deep" : "quick";
   const question = (body.question || "__INTRO__").toString().trim();
   
-  // 計算八字
   const bazi = calculateBazi(profile.year, profile.month, profile.day, profile.hourBranch);
   
   const apiKey = process.env.OPENAI_API_KEY;
