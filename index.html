@@ -1,53 +1,41 @@
 <!doctype html>
-<!-- METAMIND_HTML_OK -->
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>MetaMind｜輸入資料</title>
-<link rel="stylesheet" href="/assets/style.css?v=LUX_003" />
+<!-- METAMIND_HTML_OK -->
+<link rel="stylesheet" href="/assets/style.css?v=LUX_004" />
 </head>
 <body>
-<div class="mm-bg"></div>
-<main class="mm-shell">
-<section class="mm-card mm-float">
-<div class="page">
+<main class="page">
 <header class="hero">
-<div class="brand">MetaMind</div>
-<div class="subtitle">請輸入資料</div>
+<h1 class="brand">MetaMind</h1>
+<p class="sub">請輸入資料</p>
 </header>
-
-<section id="dailyLuck" class="daily-luck" style="display:none;">
-<div class="daily-header">
-<span class="daily-title">今日運勢</span>
-<span class="daily-time"></span>
-</div>
-<div class="luck-stars"></div>
-<div class="luck-aspects"></div>
-<div class="luck-tags"></div>
-</section>
-
-<main class="card">
-<h1 class="card-title">輸入您的資料</h1>
-<form id="baziForm" class="form" autocomplete="off">
-<label class="label">姓名</label>
-<input class="input" id="name" name="n" placeholder="例如：王小明" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+<section class="card">
+<h2 class="cardTitle">輸入您的資料</h2>
+<label class="field">
+<span>姓名</span>
+<input id="name" type="text" placeholder="例如：王小明" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+</label>
 <div class="grid3">
-<div>
-<label class="label">西元年</label>
-<input class="input" id="year" name="y" inputmode="numeric" placeholder="YYYY" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+<label class="field">
+<span>西元年</span>
+<input id="year" type="number" inputmode="numeric" placeholder="YYYY" autocomplete="off">
+</label>
+<label class="field">
+<span>月份</span>
+<input id="month" type="number" inputmode="numeric" placeholder="MM" autocomplete="off">
+</label>
+<label class="field">
+<span>日期</span>
+<input id="day" type="number" inputmode="numeric" placeholder="DD" autocomplete="off">
+</label>
 </div>
-<div>
-<label class="label">月份</label>
-<input class="input" id="month" name="m" inputmode="numeric" placeholder="MM" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-</div>
-<div>
-<label class="label">日期</label>
-<input class="input" id="day" name="d" inputmode="numeric" placeholder="DD" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-</div>
-</div>
-<label class="label">時辰</label>
-<select class="select" id="hourBranch" name="h" autocomplete="off">
+<label class="field">
+<span>時辰</span>
+<select id="hourBranch">
 <option value="">不確定 / 未知（先做概略盤）</option>
 <option value="子">子時（23:00–01:00）</option>
 <option value="丑">丑時（01:00–03:00）</option>
@@ -62,46 +50,16 @@
 <option value="戌">戌時（19:00–21:00）</option>
 <option value="亥">亥時（21:00–23:00）</option>
 </select>
-<div class="hint">不知道出生時辰也可以先做「概略盤」分析；之後補時辰，結果會更精準。</div>
-<button class="btn" type="submit">開始分析</button>
-<button type="button" class="btn btn-ghost" onclick="clearAll()">清除資料</button>
-<div class="fineprint">按下開始分析後，資料會先儲存在本機（localStorage），再進入探索中心。</div>
-</form>
-<div class="footerline">© MetaMind</div>
-</main>
+</label>
+<p class="hint">不知道出生時辰也可以先做「概略盤」分析；之後補時辰，結果會更精準。</p>
+<div class="actions">
+<button id="startBtn" class="btn-primary" type="button">開始分析</button>
+<button id="clearBtn" class="btn-ghost" type="button">清除資料</button>
 </div>
-<script>
-localStorage.removeItem("metamind_profile");
-localStorage.removeItem("baziData");
-localStorage.removeItem("metamind_daily");
-function clearAll(){
-  localStorage.removeItem("metamind_profile");
-  localStorage.removeItem("baziData");
-  localStorage.removeItem("metamind_daily");
-  document.getElementById("baziForm").reset();
-  document.getElementById("dailyLuck").style.display = "none";
-}
-</script>
-<script defer src="/assets/lunar.min.js?v=LUX_003"></script>
-<script defer src="/assets/app.js?v=LUX_003"></script>
-<script>
-(function(){
-  var t=setTimeout(function(){
-    var before=getComputedStyle(document.body,"::before").content;
-    if(!before||before==="none"||before==="\"\""){
-      var warn=document.createElement("div");
-      warn.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;padding:12px 14px;background:#111;color:#fff;border-radius:12px;z-index:99999;font-size:14px;opacity:.95";
-      warn.textContent="⚠️ CSS/JS 可能未載入（請檢查 /assets 路徑或 404）";
-      document.body.appendChild(warn);
-    }
-  },1200);
-  window.addEventListener("load",function(){clearTimeout(t)});
-})();
-</script>
+<p class="footnote">按下開始分析後，資料會先儲存在本機（localStorage），再進入探索中心。</p>
+</section>
+<footer class="copyright">© MetaMind</footer>
+</main>
+<script src="/assets/app.js?v=LUX_004" defer></script>
 </body>
 </html>
-
-
-
-
-
