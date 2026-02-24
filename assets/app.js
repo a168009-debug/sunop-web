@@ -1,9 +1,10 @@
-/* MetaMind Build: LUX_002 */
-console.log("MetaMind build:", "LUX_002");
+/* MetaMind Build: LUX_003 */
+// Global error handler
+window.onerror = function(msg, url, line){ console.log("ERROR:", msg, "line:", line); };
 // HTML corruption check
 (function(){
   if (!document.documentElement || !document.documentElement.innerHTML || !document.documentElement.innerHTML.includes("METAMIND_HTML_OK")) {
-    document.body.innerHTML = "<div style='padding:20px;text-align:center;color:red;'>HTML corrupted. Please redeploy. Build: LUX_002</div>";
+    document.body.innerHTML = "<div style='padding:20px;text-align:center;color:red;'>HTML corrupted. Please redeploy.</div>";
   }
 })();
 
