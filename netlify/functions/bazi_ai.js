@@ -138,11 +138,15 @@ baziProfile: ${JSON.stringify(b, null, 2)}
 function buildDeepPrompt(b, question) {
   return `請根據 baziProfile 產生「深度模式」JSON，欄位必須包含：
 sections: [ {title, summary, bullets} ]
+action_plan: (3~7條可執行建議)
+next_questions: (3個建議問題)
+
+若使用者有提問，請優先回答：${question || "(無指定問題，請做完整深度解析)"}
 
 baziProfile: ${JSON.stringify(b, null, 2)}
-${question ? "使用者問題: " + question : ""}
 
-輸出嚴格 JSON。
+輸出嚴格 JSON：
+{ "sections": [{"title":"...","summary":"...","bullets":["..."]}], "action_plan": ["..."], "next_questions": ["...","...","..."] }
 `.trim();
 }
 
