@@ -1,3 +1,5 @@
+/* MetaMind Build: BUILD_001 */
+:root{ --mm-css-build:"BUILD_001"; }
 {
   "name": "style.css",
   "path": "assets/style.css",
@@ -18,3 +20,4 @@
 }
 
 body::before{content:"mm-css-ok";display:none;}
+
