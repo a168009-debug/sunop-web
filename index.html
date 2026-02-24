@@ -4,89 +4,80 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>MetaMind 智慧命理</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--gold:#d6b15e;--gold2:#b8923a;--gold-dim:rgba(214,177,94,.22);--bg1:#050404;--bg2:#120c07;--bg3:#1b1209;--text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.70);--radius:22px}
-*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:"Noto Serif TC","PingFang TC",serif;color:var(--text);background:radial-gradient(1100px 560px at 50% 12%, rgba(214,177,94,.10), transparent 62%),radial-gradient(850px 520px at 10% 70%, rgba(214,177,94,.06), transparent 62%),linear-gradient(180deg,var(--bg1),var(--bg2) 40%,var(--bg3));overflow-x:hidden}
-.bg-glow{position:fixed;inset:-30%;background:radial-gradient(circle at 50% 20%, rgba(214,177,94,.10), transparent 55%),radial-gradient(circle at 22% 70%, rgba(214,177,94,.07), transparent 58%);filter:blur(16px);opacity:.9;pointer-events:none}
-.bg-sparkle{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(2px 2px at 20% 15%, rgba(214,177,94,.35) 40%, transparent 60%),radial-gradient(1.6px 1.6px at 78% 22%, rgba(214,177,94,.25) 40%, transparent 60%),radial-gradient(1.4px 1.4px at 62% 58%, rgba(214,177,94,.22) 40%, transparent 60%),radial-gradient(1.2px 1.2px at 35% 80%, rgba(214,177,94,.18) 40%, transparent 60%);opacity:.55;animation:sparkleFloat 8s ease-in-out infinite alternate}
-@keyframes sparkleFloat{from{transform:translateY(0px);opacity:.45}to{transform:translateY(-10px);opacity:.65}}
-.wrap{max-width:520px;margin:0 auto;padding:18px}
-.title{text-align:center;font-size:28px;letter-spacing:.18em;color:var(--gold);margin:8px 0;text-shadow:0 10px 30px rgba(0,0,0,.55)}
-.subtitle{text-align:center;color:var(--muted);margin:0 0 20px;font-size:14px;letter-spacing:.12em}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.1em}
-.form-group input,.form-group select{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:12px;color:#fff;font-size:15px;outline:none;transition:.3s}
-.form-group input:focus,.form-group select:focus{border-color:var(--gold);background:rgba(255,255,255,.08)}
-.btn-primary{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:14px;color:#000;font-size:15px;font-weight:bold;letter-spacing:.15em;cursor:pointer;transition:.3s}
-.btn-primary:active{transform:scale(0.98)}
+:root{ --gold:#d6b15e; --bg1:#050404; --bg2:#120c07; --text:#ffffff; }
+*{box-sizing:border-box}
+body{ margin:0; font-family:"Noto Serif TC",serif; color:var(--text); background:linear-gradient(180deg,var(--bg1),var(--bg2)); padding:20px; }
+.wrap{ max-width:480px; margin:auto; }
+.title{ font-size:28px; text-align:center; margin-bottom:20px; color:var(--gold); }
+.form-group{ margin-bottom:15px; }
+label{ display:block; margin-bottom:5px; }
+input,select{ width:100%; padding:10px; border-radius:6px; border:1px solid #333; background:#111; color:#fff; }
+button{ width:100%; padding:12px; border:none; border-radius:6px; background:var(--gold); color:#000; font-weight:bold; cursor:pointer; margin-top:10px; }
 </style>
 </head>
 <body>
-<div class="bg-glow"></div>
-<div class="bg-sparkle"></div>
 <div class="wrap">
 <div class="title">MetaMind</div>
-<div class="subtitle">智慧命理</div>
-<div class="form-group"><label>您的名字</label><input type="text" id="userName" placeholder="請輸入名字"></div>
-<div class="form-group"><label>西元年</label><input type="number" id="year" placeholder="1995"></div>
-<div class="form-group"><label>月份</label><input type="number" id="month" placeholder="1" min="1" max="12"></div>
-<div class="form-group"><label>日期</label><input type="number" id="day" placeholder="1" min="1" max="31"></div>
-<div class="form-group"><label>出生時辰</label><select id="hour"><option value="子">子時 (23:00-01:00)</option><option value="丑">丑時 (01:00-03:00)</option><option value="寅">寅時 (03:00-05:00)</option><option value="卯">卯時 (05:00-07:00)</option><option value="辰">辰時 (07:00-09:00)</option><option value="巳">巳時 (09:00-11:00)</option><option value="午">午時 (11:00-13:00)</option><option value="未">未時 (13:00-15:00)</option><option value="申">申時 (15:00-17:00)</option><option value="酉">酉時 (17:00-19:00)</option><option value="戌">戌時 (19:00-21:00)</option><option value="亥">亥時 (21:00-23:00)</option></select></div>
-<button class="btn-primary" onclick="startAnalysis()">開始分析</button>
+<div class="form-group">
+<label>您的名字</label>
+<input type="text" id="userName" placeholder="請輸入名字">
+</div>
+<div class="form-group">
+<label>西元年</label>
+<input type="number" id="year" placeholder="1995">
+</div>
+<div class="form-group">
+<label>月份</label>
+<input type="number" id="month" placeholder="1" min="1" max="12">
+</div>
+<div class="form-group">
+<label>日期</label>
+<input type="number" id="day" placeholder="1" min="1" max="31">
+</div>
+<div class="form-group">
+<label>出生時辰</label>
+<select id="hour">
+<option value="子">子時</option>
+<option value="丑">丑時</option>
+<option value="寅">寅時</option>
+<option value="卯">卯時</option>
+<option value="辰">辰時</option>
+<option value="巳">巳時</option>
+<option value="午">午時</option>
+<option value="未">未時</option>
+<option value="申">申時</option>
+<option value="酉">酉時</option>
+<option value="戌">戌時</option>
+<option value="亥">亥時</option>
+</select>
+</div>
+<button onclick="startAnalysis()">開始分析</button>
 </div>
 <script>
-// ===== 共用函式 =====
-function saveProfileToStorage(profile) {
-  localStorage.setItem('metamind_profile', JSON.stringify({
-    ...profile,
-    createdAt: new Date().toISOString()
-  }));
+function startAnalysis(){
+var name = document.getElementById("userName").value.trim();
+var year = document.getElementById("year").value;
+var month = document.getElementById("month").value;
+var day = document.getElementById("day").value;
+var hourBranch = document.getElementById("hour").value;
+if(!name || !year || !month || !day || !hourBranch){ alert("請完整填寫所有資料"); return; }
+var profile = { name:name, year:Number(year), month:Number(month), day:Number(day), hourBranch:hourBranch };
+localStorage.setItem("metamind_profile",JSON.stringify(profile));
+window.location.href="explore.html";
 }
-
-function loadProfileFromStorage() {
-  try {
-    return JSON.parse(localStorage.getItem('metamind_profile') || 'null');
-  } catch(e) { return null; }
+window.addEventListener("DOMContentLoaded",function(){
+try{
+var p = JSON.parse(localStorage.getItem("metamind_profile"));
+if(p){
+document.getElementById("userName").value = p.name || "";
+document.getElementById("year").value = p.year || "";
+document.getElementById("month").value = p.month || "";
+document.getElementById("day").value = p.day || "";
+document.getElementById("hour").value = p.hourBranch || "子";
 }
-
-// ===== 開始分析 =====
-function startAnalysis() {
-  var name = document.getElementById('userName').value.trim();
-  var year = document.getElementById('year').value;
-  var month = document.getElementById('month').value;
-  var day = document.getElementById('day').value;
-  var hour = document.getElementById('hour').value;
-  
-  if (!name || !year || !month || !day) {
-    alert('請完整填寫！');
-    return;
-  }
-  
-  // 儲存 profile
-  var profile = {
-    name: name,
-    year: Number(year),
-    month: Number(month),
-    day: Number(day),
-    hourBranch: hour
-  };
-  saveProfileToStorage(profile);
-  
-  // 跳轉到探索頁面
-  window.location.href = 'explore.html';
-}
-
-// ===== 頁面載入時自動填入 =====
-window.addEventListener('DOMContentLoaded', function() {
-  var p = loadProfileFromStorage();
-  if (p && p.name) {
-    document.getElementById('userName').value = p.name;
-    document.getElementById('year').value = p.year;
-    document.getElementById('month').value = p.month;
-    document.getElementById('day').value = p.day;
-    document.getElementById('hour').value = p.hourBranch || '子';
-  }
+}catch(e){}
 });
 </script>
 </body>
