@@ -27,6 +27,73 @@ function pickText(v){
   return String(v);
 }
 
+// ========== Share Functions ==========
+function getAnswerText(){
+  const el = $("answer");
+  if(!el) return "";
+  return (el.innerText || el.textContent || "").trim();
+}
+
+function buildShareText(answerText){
+  const url = "https://stunning-gecko-4a2c8b.netlify.app";
+  return "【MetaMind 智慧命理】\n\n" + answerText + "\n\n🔗 了解更多：" + url;
+}
+
+let toastTimer = null;
+function showToast(message){
+  const toast = $("toast");
+  if(!toast) return;
+  toast.textContent = message;
+  toast.classList.add("show");
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
+}
+
+async function copyToClipboard(text){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  const ok = document.execCommand("copy");
+  document.body.removeChild(ta);
+  if(!ok) throw new Error("copy failed");
+  return true;
+}
+
+async function shareAnswer(){
+  const answerText = getAnswerText();
+  if(!answerText){
+    showToast("目前沒有可分享的內容");
+    return;
+  }
+  const shareText = buildShareText(answerText);
+  
+  if(navigator.share){
+    try{
+      await navigator.share({text: shareText});
+      return;
+    }catch(err){
+      // Fall through to clipboard
+    }
+  }
+  try{
+    await copyToClipboard(shareText);
+    showToast("已複製到剪貼簿！");
+  }catch(err){
+    showToast("複製失敗，請手動長按複製");
+  }
+}
+window.shareAnswer = shareAnswer;
+
 // ========== History Functions ==========
 function addHistoryEntry(question, answer){
   try{
@@ -43,7 +110,6 @@ function formatTime(ts){
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today.getTime() - 86400000);
   const dateOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  
   const time = d.toLocaleTimeString("zh-TW", {hour:"2-digit", minute:"2-digit"});
   if(dateOnly.getTime() === today.getTime()) return "今天 " + time;
   if(dateOnly.getTime() === yesterday.getTime()) return "昨天 " + time;
@@ -54,7 +120,6 @@ function renderHistory(){
   const list = $("qaHistoryList");
   const empty = $("qaHistoryEmpty");
   if(!list || !empty) return;
-  
   try{
     const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
     if(h.length === 0){
@@ -106,57 +171,8 @@ function initHistoryUI(){
   renderHistory();
   const clearBtn = $("qaHistoryClear");
   if(clearBtn) clearBtn.addEventListener("click", clearHistory);
-}
-
-// ========== Share Functions ==========
-function shareAnswer(){
-  const answerEl = $("answer");
-  if(!answerEl) return;
-  const text = pickText(answerEl.textContent);
-  if(!text){ showToast("尚無內容可分享"); return; }
-  
-  const shareText = "【MetaMind 智慧命理】\n\n" + text + "\n\n🔗 https://stunning-gecko-4a2c8b.netlify.app";
-  
-  if(navigator.share){
-    navigator.share({title:"MetaMind 智慧命理", text:shareText, url:"https://stunning-gecko-4a2c8b.netlify.app"})
-      .catch(e => { if(e.name!=="AbortError") copyToClipboard(shareText); });
-  }else{
-    copyToClipboard(shareText);
-  }
-}
-
-function copyToClipboard(text){
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(() => showToast("✅ 已複製到剪貼簿！"))
-      .catch(() => fallbackCopy(text));
-  }else{
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text){
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  ta.style.opacity = "0";
-  document.body.appendChild(ta);
-  ta.select();
-  try{
-    document.execCommand("copy");
-    showToast("✅ 已複製到剪貼簿！");
-  }catch(e){
-    showToast("❌ 複製失敗");
-  }
-  document.body.removeChild(ta);
-}
-
-function showToast(msg){
-  const existing = document.querySelector(".toast-message");
-  if(existing) existing.remove();
-  const t = document.createElement("div");
-  t.className = "toast-message";
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2000);
+  const shareBtn = $("shareBtn");
+  if(shareBtn) shareBtn.addEventListener("click", shareAnswer);
 }
 
 // ========== Daily Luck ==========
@@ -169,18 +185,15 @@ function calculateDailyLuck(profile){
     const cached = JSON.parse(localStorage.getItem("metamind_daily"));
     if(cached && cached.profileTs === profile.ts && cached.date === todayTs) return cached;
   }catch(e){}
-  
   const y=parseInt(profile.year), m=parseInt(profile.month), d=parseInt(profile.day);
   let h = 12;
   const hbMap = {子:23, 丑:1, 寅:3, 卯:5, 辰:7, 巳:9, 午:11, 未:13, 申:15, 酉:17, 戌:19, 亥:21};
   h = hbMap[profile.hourBranch] || 12;
-  
   let solar, lunar;
   try{
     solar = Solar.fromYmdHms(y, m, d, h, 0, 0);
     lunar = solar.getLunar();
   }catch(e){ return null; }
-  
   const dayGan = lunar.getDayGan();
   const dayZhi = lunar.getDayZhi();
   const ganColors = {甲:"青/綠", 乙:"青/綠", 丙:"紅/紫", 丁:"紅/紫", 戊:"黃/咖", 己:"黃/咖", 庚:"白/金", 辛:"白/金", 壬:"黑/藍", 癸:"黑/藍"};
@@ -199,7 +212,6 @@ function calculateDailyLuck(profile){
     壬:{love:"智慧取勝，理性看感情", career:"靈活變通，財源廣進", health:"多喝水"},
     癸:{love:"柔情似水，適合培育", career:"耐力驚人，後勁強", health:"注意腎臟"}
   };
-  
   const result = {
     date: todayTs, profileTs: profile.ts,
     stars: ganStrength[dayGan]||3,
@@ -267,7 +279,6 @@ const askBtn = $("askBtn");
 const question = $("question");
 const answer = $("answer");
 const openSafariBtn = $("openSafariBtn");
-const shareBtn = $("shareAnswerBtn");
 
 if(profileLine){
   const profile = loadProfile();
@@ -317,8 +328,6 @@ if(openSafariBtn){
   if(isInAppBrowser()) openSafariBtn.style.display = "inline-block";
 }
 
-if(shareBtn) shareBtn.addEventListener("click", shareAnswer);
-
 if(askBtn){
   askBtn.addEventListener("click", async () => {
     const profile = loadProfile();
@@ -326,12 +335,10 @@ if(askBtn){
     if(!profile){ answer.textContent = "你還沒輸入資料，請回首頁先輸入。"; return; }
     if(!q){ answer.textContent = "先輸入你想問的問題。"; return; }
     answer.textContent = "師傅正在看盤…";
-    shareBtn.style.display = "none";
     try{
       const text = await callBaziFunction(profile, q);
       const result = pickText(text);
       answer.textContent = result;
-      shareBtn.style.display = "inline-flex";
       addHistoryEntry(q, result);
       renderHistory();
     }catch(err){
