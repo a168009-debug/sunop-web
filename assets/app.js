@@ -16,6 +16,14 @@ function loadProfile(){
 function saveProfile(profile){
   localStorage.setItem("metamind_profile", JSON.stringify(profile));
 }
+function pickText(v){
+  if(v == null) return "";
+  if(typeof v === "string") return v;
+  if(typeof v === "object"){
+    return v.text || v.message || v.content || v.reply || JSON.stringify(v);
+  }
+  return String(v);
+}
 const form = $("baziForm");
 if(form){
   form.addEventListener("submit", (e) => {
@@ -108,7 +116,7 @@ if(askBtn){
     answer.textContent = "師傅正在看盤…";
     try{
       const text = await callBaziFunction(profile, q);
-      answer.textContent = text;
+      answer.textContent = pickText(text);
     }catch(err){
       answer.textContent = "目前無法取得回覆：" + (err?.message || err);
     }
@@ -119,7 +127,7 @@ async function generateQuickReading(profile){
   quickReading.textContent = "師傅看盤中…";
   const q = "先用『師傅口吻』給我一段 6 行內的總評：1句開場+3個重點+1句一針見血+1句建議。要人話、不要長篇術語。";
   const text = await callBaziFunction(profile, q);
-  quickReading.textContent = text;
+  quickReading.textContent = pickText(text);
 }
 async function callBaziFunction(profile, userQuestion){
   const payload = { ...profile, question: userQuestion };
@@ -135,7 +143,7 @@ async function callBaziFunction(profile, userQuestion){
   const ct = res.headers.get("content-type") || "";
   if(ct.includes("application/json")){
     const j = await res.json();
-    return (j.reply || j.text || JSON.stringify(j)).toString();
+    return j.reply || j.text || j;
   }
   return await res.text();
 }
