@@ -13,27 +13,34 @@
 <div class="subtitle">探索中心</div>
 </header>
 <main class="card">
-<h1 class="card-title">探索中心</h1>
-<div id="profileLine" class="profileline">正在讀取命盤資料…</div>
-<div class="section">
-<div class="section-title">師傅先給你一句話</div>
-<div id="quickReading" class="quickbox">（尚未生成）</div>
+<div id="profileLine" class="profile-line">載入中...</div>
+<div id="quickReading" class="quick-reading">師傅看盤中…</div>
+
+<div class="ask-box">
+<textarea id="question" class="question-input" placeholder="輸入你的問題..."></textarea>
+<button id="askBtn" class="btn">問師傅</button>
 </div>
-<div class="section">
-<div class="section-title">功能</div>
-<div class="grid2" id="featureGrid"></div>
-</div>
-<div class="section">
-<div class="section-title">問 AI（像現場問師傅）</div>
-<textarea id="question" class="textarea" placeholder="例如：我最近的阻力在哪？要怎麼破局？"></textarea>
-<button id="askBtn" class="btn">送出</button>
+
 <div id="answer" class="answer"></div>
-<div class="minor-actions">
-<button id="openSafariBtn" class="btn btn-ghost" type="button">用 Safari 開啟（避免白屏）</button>
-<a class="link" href="./index.html">← 回首頁重新輸入</a>
-</div>
+<button id="shareAnswerBtn" class="share-btn" style="display:none;">📤 分享</button>
+
+<div class="features">
+<div id="featureGrid" class="feature-grid"></div>
 </div>
 </main>
+
+<!-- 歷史紀錄區塊 -->
+<section class="qa-history" id="qaHistory">
+<div class="qa-history-head">
+<h2 class="qa-history-title">我的問答</h2>
+<button id="qaHistoryClear" class="qa-history-clear" type="button">清空</button>
+</div>
+<div id="qaHistoryEmpty" class="qa-empty">目前還沒有紀錄。你問一次，這裡就會自動保存 🙂</div>
+<div id="qaHistoryList" class="qa-list"></div>
+</section>
+
+<button id="openSafariBtn" class="btn btn-ghost" style="display:none;">🌐 用 Safari 開啟</button>
+<div class="footerline"><a href="./index.html" style="color:#999;text-decoration:none;">← 重新輸入資料</a></div>
 </div>
 <script src="./assets/app.js"></script>
 </body>
