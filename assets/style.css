@@ -1,1 +1,122 @@
-:root{ --bg:#f6f7fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb; --gold:#c9a24a; --shadow: 0 10px 30px rgba(17,24,39,.08); --radius: 18px; } *{ box-sizing:border-box; } body{ margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", Arial, sans-serif; background: var(--bg); color: var(--text); } .page{ width: min(920px, 92vw); margin: 0 auto; padding: 28px 0 60px; } .hero{ text-align:center; padding: 20px 0 18px; } .brand{ font-size: 54px; font-weight: 800; letter-spacing: .08em; color: var(--gold); } .subtitle{ margin-top: 10px; color: var(--muted); font-size: 16px; } .card{ margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; } .card-title{ margin: 0 0 14px; font-size: 34px; letter-spacing: .02em; } .form{ display:block; } .label{ display:block; font-size: 14px; color: var(--muted); margin: 14px 0 6px; } .input, .select, .textarea{ width:100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 16px; outline: none; background:#fff; } .input:focus, .select:focus, .textarea:focus{ border-color: rgba(201,162,74,.55); box-shadow: 0 0 0 4px rgba(201,162,74,.15); } .grid3{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } .grid2{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; } @media (max-width: 560px){ .brand{ font-size: 42px; } .card-title{ font-size: 28px; } .grid3{ grid-template-columns: 1fr; } .grid2{ grid-template-columns: 1fr; } } .hint{ margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.45; } .btn{ width:100%; margin-top: 16px; padding: 14px 16px; border: 0; border-radius: 14px; background: var(--gold); color: #fff; font-size: 18px; font-weight: 700; cursor:pointer; } .btn:active{ transform: translateY(1px); } .btn-ghost{ background: transparent; border: 1px solid var(--line); color: var(--text); } .fineprint{ margin-top: 10px; color: var(--muted); font-size: 12px; } .footerline{ margin-top: 16px; text-align:center; color: #9ca3af; } .section{ margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); } .section-title{ font-weight: 800; margin-bottom: 10px; } .profileline{ color: var(--muted); line-height: 1.5; } .quickbox{ border: 1px dashed rgba(201,162,74,.45); background: rgba(201,162,74,.06); border-radius: 14px; padding: 12px 14px; line-height: 1.55; } .feature{ border: 1px solid var(--line); border-radius: 14px; padding: 14px; display:flex; justify-content: space-between; align-items:center; background: #fff; cursor:pointer; } .feature:hover{ border-color: rgba(201,162,74,.55); } .feature .name{ font-weight: 800; } .feature .desc{ color: var(--muted); font-size: 12px; margin-top: 3px; } .answer{ margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; min-height: 60px; white-space: pre-wrap; line-height: 1.55; } .minor-actions{ margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; } .link{ color: var(--muted); text-decoration: none; font-size: 14px; } .link:hover{ text-decoration: underline; }
+{
+  "name": "style.css",
+  "path": "assets/style.css",
+  "sha": "098ad4cd5e8ee30ee18280fe15d3b05752514b70",
+  "size": 3168,
+  "url": "https://api.github.com/repos/a168009-debug/sunop-web/contents/assets/style.css?ref=main",
+  "html_url": "https://github.com/a168009-debug/sunop-web/blob/main/assets/style.css",
+  "git_url": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/098ad4cd5e8ee30ee18280fe15d3b05752514b70",
+  "download_url": "https://raw.githubusercontent.com/a168009-debug/sunop-web/main/assets/style.css",
+  "type": "file",
+  "content": "OnJvb3R7IC0tYmc6I2Y2ZjdmYjsgLS1jYXJkOiNmZmZmZmY7IC0tdGV4dDoj\nMWYyOTM3OyAtLW11dGVkOiM2YjcyODA7IC0tbGluZTojZTVlN2ViOyAtLWdv\nbGQ6I2M5YTI0YTsgLS1zaGFkb3c6IDAgMTBweCAzMHB4IHJnYmEoMTcsMjQs\nMzksLjA4KTsgLS1yYWRpdXM6IDE4cHg7IH0gKnsgYm94LXNpemluZzpib3Jk\nZXItYm94OyB9IGJvZHl7IG1hcmdpbjowOyBmb250LWZhbWlseTogLWFwcGxl\nLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAiU2Vnb2UgVUkiLCAiUGlu\nZ0ZhbmcgVEMiLCAiTm90byBTYW5zIFRDIiwgQXJpYWwsIHNhbnMtc2VyaWY7\nIGJhY2tncm91bmQ6IHZhcigtLWJnKTsgY29sb3I6IHZhcigtLXRleHQpOyB9\nIC5wYWdleyB3aWR0aDogbWluKDkyMHB4LCA5MnZ3KTsgbWFyZ2luOiAwIGF1\ndG87IHBhZGRpbmc6IDI4cHggMCA2MHB4OyB9IC5oZXJveyB0ZXh0LWFsaWdu\nOmNlbnRlcjsgcGFkZGluZzogMjBweCAwIDE4cHg7IH0gLmJyYW5keyBmb250\nLXNpemU6IDU0cHg7IGZvbnQtd2VpZ2h0OiA4MDA7IGxldHRlci1zcGFjaW5n\nOiAuMDhlbTsgY29sb3I6IHZhcigtLWdvbGQpOyB9IC5zdWJ0aXRsZXsgbWFy\nZ2luLXRvcDogMTBweDsgY29sb3I6IHZhcigtLW11dGVkKTsgZm9udC1zaXpl\nOiAxNnB4OyB9IC5jYXJkeyBtYXJnaW4tdG9wOiAxOHB4OyBiYWNrZ3JvdW5k\nOiB2YXIoLS1jYXJkKTsgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGluZSk7\nIGJvcmRlci1yYWRpdXM6IHZhcigtLXJhZGl1cyk7IGJveC1zaGFkb3c6IHZh\ncigtLXNoYWRvdyk7IHBhZGRpbmc6IDIycHg7IH0gLmNhcmQtdGl0bGV7IG1h\ncmdpbjogMCAwIDE0cHg7IGZvbnQtc2l6ZTogMzRweDsgbGV0dGVyLXNwYWNp\nbmc6IC4wMmVtOyB9IC5mb3JteyBkaXNwbGF5OmJsb2NrOyB9IC5sYWJlbHsg\nZGlzcGxheTpibG9jazsgZm9udC1zaXplOiAxNHB4OyBjb2xvcjogdmFyKC0t\nbXV0ZWQpOyBtYXJnaW46IDE0cHggMCA2cHg7IH0gLmlucHV0LCAuc2VsZWN0\nLCAudGV4dGFyZWF7IHdpZHRoOjEwMCU7IGJvcmRlcjogMXB4IHNvbGlkIHZh\ncigtLWxpbmUpOyBib3JkZXItcmFkaXVzOiAxMnB4OyBwYWRkaW5nOiAxMnB4\nIDE0cHg7IGZvbnQtc2l6ZTogMTZweDsgb3V0bGluZTogbm9uZTsgYmFja2dy\nb3VuZDojZmZmOyB9IC5pbnB1dDpmb2N1cywgLnNlbGVjdDpmb2N1cywgLnRl\neHRhcmVhOmZvY3VzeyBib3JkZXItY29sb3I6IHJnYmEoMjAxLDE2Miw3NCwu\nNTUpOyBib3gtc2hhZG93OiAwIDAgMCA0cHggcmdiYSgyMDEsMTYyLDc0LC4x\nNSk7IH0gLmdyaWQzeyBkaXNwbGF5OmdyaWQ7IGdyaWQtdGVtcGxhdGUtY29s\ndW1uczogcmVwZWF0KDMsIDFmcik7IGdhcDogMTBweDsgfSAuZ3JpZDJ7IGRp\nc3BsYXk6Z3JpZDsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiByZXBlYXQoMiwg\nMWZyKTsgZ2FwOiAxMnB4OyB9IEBtZWRpYSAobWF4LXdpZHRoOiA1NjBweCl7\nIC5icmFuZHsgZm9udC1zaXplOiA0MnB4OyB9IC5jYXJkLXRpdGxleyBmb250\nLXNpemU6IDI4cHg7IH0gLmdyaWQzeyBncmlkLXRlbXBsYXRlLWNvbHVtbnM6\nIDFmcjsgfSAuZ3JpZDJ7IGdyaWQtdGVtcGxhdGUtY29sdW1uczogMWZyOyB9\nIH0gLmhpbnR7IG1hcmdpbi10b3A6IDEwcHg7IGNvbG9yOiB2YXIoLS1tdXRl\nZCk7IGZvbnQtc2l6ZTogMTNweDsgbGluZS1oZWlnaHQ6IDEuNDU7IH0gLmJ0\nbnsgd2lkdGg6MTAwJTsgbWFyZ2luLXRvcDogMTZweDsgcGFkZGluZzogMTRw\neCAxNnB4OyBib3JkZXI6IDA7IGJvcmRlci1yYWRpdXM6IDE0cHg7IGJhY2tn\ncm91bmQ6IHZhcigtLWdvbGQpOyBjb2xvcjogI2ZmZjsgZm9udC1zaXplOiAx\nOHB4OyBmb250LXdlaWdodDogNzAwOyBjdXJzb3I6cG9pbnRlcjsgfSAuYnRu\nOmFjdGl2ZXsgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKDFweCk7IH0gLmJ0bi1n\naG9zdHsgYmFja2dyb3VuZDogdHJhbnNwYXJlbnQ7IGJvcmRlcjogMXB4IHNv\nbGlkIHZhcigtLWxpbmUpOyBjb2xvcjogdmFyKC0tdGV4dCk7IH0gLmZpbmVw\ncmludHsgbWFyZ2luLXRvcDogMTBweDsgY29sb3I6IHZhcigtLW11dGVkKTsg\nZm9udC1zaXplOiAxMnB4OyB9IC5mb290ZXJsaW5leyBtYXJnaW4tdG9wOiAx\nNnB4OyB0ZXh0LWFsaWduOmNlbnRlcjsgY29sb3I6ICM5Y2EzYWY7IH0gLnNl\nY3Rpb257IG1hcmdpbi10b3A6IDE2cHg7IHBhZGRpbmctdG9wOiAxNnB4OyBi\nb3JkZXItdG9wOiAxcHggc29saWQgdmFyKC0tbGluZSk7IH0gLnNlY3Rpb24t\ndGl0bGV7IGZvbnQtd2VpZ2h0OiA4MDA7IG1hcmdpbi1ib3R0b206IDEwcHg7\nIH0gLnByb2ZpbGVsaW5leyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBsaW5lLWhl\naWdodDogMS41OyB9IC5xdWlja2JveHsgYm9yZGVyOiAxcHggZGFzaGVkIHJn\nYmEoMjAxLDE2Miw3NCwuNDUpOyBiYWNrZ3JvdW5kOiByZ2JhKDIwMSwxNjIs\nNzQsLjA2KTsgYm9yZGVyLXJhZGl1czogMTRweDsgcGFkZGluZzogMTJweCAx\nNHB4OyBsaW5lLWhlaWdodDogMS41NTsgfSAuZmVhdHVyZXsgYm9yZGVyOiAx\ncHggc29saWQgdmFyKC0tbGluZSk7IGJvcmRlci1yYWRpdXM6IDE0cHg7IHBh\nZGRpbmc6IDE0cHg7IGRpc3BsYXk6ZmxleDsganVzdGlmeS1jb250ZW50OiBz\ncGFjZS1iZXR3ZWVuOyBhbGlnbi1pdGVtczpjZW50ZXI7IGJhY2tncm91bmQ6\nICNmZmY7IGN1cnNvcjpwb2ludGVyOyB9IC5mZWF0dXJlOmhvdmVyeyBib3Jk\nZXItY29sb3I6IHJnYmEoMjAxLDE2Miw3NCwuNTUpOyB9IC5mZWF0dXJlIC5u\nYW1leyBmb250LXdlaWdodDogODAwOyB9IC5mZWF0dXJlIC5kZXNjeyBjb2xv\ncjogdmFyKC0tbXV0ZWQpOyBmb250LXNpemU6IDEycHg7IG1hcmdpbi10b3A6\nIDNweDsgfSAuYW5zd2VyeyBtYXJnaW4tdG9wOiAxMnB4OyBib3JkZXI6IDFw\neCBzb2xpZCB2YXIoLS1saW5lKTsgYm9yZGVyLXJhZGl1czogMTRweDsgcGFk\nZGluZzogMTJweCAxNHB4OyBtaW4taGVpZ2h0OiA2MHB4OyB3aGl0ZS1zcGFj\nZTogcHJlLXdyYXA7IGxpbmUtaGVpZ2h0OiAxLjU1OyB9IC5taW5vci1hY3Rp\nb25zeyBtYXJnaW4tdG9wOiAxMHB4OyBkaXNwbGF5OmZsZXg7IGdhcDoxMHB4\nOyBmbGV4LXdyYXA6d3JhcDsgYWxpZ24taXRlbXM6Y2VudGVyOyB9IC5saW5r\neyBjb2xvcjogdmFyKC0tbXV0ZWQpOyB0ZXh0LWRlY29yYXRpb246IG5vbmU7\nIGZvbnQtc2l6ZTogMTRweDsgfSAubGluazpob3ZlcnsgdGV4dC1kZWNvcmF0\naW9uOiB1bmRlcmxpbmU7IH0K\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/a168009-debug/sunop-web/contents/assets/style.css?ref=main",
+    "git": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/098ad4cd5e8ee30ee18280fe15d3b05752514b70",
+    "html": "https://github.com/a168009-debug/sunop-web/blob/main/assets/style.css"
+  }
+}
+
+/* 今日運勢 */
+.daily-luck {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px;
+}
+.daily-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.daily-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+.daily-time {
+  font-size: 12px;
+  color: #999;
+}
+.luck-stars {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.luck-aspects {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.luck-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tag {
+  background: #e9ecef;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* 歷史紀錄 */
+.history-section {
+  margin: 16px;
+}
+.history-item {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.history-time {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+}
+.history-q {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.history-a {
+  font-size: 14px;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 分享按鈕 */
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 9999;
+  animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
