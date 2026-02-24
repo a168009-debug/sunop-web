@@ -169,7 +169,7 @@
 <div id="menuPage" class="page">
 <div class="wrap">
 <div class="title">探索中心</div>
-<div class="subtitle" id="welcomeMsg">歡迎</div>
+<div class="subtitle"><span id="welcomeName">朋友</span>的專屬分析</div>
 <div id="aiIntro"></div>
 <div class="grid">
 <div class="card" onclick="setContext('命理分析');showPage('baziPage')"><div class="icon">📜</div><div class="card-title">八字命盤</div></div>
@@ -275,7 +275,7 @@ function loadUserData() {
       document.getElementById('day').value = data.day || '';
       document.getElementById('hour').value = data.hour || '子';
       window.userData = data;
-      document.getElementById('welcomeMsg').innerText = '歡迎 · ' + data.name;
+      document.getElementById('welcomeName').innerText = data.name || '朋友';
       return true;
     } catch(e) { console.error(e); }
   }
@@ -297,7 +297,7 @@ async function bootQuickOpening() {
   if (!input || !input.name) return;
   
   // 顯示歡迎訊息
-  document.getElementById('welcomeMsg').innerText = '歡迎 · ' + input.name;
+  document.getElementById('welcomeName').innerText = input.name || '朋友';
   
   // 顯示 loading
   var aiIntro = document.getElementById('aiIntro');
@@ -309,7 +309,7 @@ async function bootQuickOpening() {
     var res = await fetch('/.netlify/functions/bazi_ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourZhi: input.hourZhi })
+      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourBranch: input.hourZhi })
     });
     var data = await res.json();
     
@@ -387,7 +387,7 @@ function startAnalysis() {
   if (!name || !year || !month || !day) { alert('請完整填寫！'); return; }
   window.userData = { name, year, month, day, hour };
   localStorage.setItem('metamind_user', JSON.stringify(window.userData));
-  document.getElementById('welcomeMsg').innerText = '歡迎 · ' + name;
+  document.getElementById('welcomeName').innerText = name || '朋友';
   calculateBazi();
   analyzeName();
   initMoodChart();
