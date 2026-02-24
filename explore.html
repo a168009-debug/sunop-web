@@ -1,612 +1,245 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>MetaMind 智慧命理</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>探索中心 - MetaMind</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
-:root{ --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); --gold:#d6b15e;--gold2:#b8923a;--gold-soft:rgba(214,177,94,.65);--gold-dim:rgba(214,177,94,.22);--gold-line:rgba(214,177,94,.36);--bg1:#050404;--bg2:#120c07;--bg3:#1b1209;--text:rgba(255,255,255,.92);--muted:rgba(255,255,255,.70);--radius:22px;--radius2:18px;--shadow:0 22px 70px rgba(0,0,0,.65); }
-*{box-sizing:border-box} html,body{height:100%} body{ margin:0; font-family:"Noto Serif TC","PingFang TC",serif; color:var(--text); background: radial-gradient(1100px 560px at 50% 12%, rgba(214,177,94,.10), transparent 62%), radial-gradient(850px 520px at 10% 70%, rgba(214,177,94,.06), transparent 62%), linear-gradient(180deg,var(--bg1),var(--bg2) 40%,var(--bg3)); overflow-x:hidden; }
-.bg-glow{position:fixed;inset:-30%;background:radial-gradient(circle at 50% 20%, rgba(214,177,94,.10), transparent 55%),radial-gradient(circle at 22% 70%, rgba(214,177,94,.07), transparent 58%);filter:blur(16px);opacity:.9;pointer-events:none}
-.bg-sparkle{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(2px 2px at 20% 15%, rgba(214,177,94,.35) 40%, transparent 60%),radial-gradient(1.6px 1.6px at 78% 22%, rgba(214,177,94,.25) 40%, transparent 60%),radial-gradient(1.4px 1.4px at 62% 58%, rgba(214,177,94,.22) 40%, transparent 60%),radial-gradient(1.2px 1.2px at 35% 80%, rgba(214,177,94,.18) 40%, transparent 60%);opacity:.55;animation:sparkleFloat 8s ease-in-out infinite alternate}
-@keyframes sparkleFloat{from{transform:translateY(0px);opacity:.45}to{transform:translateY(-10px);opacity:.65}}
-.bg-sweep{position:fixed;inset:-40%;pointer-events:none;background:linear-gradient(90deg,transparent 0%,rgba(214,177,94,.10) 50%,transparent 100%);transform:rotate(18deg) translateX(-40%);filter:blur(14px);animation:goldSweep 7.5s ease-in-out infinite;opacity:.55}
-@keyframes goldSweep{0%{transform:rotate(18deg) translateX(-55%)}50%{transform:rotate(18deg) translateX(10%)}100%{transform:rotate(18deg) translateX(65%)}}
-.wrap{max-width:520px;margin:0 auto;padding:calc(18px + var(--safe-top)) 18px calc(120px + var(--safe-bottom))}
-.title{text-align:center;font-size:28px;letter-spacing:.18em;color:var(--gold);margin:8px 0;text-shadow:0 10px 30px rgba(0,0,0,.55)}
-.subtitle{text-align:center;color:var(--muted);margin:0 0 20px;font-size:14px;letter-spacing:.12em}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{position:relative;padding:18px 10px 16px;border-radius:var(--radius2);cursor:pointer;user-select:none;background:radial-gradient(120% 140% at 50% 10%, rgba(255,255,255,.06), rgba(255,255,255,.02) 60%, rgba(0,0,0,.22) 100%),linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.18));border:1px solid var(--gold-dim);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 -10px 30px rgba(0,0,0,.38),0 14px 40px rgba(0,0,0,.35);overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.card::before{content:"";position:absolute;inset:8px;border-radius:14px;border:1px solid rgba(214,177,94,.18);pointer-events:none}
-.card:active{transform:scale(.985)}
-.card:hover{transform:translateY(-3px);border-color:rgba(214,177,94,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -10px 30px rgba(0,0,0,.36),0 18px 55px rgba(214,177,94,.18),0 20px 65px rgba(0,0,0,.45)}
-.icon{font-size:30px;margin-bottom:8px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))}
-.card-title{color:var(--gold);font-size:12px;letter-spacing:.12em;text-align:center}
-.daily{margin-top:26px;padding:18px;border-radius:var(--radius);border:1px solid var(--gold-dim);background:radial-gradient(120% 180% at 50% 0%, rgba(214,177,94,.07), transparent 60%),rgba(255,255,255,.02);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 16px 50px rgba(0,0,0,.35)}
-.daily h3{margin:0 0 10px;color:var(--gold);letter-spacing:.16em;font-size:16px}
-.daily ul{margin:0;padding-left:18px;color:rgba(255,255,255,.80);line-height:1.9;font-size:13px}
-.ask-ai{position:fixed;right:18px;bottom:calc(86px + var(--safe-bottom));width:70px;height:70px;border-radius:50%;border:2px solid rgba(214,177,94,.85);background:radial-gradient(circle at 30% 25%, rgba(214,177,94,.20), transparent 55%),linear-gradient(135deg,#1a1209,#000);color:var(--gold);font-weight:800;font-size:14px;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(214,177,94,.28),0 18px 60px rgba(0,0,0,.55);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;z-index:1000}
-.ask-ai:active{transform:scale(.98)}
-.ask-ai:hover{box-shadow:0 0 55px rgba(214,177,94,.40),0 18px 70px rgba(0,0,0,.62)}
-.nav{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(10px + var(--safe-bottom));background:linear-gradient(180deg, rgba(10,7,5,.35), rgba(0,0,0,.70));border-top:1px solid rgba(214,177,94,.18);backdrop-filter:blur(10px);z-index:999}
-.nav-inner{max-width:520px;margin:0 auto;display:flex;justify-content:space-between;gap:8px}
-.nav-item{flex:1;text-align:center;color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.1em;padding:6px 0;border-radius:14px;cursor:pointer}
-.nav-item .nicon{display:block;font-size:18px;margin-bottom:2px;color:rgba(214,177,94,.70)}
-.nav-item.active{color:var(--gold);background:rgba(214,177,94,.08);border:1px solid rgba(214,177,94,.20)}
+:root{--gold:#d6b15e;--bg1:#050404;--bg2:#120c07;--text:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Serif TC",serif;color:var(--text);background:linear-gradient(180deg,var(--bg1),var(--bg2));min-height:100vh;padding-bottom:80px}
+.wrap{max-width:480px;margin:0 auto;padding:20px}
+.title{font-size:24px;text-align:center;color:var(--gold);margin-bottom:15px}
+.subtitle{font-size:16px;text-align:center;color:var(--gold);margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.card{background:rgba(255,255,255,.05);border:1px solid #333;border-radius:10px;padding:15px;text-align:center;cursor:pointer}
+.card:hover{border-color:var(--gold)}
+.card-icon{font-size:24px;margin-bottom:5px}
+.card-title{font-size:12px;color:#aaa}
+.btn{width:100%;padding:12px;background:var(--gold);border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer;margin-top:10px}
+.btn-back{background:#333;color:#fff}
+.ask-ai{position:fixed;right:20px;bottom:90px;width:60px;height:60px;border-radius:50%;background:var(--gold);border:none;color:#000;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.5);z-index:100}
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:200}
+.ai-overlay.open{display:flex}
+.ai-box{width:90%;max-width:400px;background:#1a1a1a;border:1px solid var(--gold);border-radius:12px;padding:15px;max-height:80vh;display:flex;flex-direction:column}
+.ai-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ai-title{color:var(--gold);font-weight:bold}
+.ai-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.ai-msgs{flex:1;overflow-y:auto;min-height:200px;margin-bottom:10px}
+.ai-msg{padding:8px 12px;border-radius:8px;margin-bottom:8px;max-width:85%}
+.ai-msg.ai{background:rgba(214,177,94,.2);align-self:flex-start}
+.ai-msg.user{background:rgba(214,177,94,.4);align-self:flex-end;margin-left:auto}
+.ai-input{width:100%;padding:10px;background:#333;border:1px solid #444;border-radius:8px;color:#fff}
 .page{display:none}
 .page.active{display:block}
-/* Form styles */
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.1em}
-.form-group input,.form-group select{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:12px;color:#fff;font-size:15px;outline:none;transition:.3s}
-.form-group input:focus,.form-group select:focus{border-color:var(--gold);background:rgba(255,255,255,.08)}
-.btn-primary{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:14px;color:#000;font-size:15px;font-weight:bold;letter-spacing:.15em;cursor:pointer;transition:.3s}
-.btn-primary:active{transform:scale(0.98)}
-.ask-ai-small{display:block;width:100%;margin-top:12px;padding:12px;background:rgba(214,177,94,.15);border:1px solid var(--gold);border-radius:12px;color:var(--gold);font-size:14px;cursor:pointer;text-align:center}
-.ask-ai-small:hover{background:rgba(214,177,94,.25)}
-.ai-loading{text-align:center;color:var(--gold);padding:20px;font-size:14px}
-.ai-analysis{background:rgba(214,177,94,.08);border:1px solid var(--gold-dim);border-radius:12px;padding:14px;margin-top:12px}
-.ai-analysis strong{color:var(--gold);display:block;margin-bottom:10px}
-.ai-analysis p{margin:6px 0;color:rgba(255,255,255,.85);font-size:13px;line-height:1.5}
-.ai-opening{font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:12px}
-.ai-highlights ul,.ai-risks ul{margin:5px 0;padding-left:18px;color:rgba(255,255,255,.85);font-size:13px}
-.ai-suggestions{margin-top:12px}
-.ai-suggestions .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.ai-suggestions .chip{border:1px solid var(--gold);background:rgba(214,177,94,.1);color:var(--gold);padding:8px 12px;border-radius:20px;font-size:12px;cursor:pointer}
-.ai-error{color:rgba(255,255,255,.5);font-size:13px;text-align:center;padding:10px}
-/* Result boxes */
-.result-box{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:16px;padding:16px;margin-bottom:14px}
-.result-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gold-dim)}
-.result-row:last-child{border:none}
-.result-label{color:var(--muted)}
+.result-box{background:rgba(255,255,255,.05);border:1px solid #333;border-radius:10px;padding:15px;margin-bottom:15px}
+.result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #333}
+.result-label{color:#888}
 .result-value{color:var(--gold);font-weight:bold}
-.health-tip{background:rgba(214,177,94,.12);border-left:3px solid var(--gold);border-radius:8px;padding:12px;margin-top:10px;font-size:13px;line-height:1.6}
-/* Chart */
-#chart-container{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:16px;padding:14px;margin-bottom:14px}
-.mood-buttons{display:flex;justify-content:space-around;margin-bottom:14px}
-.mood-btn{font-size:26px;padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:10px;cursor:pointer;transition:.3s}
-.mood-btn:hover{border-color:var(--gold);transform:scale(1.1)}
-/* Soul canvas */
-.soul-canvas{position:relative;width:100%;height:180px;border-radius:16px;background:#0a0805;overflow:hidden;margin-bottom:14px;border:1px solid var(--gold-dim)}
-.soul-orb{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:soul-float var(--dur,16s) ease-in-out infinite}
-@keyframes soul-float{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(var(--dx,20px),var(--dy,-14px),0)}100%{transform:translate3d(0,0,0)}}
-.soul-vignette{position:absolute;inset:0;border-radius:16px;background:radial-gradient(120% 100% at 50% 40%,rgba(255,255,255,0.03),rgba(0,0,0,0.4))}
-/* Oracle card */
-.card-wrap{width:100%;margin-bottom:14px}
-.oracle-card{width:100%;height:160px;border:none;background:transparent;cursor:pointer;border-radius:16px;outline:none;perspective:1000px}
-.card-inner{width:100%;height:100%;position:relative;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);transform-style:preserve-3d;transition:transform 0.6s}
-.oracle-card.is-flipped .card-inner{transform:rotateY(180deg)}
-.card-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;backface-visibility:hidden;border-radius:16px}
-.card-front{background:linear-gradient(135deg,rgba(214,177,94,.1),rgba(0,0,0,.3))}
-.front-title{font-size:20px;color:var(--gold);font-weight:bold;letter-spacing:.1em}
-.front-sub{margin-top:8px;font-size:11px;color:var(--muted)}
-.card-back{transform:rotateY(180deg);background:linear-gradient(135deg,rgba(214,177,94,.15),rgba(0,0,0,.5))}
-.back-title{font-size:16px;color:var(--gold);font-weight:bold;margin-bottom:8px}
-.back-msg{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5;text-align:center;padding:0 10px}
-/* Zi input */
-.zi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.zi-btn{aspect-ratio:1;font-size:24px;background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:10px;cursor:pointer;transition:.3s}
-.zi-btn:hover{border-color:var(--gold);transform:translateY(-2px)}
-.zi-input-area{display:flex;gap:10px;margin-bottom:14px}
-.zi-input-area input{flex:1;padding:12px;background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:10px;color:#fff;font-size:15px}
-.zi-input-area button{padding:12px 18px;background:var(--gold);border:none;border-radius:10px;color:#000;font-weight:bold;cursor:pointer}
-.zi-result{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:12px;padding:14px;display:none}
-.zi-result.show{display:block}
-.zi-result .element{color:var(--gold);font-weight:bold}
-/* AI Modal */
-.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-end;justify-content:center;padding:14px 12px calc(14px + var(--safe-bottom));z-index:2000}
-.ai-overlay.open{display:flex}
-.ai-sheet{width:min(720px,100%);border-radius:26px;border:1px solid rgba(214,177,94,.25);background:radial-gradient(120% 200% at 50% 0%,rgba(214,177,94,.10),transparent 65%),rgba(10,7,5,.88);backdrop-filter:blur(14px);box-shadow:var(--shadow);overflow:hidden}
-.ai-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 10px;border-bottom:1px solid rgba(214,177,94,.18)}
-.ai-title{font-size:14px;color:var(--gold);letter-spacing:.1em}
-.ai-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(214,177,94,.22);background:rgba(255,255,255,.04);color:#fff;cursor:pointer}
-.ai-body{padding:12px 12px 0}
-.key-row{display:flex;gap:10px;align-items:center;padding:10px;border-radius:16px;border:1px solid rgba(214,177,94,.18);background:rgba(255,255,255,.03);margin-bottom:10px}
-.key-row input{flex:1;background:transparent;border:none;outline:none;color:rgba(255,255,255,.92);font-size:13px}
-.key-row button{background:rgba(214,177,94,.10);color:var(--gold);padding:8px 12px;border:none;border-radius:12px;cursor:pointer;font-size:12px;font-weight:800}
-.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 2px 10px}
-.chip{border:1px solid rgba(214,177,94,.20);background:rgba(255,255,255,.03);color:#fff;padding:8px 10px;border-radius:999px;font-size:11px;cursor:pointer}
-.msgs{height:min(50vh,450px);overflow:auto;padding:6px 2px 10px}
-.msg{display:flex;gap:10px;padding:8px 2px}
-.avatar{width:28px;height:28px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(214,177,94,.18);background:rgba(214,177,94,.10);color:var(--gold);font-size:11px;font-weight:900;flex:0 0 auto}
-.bubble{max-width:86%;padding:10px 12px;border-radius:16px;border:1px solid rgba(214,177,94,.18);background:rgba(255,255,255,.03);color:rgba(255,255,255,.90);line-height:1.55;font-size:13px}
-.msg.user{justify-content:flex-end}
-.msg.user .avatar{display:none}
-.msg.user .bubble{border-color:rgba(214,177,94,.28);background:linear-gradient(135deg,rgba(214,177,94,.14),rgba(255,255,255,.02))}
-.msg.meta .bubble{border-style:dashed;color:rgba(255,255,255,.70)}
-.ai-footer{padding:10px 12px 12px;border-top:1px solid rgba(214,177,94,.16);background:rgba(0,0,0,.18)}
-.inputbar{display:flex;gap:10px;align-items:flex-end;padding:10px;border-radius:18px;border:1px solid rgba(214,177,94,.18);background:rgba(255,255,255,.03)}
-.inputbar textarea{flex:1;resize:none;border:none;outline:none;background:transparent;color:rgba(255,255,255,.92);font-size:13px;line-height:1.4;min-height:22px;max-height:120px}
-.send{background:linear-gradient(135deg,rgba(214,177,94,.95),rgba(184,146,58,.92));border:none;cursor:pointer;padding:10px 14px;border-radius:14px;color:#1a1209;font-weight:900;font-size:12px}
-.send:disabled{opacity:.45;cursor:not-allowed}
+.health-tip{background:rgba(214,177,94,.1);border-left:3px solid var(--gold);padding:10px;margin-top:10px;font-size:13px}
+.ai-section{background:rgba(214,177,94,.1);border:1px solid #333;border-radius:8px;padding:12px;margin-bottom:10px}
+.ai-section h4{color:var(--gold);margin:0 0 8px;font-size:14px}
+.ai-section ul{margin:0;padding-left:18px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:rgba(214,177,94,.2);border:1px solid var(--gold);color:var(--gold);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer}
+.loading{text-align:center;color:var(--gold);padding:20px}
 </style>
 </head>
 <body>
-<div class="bg-glow"></div>
-<div class="bg-sparkle"></div>
-<div class="bg-sweep"></div>
+<button class="ask-ai" id="askAiBtn" onclick="openAI()">問AI</button>
 
-<!-- 浮動問AI按鈕 -->
-<button class="ask-ai" id="askAiBtn" onclick="showAIChat()">問AI</button>
-
-<!-- AI對話框 -->
-<div class="ai-overlay" id="aiOverlay" onclick="closeAIChat()">
-<div class="ai-sheet" onclick="event.stopPropagation()">
-<div class="ai-header">
-<div class="ai-title">💬 AI 命理顧問</div>
-<button class="ai-close" onclick="closeAIChat()">✕</button>
-</div>
-<div class="ai-body">
-<div class="chips" id="aiChips"></div>
-<div class="msgs" id="aiMessages"></div>
-</div>
-<div class="ai-footer">
-<div class="inputbar">
-<textarea id="aiInput" rows="1" placeholder="問 AI 任何問題…"></textarea>
-<button class="send" id="aiSend" onclick="sendAIMessage()">送出</button>
-</div>
-</div>
-</div>
-</div>
-
-<!-- 首頁 -->
-<div id="homePage" class="page active">
-<div class="wrap">
-<div class="title">MetaMind</div>
-<div class="subtitle">智慧命理</div>
-<div class="form-group"><label>您的名字</label><input type="text" id="userName" placeholder="請輸入名字"></div>
-<div class="form-group"><label>西元年</label><input type="number" id="year" placeholder="1995"></div>
-<div class="form-group"><label>月份</label><input type="number" id="month" placeholder="1" min="1" max="12"></div>
-<div class="form-group"><label>日期</label><input type="number" id="day" placeholder="1" min="1" max="31"></div>
-<div class="form-group"><label>出生時辰</label><select id="hour"><option value="子">子時</option><option value="丑">丑時</option><option value="寅">寅時</option><option value="卯">卯時</option><option value="辰">辰時</option><option value="巳">巳時</option><option value="午">午時</option><option value="未">未時</option><option value="申">申時</option><option value="酉">酉時</option><option value="戌">戌時</option><option value="亥">亥時</option></select></div>
-<button class="btn-primary" onclick="checkAndStart()">開始分析</button>
-</div>
-</div>
-
-<!-- 選單頁 -->
-<div id="menuPage" class="page">
 <div class="wrap">
 <div class="title">探索中心</div>
-<div class="subtitle"><span id="welcomeName">朋友</span>的專屬分析</div>
+<div class="subtitle" id="welcomeName">朋友的專屬分析</div>
 <div id="aiIntro"></div>
+
 <div class="grid">
-<div class="card" onclick="setContext('命理分析');showPage('baziPage')"><div class="icon">📜</div><div class="card-title">八字命盤</div></div>
-<div class="card" onclick="setContext('姓名分析');showPage('namePage')"><div class="icon">✍️</div><div class="card-title">姓名分析</div></div>
-<div class="card" onclick="setContext('情緒曲線');showPage('moodPage')"><div class="icon">📊</div><div class="card-title">情緒曲線</div></div>
-<div class="card" onclick="setContext('AI畫像');showPage('artPage')"><div class="icon">🎨</div><div class="card-title">AI畫像</div></div>
-<div class="card" onclick="setContext('智慧卡');showPage('cardPage')"><div class="icon">🃏</div><div class="card-title">智慧卡</div></div>
-<div class="card" onclick="setContext('測字');showPage('ziPage')"><div class="icon">🖋️</div><div class="card-title">測字</div></div>
-</div>
-<div class="daily">
-<h3>今日指引</h3>
-<ul><li>點擊任一功能了解自己</li><li>有問題可以問 AI 助理</li></ul>
-</div>
-<button class="btn-primary" style="margin-top:14px" onclick="goHome()">回首頁</button>
-</div>
+<div class="card" onclick="showPage('bazi')"><div class="card-icon">📜</div><div class="card-title">八字命盤</div></div>
+<div class="card" onclick="showPage('name')"><div class="card-icon">✍️</div><div class="card-title">姓名分析</div></div>
+<div class="card" onclick="showPage('mood')"><div class="card-icon">📊</div><div class="card-title">情緒曲線</div></div>
+<div class="card" onclick="showPage('art')"><div class="card-icon">🎨</div><div class="card-title">AI畫像</div></div>
+<div class="card" onclick="showPage('card')"><div class="card-icon">🃏</div><div class="card-title">智慧卡</div></div>
+<div class="card" onclick="showPage('zi')"><div class="card-icon">🖋️</div><div class="card-title">測字</div></div>
 </div>
 
-<!-- 命理分析 -->
+<button class="btn btn-back" onclick="goHome()">回首頁</button>
+</div>
+
+<!-- 八字頁 -->
 <div id="baziPage" class="page">
 <div class="wrap">
 <div class="title">八字命盤</div>
 <div id="baziResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
+<button class="btn btn-back" onclick="showPage('')">返回</button>
 </div>
 </div>
 
-<!-- 姓名分析 -->
+<!-- 姓名頁 -->
 <div id="namePage" class="page">
 <div class="wrap">
 <div class="title">姓名分析</div>
 <div id="nameResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
+<button class="btn btn-back" onclick="showPage('')">返回</button>
 </div>
 </div>
 
-<!-- 情緒曲線 -->
-<div id="moodPage" class="page">
-<div class="wrap">
-<div class="title">情緒曲線</div>
-<div id="chart-container"><canvas id="moodChart"></canvas></div>
-<div class="mood-buttons">
-<button class="mood-btn" data-mood="5">😊</button>
-<button class="mood-btn" data-mood="4">🙂</button>
-<button class="mood-btn" data-mood="3">😐</button>
-<button class="mood-btn" data-mood="2">😟</button>
-<button class="mood-btn" data-mood="1">😫</button>
+<!-- AI 對話框 -->
+<div class="ai-overlay" id="aiOverlay" onclick="closeAI(event)">
+<div class="ai-box" onclick="event.stopPropagation()">
+<div class="ai-header">
+<span class="ai-title">💬 AI 命理顧問</span>
+<button class="ai-close" onclick="closeAI()">✕</button>
 </div>
-<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
+<div class="ai-msgs" id="aiMsgs"></div>
+<input class="ai-input" id="aiInput" placeholder="問 AI 任何問題…" onkeydown="if(event.key==='Enter')sendAI()">
 </div>
-</div>
-
-<!-- AI畫像 -->
-<div id="artPage" class="page">
-<div class="wrap">
-<div class="title">AI靈魂畫像</div>
-<div id="soulCanvas" class="soul-canvas"></div>
-<div id="artInfo" style="text-align:center;margin-bottom:14px;color:var(--gold)"></div>
-<button class="btn-primary" onclick="goHome()">回首頁</button>
-</div>
-</div>
-
-<!-- 智慧卡 -->
-<div id="cardPage" class="page">
-<div class="wrap">
-<div class="title">智慧卡</div>
-<div class="card-wrap">
-<button id="oracleCard" class="oracle-card">
-<div class="card-inner">
-<div class="card-face card-front"><div class="front-title">點我抽一張</div><div class="front-sub">（翻開看今日訊息）</div></div>
-<div class="card-face card-back"><div class="back-title" id="cardTitle"></div><div class="back-msg" id="cardMsg"></div></div>
-</div>
-</button>
-</div>
-<button class="btn-primary" onclick="goHome()">回首頁</button>
-</div>
-</div>
-
-<!-- 測字 -->
-<div id="ziPage" class="page">
-<div class="wrap">
-<div class="title">測字</div>
-<div class="zi-grid" id="ziGrid"></div>
-<div class="zi-input-area"><input type="text" id="ziInput" maxlength="1" placeholder="輸入字"><button onclick="showZiResult()">解讀</button></div>
-<div class="zi-result" id="ziResult"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="goHome()">回首頁</button>
 </div>
 </div>
 
 <script>
-var currentContext = '命理分析';
-var apiKey = localStorage.getItem('openai_api_key') || '';
+var profile = null;
 var chatHistory = [];
 
-// 載入已儲存的用戶資料
-function loadUserData() {
-  var saved = localStorage.getItem('metamind_user');
-  if (saved) {
-    try {
-      var data = JSON.parse(saved);
-      document.getElementById('userName').value = data.name || '';
-      document.getElementById('year').value = data.year || '';
-      document.getElementById('month').value = data.month || '';
-      document.getElementById('day').value = data.day || '';
-      document.getElementById('hour').value = data.hour || '子';
-      window.userData = data;
-      document.getElementById('welcomeName').innerText = data.name || '朋友';
-      return true;
-    } catch(e) { console.error(e); }
-  }
-  return false;
+function loadProfile(){
+  try{ return JSON.parse(localStorage.getItem('metamind_profile')); }catch(e){ return null; }
 }
 
-// 頁面載入時恢復資料
-window.addEventListener('DOMContentLoaded', function() {
-  loadUserData();
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  if(id){
+    document.getElementById(id+'Page').classList.add('active');
+    if(id==='bazi') calculateBazi();
+    if(id==='name') analyzeName();
+  }
+}
+
+function goHome(){ window.location.href='index.html'; }
+
+window.addEventListener('DOMContentLoaded',function(){
+  profile = loadProfile();
+  if(!profile || !profile.name){ window.location.href='index.html'; return; }
+  document.getElementById('welcomeName').textContent = profile.name + '的專屬分析';
   bootQuickOpening();
 });
 
-// 探索頁載入時自動呼叫 AI 開場
-async function bootQuickOpening() {
-  var aiBtn = document.getElementById('askAiBtn');
-  if(aiBtn) aiBtn.style.display = 'flex';
-  
-  var input = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
-  if (!input || !input.name) return;
-  
-  // 顯示歡迎訊息
-  document.getElementById('welcomeName').innerText = input.name || '朋友';
-  
-  // 顯示 loading
-  var aiIntro = document.getElementById('aiIntro');
-  if(aiIntro) {
-    aiIntro.innerHTML = '<div class="ai-loading">✨ AI 正在分析中...</div>';
-  }
-  
-  try {
-    var res = await fetch('/.netlify/functions/bazi_ai', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ mode: 'quick', name: input.name, year: input.year, month: input.month, day: input.day, hourBranch: input.hourBranch })
+async function bootQuickOpening(){
+  var el = document.getElementById('aiIntro');
+  el.innerHTML = '<div class="loading">✨ AI 正在分析中...</div>';
+  try{
+    var res = await fetch('/.netlify/functions/bazi_ai',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mode:'quick',name:profile.name,year:profile.year,month:profile.month,day:profile.day,hourBranch:profile.hourBranch})
     });
     var data = await res.json();
-    
-    if (!data.ok) {
-      if(aiIntro) aiIntro.innerHTML = '<div class="ai-error">錯誤: ' + (data.message || '請稍後再試') + '</div>';
-      return;
+    if(!data.ok){ el.innerHTML='<div class="ai-section"><p>請稍後再試</p></div>'; return; }
+    var r = data.result || {};
+    var html = '';
+    if(r.opening) html += '<div class="ai-section"><h4>🔮 '+r.opening+'</h4></div>';
+    if(r.highlights){
+      html += '<div class="ai-section"><h4>今日關鍵</h4><ul>';
+      r.highlights.forEach(h=>html+='<li>'+h+'</li>');
+      html += '</ul></div>';
     }
-    
-    // 渲染開場
-    if(aiIntro && data.result) {
-      var r = data.result;
-      var html = '';
-      if (r.opening) html += '<div class="ai-opening">' + r.opening + '</div>';
-      if (r.highlights && r.highlights.length > 0) {
-        html += '<div class="ai-section"><h3>🔮 今日關鍵</h3><ul>';
-        r.highlights.forEach(function(h) { html += '<li>' + h + '</li>'; });
-        html += '</ul></div>';
-      }
-      if (r.risk_flags && r.risk_flags.length > 0) {
-        html += '<div class="ai-section risk"><h3>⚠ 需要留意</h3><ul>';
-        r.risk_flags.forEach(function(f) { html += '<li>' + f + '</li>'; });
-        html += '</ul></div>';
-      }
-      if (r.suggested_questions && r.suggested_questions.length > 0) {
-        html += '<div class="ai-section"><h3>💬 你可能想問</h3><div class="chips">';
-        r.suggested_questions.forEach(function(q) { 
-          html += '<button class="chip" onclick="askAIWithQuestion(\'' + q.replace(/'/g, "\\'") + '\')">' + q + '</button>'; 
-        });
-        html += '</div></div>';
-      }
-      aiIntro.innerHTML = html;
+    if(r.risk_flags){
+      html += '<div class="ai-section" style="border-color:#f55"><h4>⚠ 注意</h4><ul>';
+      r.risk_flags.forEach(f=>html+='<li>'+f+'</li>');
+      html += '</ul></div>';
     }
-  } catch(e) {
-    if(aiIntro) aiIntro.innerHTML = '<div class="ai-error">請稍後再試</div>';
+    if(r.suggested_questions){
+      html += '<div class="chips">';
+      r.suggested_questions.forEach(q=>html+='<span class="chip" onclick="openAI(\''+q+'\')">'+q+'</span>');
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  }catch(e){ el.innerHTML = '<div class="ai-section"><p>請稍後再試</p></div>'; }
+}
+
+function openAI(question){
+  document.getElementById('aiOverlay').classList.add('open');
+  var msgs = document.getElementById('aiMsgs');
+  if(!msgs.innerHTML){
+    var p = profile;
+    addMsg('已讀取：'+p.name+'｜'+p.year+'/'+p.month+'/'+p.day+'｜'+p.hourBranch);
+  }
+  if(question){
+    document.getElementById('aiInput').value = question;
+    sendAI();
   }
 }
 
-async function askAIWithQuestion(question) {
-  var input = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
-  if (!input || !input.name) return;
+function closeAI(e){ if(e && e.target!==e.currentTarget)return; document.getElementById('aiOverlay').classList.remove('open'); }
+function addMsg(text,isUser){
+  var msgs = document.getElementById('aiMsgs');
+  var div = document.createElement('div');
+  div.className = 'ai-msg '+(isUser?'user':'ai');
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendAI(){
+  var input = document.getElementById('aiInput');
+  var text = input.value.trim();
+  if(!text) return;
+  addMsg(text,true);
+  input.value = '';
+  addMsg('...','ai');
   
-  showAIChat('請根據我的八字給我更多建議：' + question);
-}
-
-var CONTEXTS = {
-  '命理分析': { examples: ['為什麼我的日柱是火？', '我的五行偏弱要怎麼補？'], system: '你是命理分析 AI 助理。用繁體中文回答，溫和專業。' },
-  '姓名分析': { examples: ['這個名字適合我嗎？', '哪個字會讓整體更順？'], system: '你是姓名分析 AI 助理。用繁體中文回答。' },
-  '情緒曲線': { examples: ['我最近情緒起伏大怎麼辦？', '如何改善情緒？'], system: '你是情緒分析 AI 助理。用繁體中文回答。' },
-  'AI畫像': { examples: ['我的靈魂畫像代表什麼？', '這個五行有什麼含義？'], system: '你是AI畫像解讀 AI 助理。用繁體中文回答。' },
-  '智慧卡': { examples: ['這張牌是什麼意思？', '正位/逆位差在哪？'], system: '你是智慧卡解讀 AI 助理。用繁體中文回答。' },
-  '測字': { examples: ['這個字代表什麼？', '我問感情抽到這個字怎麼看？'], system: '你是測字解讀 AI 助理。用繁體中文回答。' }
-};
-
-function setContext(ctx) { currentContext = ctx; }
-function showPage(id) { 
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-  document.getElementById(id).classList.add('active'); 
-  // 控制問AI按鈕顯示
-  var aiBtn = document.getElementById('askAiBtn');
-  if (id === 'homePage') {
-    aiBtn.style.display = 'none';
-  } else {
-    aiBtn.style.display = 'flex';
-  }
-}
-function goHome() { loadUserData(); showPage('homePage'); }
-function checkAndStart() { if(loadUserData() && window.userData && window.userData.name) { showPage('menuPage'); } else { startAnalysis(); } }
-
-function startAnalysis() {
-  var name = document.getElementById('userName').value.trim();
-  var year = document.getElementById('year').value;
-  var month = document.getElementById('month').value;
-  var day = document.getElementById('day').value;
-  var hour = document.getElementById('hour').value;
-  if (!name || !year || !month || !day) { alert('請完整填寫！'); return; }
-  window.userData = { name, year, month, day, hour };
-  localStorage.setItem('metamind_user', JSON.stringify(window.userData));
-  document.getElementById('welcomeName').innerText = name || '朋友';
-  calculateBazi();
-  analyzeName();
-  initMoodChart();
-  renderSoulPortrait('water');
-  initOracleCard();
-  initZiGrid();
-  showPage('menuPage');
-}
-
-function calculateBazi() {
-  var year = parseInt(window.userData.year);
-  var month = parseInt(window.userData.month);
-  var day = parseInt(window.userData.day);
-  var hour = window.userData.hour;
-  var 天干表 = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-  var 地支表 = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-  var 地支五行 = { "子":"水","亥":"水","寅":"木","卯":"木","巳":"火","午":"火","申":"金","酉":"金","丑":"土","辰":"土","未":"土","戌":"土" };
-  var 五行健康 = { "火":"脾氣火爆","水":"容易焦慮","木":"肝火旺盛","金":"呼吸系統弱","土":"消化系統弱" };
-  var 年柱 = 天干表[(year-4)%10] + 地支表[(year-4)%12];
-  var 年干索引 = 天干表.indexOf(年柱[0]);
-  var 起始索引 = [2,4,6,8,0][Math.floor(年干索引/2)] || 0;
-  var 月柱 = 天干表[(起始索引 + month - 1)%10] + ["寅","卯","辰","巳","午","未","申","酉","戌","亥","子","丑"][month-1];
-  var 基準日 = new Date(1900, 2, 1);
-  var 天數差 = Math.floor((new Date(year, month-1, day) - 基準日) / (1000*60*60*24));
-  var 日柱 = 天干表[(天數差%10+10)%10] + 地支表[(天數差%12+12)%12];
-  var 日干索引 = 天干表.indexOf(日柱[0]);
-  var 時柱 = 天干表[([0,2,4,6,8][Math.floor(日干索引/2)]||0) + 地支表.indexOf(hour)%10] + hour;
-  var 日五行 = 地支五行[日柱[1]];
-  document.getElementById('baziResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">年柱</span><span class="result-value">'+年柱+'</span></div><div class="result-row"><span class="result-label">月柱</span><span class="result-value">'+月柱+'</span></div><div class="result-row"><span class="result-label">日柱</span><span class="result-value">'+日柱+'</span></div><div class="result-row"><span class="result-label">時柱</span><span class="result-value">'+時柱+'</span></div></div><div class="health-tip"><strong>望診提醒：</strong>'+五行健康[日五行]+'</div><div id="aiAnalysis"><div class="ai-loading">✨ AI 解析中...</div></div>';
-  generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行);
-  setTimeout(function() { renderSoulPortrait({木:'wood',火:'fire',土:'earth',金:'metal',水:'water'}[日五行] || 'water'); }, 100);
-}
-
-async function generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行) {
-  // 儲存上下文供後續使用
-  window.baziContext = '我的八字：年柱' + 年柱 + '、月柱' + 月柱 + '、日柱' + 日柱 + '、時柱' + 時柱 + '。日主五行為' + 日五行 + '。';
-  
-  try {
-    var resp = await fetch('/.netlify/functions/bazi_ai', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        year: window.userData.year,
-        month: window.userData.month,
-        day: window.userData.day,
-        hour: window.userData.hour,
-        mode: 'quick'
-      })
+  try{
+    var res = await fetch('/.netlify/functions/bazi_ai',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mode:'deep',name:profile.name,year:profile.year,month:profile.month,day:profile.day,hourBranch:profile.hourBranch,question:text}),
+      signal:AbortSignal.timeout(25000)
     });
-    var data = await resp.json();
+    var data = await res.json();
+    var msgs = document.getElementById('aiMsgs');
+    msgs.lastChild.remove();
     
-    if (data.error) {
-      document.getElementById('aiAnalysis').innerHTML = '<div class="ai-error">錯誤: ' + data.error + '</div>';
-      return;
-    }
-    
-    if (data.reply) {
-      // Try to parse JSON response
-      try {
-        var aiData = JSON.parse(data.reply);
-        var html = '<div class="ai-analysis">';
-        if (aiData.opening) {
-          html += '<p class="ai-opening">' + aiData.opening + '</p>';
-        }
-        if (aiData.highlights && aiData.highlights.length > 0) {
-          html += '<div class="ai-highlights"><strong>重點：</strong><ul>';
-          aiData.highlights.forEach(function(h) { html += '<li>' + h + '</li>'; });
-          html += '</ul></div>';
-        }
-        if (aiData.risk_flags && aiData.risk_flags.length > 0) {
-          html += '<div class="ai-risks"><strong>注意：</strong><ul>';
-          aiData.risk_flags.forEach(function(r) { html += '<li>' + r.類型 + '：' + r.內容 + '</li>'; });
-          html += '</ul></div>';
-        }
-        if (aiData.suggested_questions && aiData.suggested_questions.length > 0) {
-          html += '<div class="ai-suggestions"><strong>可以問：</strong><div class="chips">';
-          aiData.suggested_questions.forEach(function(q) { 
-            html += '<button class="chip" onclick="askAIPredefined(\'' + q.replace(/'/g, "\\'") + '\')">' + q + '</button>'; 
-          });
-          html += '</div></div>';
-        }
-        html += '</div>';
-        document.getElementById('aiAnalysis').innerHTML = html;
-      } catch(e) {
-        // If not JSON, display as text
-        document.getElementById('aiAnalysis').innerHTML = '<div class="ai-analysis"><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div>';
-      }
-    }
-  } catch(e) {
-    document.getElementById('aiAnalysis').innerHTML = '<div class="ai-error">解析稍後可用</div>';
-  }
-}
-
-function askAIPredefined(question) {
-  showAIChat(question);
-}
-
-function askAIWithContext() {
-  var contextMsg = window.baziContext || '';
-  showAIChat('請根據我的八字命盤：' + contextMsg + ' 給我更多建議');
-}
-
-function analyzeName() {
-  var name = window.userData.name;
-  var firstChar = name.charAt(0);
-  var strokes = (firstChar.charCodeAt(0) % 10) + 1;
-  var 天干表 = ["","甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-  var stem = 天干表[strokes % 10] || 天干表[10];
-  var element = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[stem];
-  document.getElementById('nameResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+firstChar+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div><div class="health-tip"><strong>建議：</strong>'+element+'代表特質</div>';
-}
-
-var moodChart;
-function initMoodChart() {
-  var ctx = document.getElementById('moodChart').getContext('2d');
-  var days = [];
-  for (var i = 6; i >= 0; i--) { var d = new Date(); d.setDate(d.getDate() - i); days.push(d.getDate()+'日'); }
-  var moodData = [3,4,2,5,3,4,0];
-  if (moodChart) moodChart.destroy();
-  moodChart = new Chart(ctx, { type: 'line', data: { labels: days, datasets: [{ label: '情緒', data: moodData, borderColor: '#d6b15e', backgroundColor: 'rgba(214,177,94,0.1)', fill: true, tension: 0.4 }] }, options: { scales: { y: { min: 1, max: 5 } }, plugins: { legend: { display: false } } } });
-  document.querySelectorAll('.mood-btn').forEach(function(btn) { btn.addEventListener('click', function() { var m = parseInt(this.getAttribute('data-mood')); moodChart.data.datasets[0].data[moodChart.data.datasets[0].data.length-1] = m; moodChart.update(); }); }); }
-
-// ========== AI Chat Functions ==========
-function showAIChat(autoMsg) { 
-  document.getElementById('aiOverlay').classList.add('open'); 
-  
-  // 顯示已讀取的 profile
-  var profile = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
-  if(profile && profile.name) {
-    var profileText = profile.name + '｜' + profile.year + '/' + String(profile.month).padStart(2,'0') + '/' + String(profile.day).padStart(2,'0') + '｜' + profile.hourBranch;
-    addAIMsg('meta', '已讀取：' + profileText);
-  } else {
-    addAIMsg('meta', '請先在首頁輸入出生資料');
-  }
-  
-  setTimeout(function(){
-    document.getElementById('aiInput').focus(); 
-    if (autoMsg) {
-      sendAIMessage(autoMsg);
-    }
-  }, 100); 
-}
-function closeAIChat() { document.getElementById('aiOverlay').classList.remove('open'); }
-function saveApiKey() { var v = document.getElementById('apiKeyInput').value.trim(); if(v) { apiKey = v; localStorage.setItem('openai_api_key', apiKey); addAIMsg('meta', 'API Key 已儲存！'); } }
-function clearApiKey() { apiKey = ''; localStorage.removeItem('openai_api_key'); document.getElementById('apiKeyInput').value = ''; addAIMsg('meta', 'API Key 已清除。'); }
-function esc(s) { return s.replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]}); }
-function addAIMsg(type, text) { var m = document.getElementById('aiMessages'); var row = document.createElement('div'); row.className = 'msg ' + type; if(type === 'ai') row.innerHTML = '<div class="avatar">AI</div><div class="bubble">'+esc(text)+'</div>'; else if(type === 'user') row.innerHTML = '<div class="bubble">'+esc(text)+'</div>'; else if(type === 'error') row.innerHTML = '<div class="avatar">!</div><div class="bubble">'+esc(text)+'</div>'; else row.innerHTML = '<div class="avatar">i</div><div class="bubble">'+esc(text)+'</div>'; m.appendChild(row); m.scrollTop = m.scrollHeight; }
-async function sendAIMessage(autoMsg) { 
-  var input = document.getElementById('aiInput'); 
-  var text = autoMsg || input.value.trim(); 
-  if(!text) return; 
-  
-  // 取得 profile
-  var profile = JSON.parse(localStorage.getItem('metamind_profile') || '{}');
-  
-  addAIMsg('user', text); 
-  chatHistory.push({role:'user',content:text}); 
-  if(!autoMsg) input.value = ''; 
-  document.getElementById('aiSend').disabled = true; 
-  addAIMsg('ai', '...'); 
-  var loadingMsg = document.getElementById('aiMessages').lastChild; 
-  try { 
-    var url = '/.netlify/functions/bazi_ai'; 
-    var resp = await fetch(url, { 
-      method:'POST', 
-      headers:{'Content-Type':'application/json'}, 
-      body:JSON.stringify({
-        name: profile.name,
-        year: profile.year,
-        month: profile.month,
-        day: profile.day,
-        hourBranch: profile.hourBranch,
-        mode: 'deep',
-        question: text
-      }), 
-      signal:AbortSignal.timeout(30000) 
-    }); 
-    var data = await resp.json(); 
-    if(!resp.ok) throw new Error(data.error || data.message || 'API 錯誤'); 
-    if(data.result) {
-      // Deep mode 回覆格式
+    if(data.fallback){
+      addMsg(data.summary+' '+data.suggestions.join(' '));
+    }else if(data.result){
       var r = data.result;
-      var replyText = '';
-      if(r.sections && r.sections.length > 0) {
-        r.sections.forEach(function(s) {
-          replyText += '<strong>' + s.title + '</strong><br>' + s.summary + '<br>';
-        });
-      }
-      if(r.action_plan && r.action_plan.length > 0) {
-        replyText += '<br><strong>💡 建議：</strong><ul>';
-        r.action_plan.forEach(function(a) { replyText += '<li>' + a + '</li>'; });
-        replyText += '</ul>';
-      }
-      loadingMsg.querySelector('.bubble').innerHTML = replyText || JSON.stringify(r);
-    } else if (data.reply) {
-      loadingMsg.querySelector('.bubble').innerHTML = data.reply.replace(/\n/g, '<br>'); 
+      var reply = '';
+      if(r.sections) r.sections.forEach(s=>reply+=s.summary+' ');
+      if(r.action_plan) reply += '\n建議：'+r.action_plan.join(' ');
+      addMsg(reply);
+    }else{
+      addMsg(data.result || data.error || '請稍後再試');
     }
-    chatHistory.push({role:'assistant',content:JSON.stringify(data.result || data.reply)}); 
-  } catch(e) { 
-    loadingMsg.querySelector('.bubble').textContent = '錯誤: ' + e.message; 
-    addAIMsg('error', e.message); 
-  } finally { 
-    document.getElementById('aiSend').disabled = false; 
-    input.focus(); 
-  } 
+  }catch(e){
+    var msgs = document.getElementById('aiMsgs');
+    if(msgs.lastChild)msgs.lastChild.textContent = '錯誤：'+e.message;
+  }
 }
 
-// ========== Oracle Card ==========
-var ORACLE_CARDS = [{title:'覺醒',msg:'是時候覺醒你內在的力量了。'},{title:'平衡',msg:'生活需要平衡。'},{title:'行動',msg:'不要猶豫，行動吧！'},{title:'靜心',msg:'給自己一個喘息的空間。'},{title:'轉變',msg:'改變即將到來。'},{title:'智慧',msg:'聆聽內心的聲音。'}];
-function initOracleCard() { var card = document.getElementById('oracleCard'); card.addEventListener('click', function() { if(this.classList.contains('is-flipped')) { this.classList.remove('is-flipped'); setTimeout(function(){card.querySelector('.back-title').textContent = ''; card.querySelector('.back-msg').textContent = '';}, 300); } else { var c = ORACLE_CARDS[Math.floor(Math.random()*ORACLE_CARDS.length)]; card.querySelector('.back-title').textContent = c.title; card.querySelector('.back-msg').textContent = c.msg; this.classList.add('is-flipped'); } }); }
+function calculateBazi(){
+  var y=profile.year,m=profile.month,d=profile.day,h=profile.hourBranch;
+  var 天干=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+  var 地支=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  var 地支五行={"子":"水","亥":"水","寅":"木","卯":"木","巳":"火","午":"火","申":"金","酉":"金","丑":"土","辰":"土","未":"土","戌":"土"};
+  var 五行健康={"火":"脾氣火爆","水":"容易焦慮","木":"肝火旺盛","金":"呼吸系統弱","土":"消化系統弱"};
+  
+  var 年柱=天干[(y-4)%10]+地支[(y-4)%12];
+  var 起始=[2,4,6,8,0][Math.floor(天干.indexOf(年柱[0])/2)];
+  var 月柱=天干[(起始+m-1)%10]+["寅","卯","辰","巳","午","未","申","酉","戌","亥","子","丑"][m-1];
+  var 基準日=new Date(1900,2,1);
+  var 天數差=Math.floor((new Date(y,m-1,d)-基準日)/(1000*60*60*24));
+  var 日柱=天干[(天數差%10+10)%10]+地支[(天數差%12+12)%12];
+  var 日干索引=天干.indexOf(日柱[0]);
+  var 時柱=天干[([0,2,4,6,8][Math.floor(日干索引/2)]||0)+地支.indexOf(h)%10]+h;
+  var 日五行=地支五行[日柱[1]];
+  
+  document.getElementById('baziResult').innerHTML='<div class="result-box"><div class="result-row"><span class="result-label">年柱</span><span class="result-value">'+年柱+'</span></div><div class="result-row"><span class="result-label">月柱</span><span class="result-value">'+月柱+'</span></div><div class="result-row"><span class="result-label">日柱</span><span class="result-value">'+日柱+'</span></div><div class="result-row"><span class="result-label">時柱</span><span class="result-value">'+時柱+'</span></div></div><div class="health-tip"><strong>望診提醒：</strong>'+五行健康[日五行]+'</div>';
+}
 
-// ========== Zi Analysis ==========
-function initZiGrid() { var grid = document.getElementById('ziGrid'); var zis = ['愛','心','運','氣','財','福','吉','順','明','智','和','安']; zis.forEach(function(z) { var b = document.createElement('button'); b.className = 'zi-btn'; b.textContent = z; b.addEventListener('click', function(){document.getElementById('ziInput').value = z; showZiResult();}); grid.appendChild(b); }); }
-function showZiResult() { var z = document.getElementById('ziInput').value.trim(); if(!z) return; var elems = {木:['🌿','健康注意肝'],火:['🔥','熱情活力'],土:['🌍','穩重踏實'],金:['⚔️','果斷堅毅'],水:['🌊','智慧流動']}; var e = elems[z.charCodeAt(0)%5] || elems['水']; var r = document.getElementById('ziResult'); r.classList.add('show'); r.innerHTML = '<div><strong>'+z+'</strong> → <span class="element">'+e[0]+' '+e[1]+'</span></div><div style="margin-top:8px;color:var(--muted)">字義解讀：'+z+'代表著...</div>'; }
-
-// ========== Soul Portrait ==========
-function renderSoulPortrait(type) { var colors = {wood:['#8B4513','#228B22','#90EE90'],fire:['#FF4500','#FF6347','#FFD700'],earth:['#8B4513','#D2691E','#F4A460'],metal:['#C0C0C0','#708090','#B0C4DE'],water:['#000080','#4169E1','#87CEEB']}[type]||colors.water; var c = document.getElementById('soulCanvas'); if(!c) return; c.innerHTML = '<div class="soul-vignette"></div>'; for(var i=0;i<5;i++){ var o = document.createElement('div'); o.className = 'soul-orb'; o.style.cssText = 'width:'+(30+Math.random()*40)+'px;height:'+(30+Math.random()*40)+'px;background:'+colors[Math.floor(Math.random()*3)]+';left:'+(10+Math.random()*60)+'%;top:'+(10+Math.random()*60)+'%;--dur:'+(12+Math.random()*8)+'s;--dx:'+(10+Math.random()*30)+'px;--dy:'+(10+Math.random()*30)+'px;opacity:'+(0.3+Math.random()*0.4); c.appendChild(o); } document.getElementById('artInfo').textContent = '你的五行靈魂：' + {wood:'木',fire:'火',earth:'土',metal:'金',water:'水'}[type]; }
-
-// Auto-grow textarea
-document.getElementById('aiInput').addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
-document.getElementById('aiInput').addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendAIMessage(); } });
+function analyzeName(){
+  var name = profile.name;
+  var first = name.charAt(0);
+  var strokes = (first.charCodeAt(0)%10)+1;
+  var elements=['木','火','土','金','水'];
+  var element = elements[strokes%5];
+  document.getElementById('nameResult').innerHTML='<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+first+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div>';
+}
 </script>
+</body>
+</html>
