@@ -136,8 +136,8 @@ function callOpenAI(apiKey, messages) {
     const data = JSON.stringify({
       model: "gpt-3.5-turbo",
       messages,
-      temperature: 0.7,
-      max_tokens: 1500,
+      temperature: 0.5,
+      max_tokens: 800,
     });
 
     const options = {
@@ -149,7 +149,7 @@ function callOpenAI(apiKey, messages) {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Length": Buffer.byteLength(data),
       },
-      timeout: 15000,
+      timeout: 10000,
     };
 
     const req = https.request(options, (res) => {
@@ -159,30 +159,26 @@ function callOpenAI(apiKey, messages) {
         try {
           const json = JSON.parse(body || "{}");
           
-          // Check for OpenAI errors
           if (json.error) {
             return reject(new Error(json.error.message));
           }
           
           if (!res.statusCode || res.statusCode >= 400) {
-            const msg = json?.error?.message || `HTTP ${res.statusCode}: ${body}`;
+            const msg = json?.error?.message || `HTTP ${res.statusCode}`;
             return reject(new Error(msg));
           }
           
           const content = json?.choices?.[0]?.message?.content;
-          if (!content) return reject(new Error("OpenAI 回傳空內容"));
+          if (!content) return reject(new Error("回應為空"));
           resolve(content);
         } catch (e) {
-          reject(new Error("解析回應失敗: " + e.message));
+          reject(new Error("解析失敗"));
         }
       });
     });
 
-    req.on("error", (e) => reject(new Error("網路錯誤: " + e.message)));
-    req.setTimeout(15000, () => {
-      req.destroy();
-      reject(new Error("請求超時（15秒）"));
-    });
+    req.on("error", (e) => reject(new Error("網路錯誤")));
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error("超時（10秒）")); });
     req.write(data);
     req.end();
   });
