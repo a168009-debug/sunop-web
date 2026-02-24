@@ -50,6 +50,11 @@
 .ai-analysis{background:rgba(214,177,94,.08);border:1px solid var(--gold-dim);border-radius:12px;padding:14px;margin-top:12px}
 .ai-analysis strong{color:var(--gold);display:block;margin-bottom:10px}
 .ai-analysis p{margin:6px 0;color:rgba(255,255,255,.85);font-size:13px;line-height:1.5}
+.ai-opening{font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:12px}
+.ai-highlights ul,.ai-risks ul{margin:5px 0;padding-left:18px;color:rgba(255,255,255,.85);font-size:13px}
+.ai-suggestions{margin-top:12px}
+.ai-suggestions .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ai-suggestions .chip{border:1px solid var(--gold);background:rgba(214,177,94,.1);color:var(--gold);padding:8px 12px;border-radius:20px;font-size:12px;cursor:pointer}
 .ai-error{color:rgba(255,255,255,.5);font-size:13px;text-align:center;padding:10px}
 /* Result boxes */
 .result-box{background:rgba(255,255,255,.03);border:1px solid var(--gold-dim);border-radius:16px;padding:16px;margin-bottom:14px}
@@ -291,7 +296,17 @@ var CONTEXTS = {
 };
 
 function setContext(ctx) { currentContext = ctx; }
-function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function showPage(id) { 
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+  // 控制問AI按鈕顯示
+  var aiBtn = document.getElementById('askAiBtn');
+  if (id === 'homePage') {
+    aiBtn.style.display = 'none';
+  } else {
+    aiBtn.style.display = 'flex';
+  }
+}
 function goHome() { loadUserData(); showPage('homePage'); }
 function checkAndStart() { if(loadUserData() && window.userData && window.userData.name) { showPage('menuPage'); } else { startAnalysis(); } }
 
@@ -343,20 +358,63 @@ async function generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行) {
   window.baziContext = '我的八字：年柱' + 年柱 + '、月柱' + 月柱 + '、日柱' + 日柱 + '、時柱' + 時柱 + '。日主五行為' + 日五行 + '。';
   
   try {
-    var prompt = '你是八字命理專家。請根據以下資訊生成詳細分析：\n年柱：'+年柱+'\n月柱：'+月柱+'\n日柱：'+日柱+'\n時柱：'+時柱+'\n日主五行：'+日五行+'\n\n請用以下格式回覆（用markdown）：\n1. 可能體質原因：\n2. 五行關聯：\n3. 生活建議：\n4. 飲食建議：';
-    var resp = await fetch('/.netlify/functions/chat', {
+    var resp = await fetch('/.netlify/functions/bazi_ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: prompt, context: '命理分析', history: []})
+      body: JSON.stringify({
+        year: window.userData.year,
+        month: window.userData.month,
+        day: window.userData.day,
+        hour: window.userData.hour,
+        mode: 'quick'
+      })
     });
     var data = await resp.json();
+    
+    if (data.error) {
+      document.getElementById('aiAnalysis').innerHTML = '<div class="ai-error">錯誤: ' + data.error + '</div>';
+      return;
+    }
+    
     if (data.reply) {
-      var html = '<div class="ai-analysis"><strong>✨ AI 解析</strong><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div>';
-      document.getElementById('aiAnalysis').innerHTML = html;
+      // Try to parse JSON response
+      try {
+        var aiData = JSON.parse(data.reply);
+        var html = '<div class="ai-analysis">';
+        if (aiData.opening) {
+          html += '<p class="ai-opening">' + aiData.opening + '</p>';
+        }
+        if (aiData.highlights && aiData.highlights.length > 0) {
+          html += '<div class="ai-highlights"><strong>重點：</strong><ul>';
+          aiData.highlights.forEach(function(h) { html += '<li>' + h + '</li>'; });
+          html += '</ul></div>';
+        }
+        if (aiData.risk_flags && aiData.risk_flags.length > 0) {
+          html += '<div class="ai-risks"><strong>注意：</strong><ul>';
+          aiData.risk_flags.forEach(function(r) { html += '<li>' + r.類型 + '：' + r.內容 + '</li>'; });
+          html += '</ul></div>';
+        }
+        if (aiData.suggested_questions && aiData.suggested_questions.length > 0) {
+          html += '<div class="ai-suggestions"><strong>可以問：</strong><div class="chips">';
+          aiData.suggested_questions.forEach(function(q) { 
+            html += '<button class="chip" onclick="askAIPredefined(\'' + q.replace(/'/g, "\\'") + '\')">' + q + '</button>'; 
+          });
+          html += '</div></div>';
+        }
+        html += '</div>';
+        document.getElementById('aiAnalysis').innerHTML = html;
+      } catch(e) {
+        // If not JSON, display as text
+        document.getElementById('aiAnalysis').innerHTML = '<div class="ai-analysis"><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div>';
+      }
     }
   } catch(e) {
     document.getElementById('aiAnalysis').innerHTML = '<div class="ai-error">解析稍後可用</div>';
   }
+}
+
+function askAIPredefined(question) {
+  showAIChat(question);
 }
 
 function askAIWithContext() {
