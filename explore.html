@@ -1,75 +1,46 @@
 <!doctype html>
-<!-- METAMIND_HTML_OK -->
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>MetaMind｜探索中心</title>
-<link rel="stylesheet" href="/assets/style.css?v=LUX_003" />
+<!-- METAMIND_HTML_OK -->
+<link rel="stylesheet" href="/assets/style.css?v=LUX_004" />
 </head>
 <body>
-<div class="page">
+<main class="page">
 <header class="hero">
-<div class="brand">MetaMind</div>
-<div class="subtitle">探索中心</div>
+<h1 class="brand">MetaMind</h1>
+<p class="sub">探索中心</p>
 </header>
-<main class="card">
-<div id="profileLine" class="profile-line">載入中...</div>
-<div id="quickReading" class="quick-reading">師傅看盤中…</div>
-
-<div class="ask-box">
-<textarea id="question" class="question-input" placeholder="輸入你的問題..."></textarea>
-<button id="askBtn" class="btn">問師傅</button>
+<section class="card">
+<div id="profileLine" class="profileLine">載入中...</div>
+<div class="masterLineWrap">
+<div class="masterLabel">師傅看盤中…</div>
+<div id="masterLine" class="masterLine"></div>
 </div>
-
+<div class="qa">
+<label class="field">
+<span>問師傅</span>
+<textarea id="question" rows="3" placeholder="你想問什麼？" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+</label>
+<button id="askBtn" class="btn-primary" type="button">送出</button>
+</div>
+<div id="answerWrap" class="answerWrap">
 <div id="answer" class="answer"></div>
-
-<div class="share-row">
-<button id="shareBtn" class="btn-share" type="button" aria-label="分享">
-<span class="share-icon" aria-hidden="true">⤴︎</span>
-<span>分享</span>
-</button>
+<button id="shareBtn" class="btn-share" type="button">⤴ 分享</button>
 </div>
-<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-<div class="features">
-<div id="featureGrid" class="feature-grid"></div>
+<h3 class="sectionTitle">我的問答</h3>
+<div id="history" class="history"></div>
+<button id="clearHistoryBtn" class="btn-ghost" type="button">清空</button>
+<div class="debugRow">
+<button id="reportBtn" class="btn-link" type="button">回報除錯資訊</button>
+<a class="btn-link" href="https://stunning-gecko-4a2c8b.netlify.app/" rel="noopener">← 重新輸入資料</a>
 </div>
-</main>
-
-<section class="qa-history" id="qaHistory">
-<div class="qa-history-head">
-<h2 class="qa-history-title">我的問答</h2>
-<button id="qaHistoryClear" class="qa-history-clear" type="button">清空</button>
-</div>
-<div id="qaHistoryEmpty" class="qa-empty">目前還沒有紀錄。你問一次，這裡就會自動保存 🙂</div>
-<div id="qaHistoryList" class="qa-list"></div>
 </section>
-
-<button id="debugBtn" class="btn-debug" type="button">回報除錯資訊</button>
-<pre id="debugOutput" class="debug-output"></pre>
-
-<button id="openSafariBtn" class="btn btn-ghost" style="display:none;">🌐 用 Safari 開啟</button>
-<div class="footerline"><a href="/index.html?v=LUX_003?v=LUX_003" style="color:#999;text-decoration:none;">← 重新輸入資料</a></div>
-</div>
-<script defer src="/assets/app.js?v=LUX_003"></script>
-<script>
-(function(){
-  var t=setTimeout(function(){
-    var before=getComputedStyle(document.body,"::before").content;
-    if(!before||before==="none"||before==="\"\""){
-      var warn=document.createElement("div");
-      warn.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;padding:12px 14px;background:#111;color:#fff;border-radius:12px;z-index:99999;font-size:14px;opacity:.95";
-      warn.textContent="⚠️ CSS/JS 可能未載入（請檢查 /assets 路徑或 404）";
-      document.body.appendChild(warn);
-    }
-  },1200);
-  window.addEventListener("load",function(){clearTimeout(t)});
-})();
-</script>
+<div id="toast" class="toast">已複製到剪貼簿！</div>
+<footer class="copyright">© MetaMind</footer>
+</main>
+<script src="/assets/app.js?v=LUX_004" defer></script>
 </body>
 </html>
-
-
-
-
