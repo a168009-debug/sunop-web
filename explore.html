@@ -1,70 +1,18 @@
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>MetaMind｜探索中心</title>
-<link rel="stylesheet" href="/assets/style.css?v=202602251200" />
-</head>
-<body>
-<div class="page">
-<header class="hero">
-<div class="brand">MetaMind</div>
-<div class="subtitle">探索中心</div>
-</header>
-<main class="card">
-<div id="profileLine" class="profile-line">載入中...</div>
-<div id="quickReading" class="quick-reading">師傅看盤中…</div>
-
-<div class="ask-box">
-<textarea id="question" class="question-input" placeholder="輸入你的問題..."></textarea>
-<button id="askBtn" class="btn">問師傅</button>
-</div>
-
-<div id="answer" class="answer"></div>
-
-<div class="share-row">
-<button id="shareBtn" class="btn-share" type="button" aria-label="分享">
-<span class="share-icon" aria-hidden="true">⤴︎</span>
-<span>分享</span>
-</button>
-</div>
-<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-<div class="features">
-<div id="featureGrid" class="feature-grid"></div>
-</div>
-</main>
-
-<section class="qa-history" id="qaHistory">
-<div class="qa-history-head">
-<h2 class="qa-history-title">我的問答</h2>
-<button id="qaHistoryClear" class="qa-history-clear" type="button">清空</button>
-</div>
-<div id="qaHistoryEmpty" class="qa-empty">目前還沒有紀錄。你問一次，這裡就會自動保存 🙂</div>
-<div id="qaHistoryList" class="qa-list"></div>
-</section>
-
-<button id="debugBtn" class="btn-debug" type="button">回報除錯資訊</button>
-<pre id="debugOutput" class="debug-output"></pre>
-
-<button id="openSafariBtn" class="btn btn-ghost" style="display:none;">🌐 用 Safari 開啟</button>
-<div class="footerline"><a href="/index.html?v=202602251200" style="color:#999;text-decoration:none;">← 重新輸入資料</a></div>
-</div>
-<script defer src="/assets/app.js?v=202602251200"></script>
-<script>
-(function(){
-  var t=setTimeout(function(){
-    var before=getComputedStyle(document.body,"::before").content;
-    if(!before||before==="none"||before==='""'){
-      var warn=document.createElement("div");
-      warn.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;padding:12px 14px;background:#111;color:#fff;border-radius:12px;z-index:99999;font-size:14px;opacity:.95";
-      warn.textContent="⚠️ CSS/JS 可能未載入（請檢查 /assets 路徑或 404）";
-      document.body.appendChild(warn);
-    }
-  },1200);
-  window.addEventListener("load",function(){clearTimeout(t)});
-})();
-</script>
-</body>
-</html>
+{
+  "name": "explore.html",
+  "path": "explore.html",
+  "sha": "eaf7bdcc21b182383b5cd42da0688600c28d6fc6",
+  "size": 2614,
+  "url": "https://api.github.com/repos/a168009-debug/sunop-web/contents/explore.html?ref=main",
+  "html_url": "https://github.com/a168009-debug/sunop-web/blob/main/explore.html",
+  "git_url": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/eaf7bdcc21b182383b5cd42da0688600c28d6fc6",
+  "download_url": "https://raw.githubusercontent.com/a168009-debug/sunop-web/main/explore.html",
+  "type": "file",
+  "content": "PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9InpoLUhhbnQiPgo8aGVhZD4K\nPG1ldGEgY2hhcnNldD0idXRmLTgiIC8+CjxtZXRhIG5hbWU9InZpZXdwb3J0\nIiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsIGluaXRpYWwtc2NhbGU9\nMSwgdmlld3BvcnQtZml0PWNvdmVyIiAvPgo8dGl0bGU+TWV0YU1pbmTvvZzm\njqLntKLkuK3lv4M8L3RpdGxlPgo8bGluayByZWw9InN0eWxlc2hlZXQiIGhy\nZWY9Ii9hc3NldHMvc3R5bGUuY3NzP3Y9MjAyNjAyMjUxMjAwIiAvPgo8L2hl\nYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJwYWdlIj4KPGhlYWRlciBjbGFzcz0i\naGVybyI+CjxkaXYgY2xhc3M9ImJyYW5kIj5NZXRhTWluZDwvZGl2Pgo8ZGl2\nIGNsYXNzPSJzdWJ0aXRsZSI+5o6i57Si5Lit5b+DPC9kaXY+CjwvaGVhZGVy\nPgo8bWFpbiBjbGFzcz0iY2FyZCI+CjxkaXYgaWQ9InByb2ZpbGVMaW5lIiBj\nbGFzcz0icHJvZmlsZS1saW5lIj7ovInlhaXkuK0uLi48L2Rpdj4KPGRpdiBp\nZD0icXVpY2tSZWFkaW5nIiBjbGFzcz0icXVpY2stcmVhZGluZyI+5bir5YKF\n55yL55uk5Lit4oCmPC9kaXY+Cgo8ZGl2IGNsYXNzPSJhc2stYm94Ij4KPHRl\neHRhcmVhIGlkPSJxdWVzdGlvbiIgY2xhc3M9InF1ZXN0aW9uLWlucHV0IiBw\nbGFjZWhvbGRlcj0i6Ly45YWl5L2g55qE5ZWP6aGMLi4uIj48L3RleHRhcmVh\nPgo8YnV0dG9uIGlkPSJhc2tCdG4iIGNsYXNzPSJidG4iPuWVj+W4q+WChTwv\nYnV0dG9uPgo8L2Rpdj4KCjxkaXYgaWQ9ImFuc3dlciIgY2xhc3M9ImFuc3dl\nciI+PC9kaXY+Cgo8ZGl2IGNsYXNzPSJzaGFyZS1yb3ciPgo8YnV0dG9uIGlk\nPSJzaGFyZUJ0biIgY2xhc3M9ImJ0bi1zaGFyZSIgdHlwZT0iYnV0dG9uIiBh\ncmlhLWxhYmVsPSLliIbkuqsiPgo8c3BhbiBjbGFzcz0ic2hhcmUtaWNvbiIg\nYXJpYS1oaWRkZW49InRydWUiPuKktO+4jjwvc3Bhbj4KPHNwYW4+5YiG5Lqr\nPC9zcGFuPgo8L2J1dHRvbj4KPC9kaXY+CjxkaXYgaWQ9InRvYXN0IiBjbGFz\ncz0idG9hc3QiIHJvbGU9InN0YXR1cyIgYXJpYS1saXZlPSJwb2xpdGUiIGFy\naWEtYXRvbWljPSJ0cnVlIj48L2Rpdj4KCjxkaXYgY2xhc3M9ImZlYXR1cmVz\nIj4KPGRpdiBpZD0iZmVhdHVyZUdyaWQiIGNsYXNzPSJmZWF0dXJlLWdyaWQi\nPjwvZGl2Pgo8L2Rpdj4KPC9tYWluPgoKPHNlY3Rpb24gY2xhc3M9InFhLWhp\nc3RvcnkiIGlkPSJxYUhpc3RvcnkiPgo8ZGl2IGNsYXNzPSJxYS1oaXN0b3J5\nLWhlYWQiPgo8aDIgY2xhc3M9InFhLWhpc3RvcnktdGl0bGUiPuaIkeeahOWV\nj+etlDwvaDI+CjxidXR0b24gaWQ9InFhSGlzdG9yeUNsZWFyIiBjbGFzcz0i\ncWEtaGlzdG9yeS1jbGVhciIgdHlwZT0iYnV0dG9uIj7muIXnqbo8L2J1dHRv\nbj4KPC9kaXY+CjxkaXYgaWQ9InFhSGlzdG9yeUVtcHR5IiBjbGFzcz0icWEt\nZW1wdHkiPuebruWJjemChOaykuaciee0gOmMhOOAguS9oOWVj+S4gOasoe+8\njOmAmeijoeWwseacg+iHquWLleS/neWtmCDwn5mCPC9kaXY+CjxkaXYgaWQ9\nInFhSGlzdG9yeUxpc3QiIGNsYXNzPSJxYS1saXN0Ij48L2Rpdj4KPC9zZWN0\naW9uPgoKPGJ1dHRvbiBpZD0iZGVidWdCdG4iIGNsYXNzPSJidG4tZGVidWci\nIHR5cGU9ImJ1dHRvbiI+5Zue5aCx6Zmk6Yyv6LOH6KiKPC9idXR0b24+Cjxw\ncmUgaWQ9ImRlYnVnT3V0cHV0IiBjbGFzcz0iZGVidWctb3V0cHV0Ij48L3By\nZT4KCjxidXR0b24gaWQ9Im9wZW5TYWZhcmlCdG4iIGNsYXNzPSJidG4gYnRu\nLWdob3N0IiBzdHlsZT0iZGlzcGxheTpub25lOyI+8J+MkCDnlKggU2FmYXJp\nIOmWi+WVnzwvYnV0dG9uPgo8ZGl2IGNsYXNzPSJmb290ZXJsaW5lIj48YSBo\ncmVmPSIvaW5kZXguaHRtbD92PTIwMjYwMjI1MTIwMCIgc3R5bGU9ImNvbG9y\nOiM5OTk7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Ij7ihpAg6YeN5paw6Ly45YWl\n6LOH5paZPC9hPjwvZGl2Pgo8L2Rpdj4KPHNjcmlwdCBkZWZlciBzcmM9Ii9h\nc3NldHMvYXBwLmpzP3Y9MjAyNjAyMjUxMjAwIj48L3NjcmlwdD4KPHNjcmlw\ndD4KKGZ1bmN0aW9uKCl7CiAgdmFyIHQ9c2V0VGltZW91dChmdW5jdGlvbigp\newogICAgdmFyIGJlZm9yZT1nZXRDb21wdXRlZFN0eWxlKGRvY3VtZW50LmJv\nZHksIjo6YmVmb3JlIikuY29udGVudDsKICAgIGlmKCFiZWZvcmV8fGJlZm9y\nZT09PSJub25lInx8YmVmb3JlPT09JyIiJyl7CiAgICAgIHZhciB3YXJuPWRv\nY3VtZW50LmNyZWF0ZUVsZW1lbnQoImRpdiIpOwogICAgICB3YXJuLnN0eWxl\nLmNzc1RleHQ9InBvc2l0aW9uOmZpeGVkO2xlZnQ6MTJweDtyaWdodDoxMnB4\nO2JvdHRvbToxMnB4O3BhZGRpbmc6MTJweCAxNHB4O2JhY2tncm91bmQ6IzEx\nMTtjb2xvcjojZmZmO2JvcmRlci1yYWRpdXM6MTJweDt6LWluZGV4Ojk5OTk5\nO2ZvbnQtc2l6ZToxNHB4O29wYWNpdHk6Ljk1IjsKICAgICAgd2Fybi50ZXh0\nQ29udGVudD0i4pqg77iPIENTUy9KUyDlj6/og73mnKrovInlhaXvvIjoq4vm\nqqLmn6UgL2Fzc2V0cyDot6/lvpHmiJYgNDA077yJIjsKICAgICAgZG9jdW1l\nbnQuYm9keS5hcHBlbmRDaGlsZCh3YXJuKTsKICAgIH0KICB9LDEyMDApOwog\nIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyKCJsb2FkIixmdW5jdGlvbigpe2Ns\nZWFyVGltZW91dCh0KX0pOwp9KSgpOwo8L3NjcmlwdD4KPC9ib2R5Pgo8L2h0\nbWw+Cg==\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/a168009-debug/sunop-web/contents/explore.html?ref=main",
+    "git": "https://api.github.com/repos/a168009-debug/sunop-web/git/blobs/eaf7bdcc21b182383b5cd42da0688600c28d6fc6",
+    "html": "https://github.com/a168009-debug/sunop-web/blob/main/explore.html"
+  }
+}
