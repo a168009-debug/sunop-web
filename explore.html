@@ -3,150 +3,173 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>MetaMind 探索中心</title>
+<title>MetaMind｜探索中心</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-:root{ --gold:#d6b15e; --gold2:#b8923a; --gold-dim:rgba(214,177,94,.22); --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); }
+:root{ --gold:#d6b15e; --gold2:#b8923a; --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); --muted:rgba(247,243,232,.75); }
 *{box-sizing:border-box}
-body{margin:0; font-family:"Noto Serif TC",serif; color:var(--text); background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-.wrap{max-width:740px; margin:0 auto; padding:22px 16px 96px;}
-.header{margin:10px 0 12px; text-align:center;}
-.h1{font-size:42px; letter-spacing:6px; color:var(--gold); margin:0;}
-.sub{opacity:.88; margin:10px 0 0; font-size:16px;}
-.opening{ margin:16px auto 18px; max-width:680px; border:1px solid var(--stroke); background:var(--card); border-radius:18px; padding:14px 14px; box-shadow:0 10px 40px rgba(0,0,0,.35); min-height:74px; line-height:1.7; }
-.muted{opacity:.78}
-.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px;}
-.tile{ border:1px solid var(--stroke); background:var(--card); border-radius:18px; padding:18px; text-align:center; cursor:pointer; user-select:none; box-shadow:0 10px 30px rgba(0,0,0,.28); }
-.tile .icon{font-size:34px; margin-bottom:10px;}
-.tile .t{color:var(--gold); letter-spacing:2px; font-weight:800;}
-.footerBtn{ margin-top:18px; width:100%; padding:14px 12px; border-radius:14px; border:none; cursor:pointer; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1b1207; font-weight:800; letter-spacing:2px; }
-.floatAI{ position:fixed; right:16px; bottom:18px; width:78px; height:78px; border-radius:50%; background:radial-gradient(circle at 30% 30%, rgba(214,177,94,.3), rgba(0,0,0,.45)); border:2px solid rgba(214,177,94,.55); display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:900; letter-spacing:2px; cursor:pointer; box-shadow:0 14px 40px rgba(0,0,0,.5); }
-.modalMask{ position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:18px; }
-.modal{ width:100%; max-width:720px; border:1px solid var(--stroke); background:rgba(10,6,3,.95); border-radius:18px; overflow:hidden; box-shadow:0 20px 80px rgba(0,0,0,.65); }
-.modalHeader{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid rgba(214,177,94,.2); }
-.modalHeader .ttl{color:var(--gold); font-weight:900; letter-spacing:2px;}
-.modalHeader button{ background:transparent; border:1px solid rgba(214,177,94,.35); color:var(--gold); border-radius:10px; padding:6px 10px; cursor:pointer; }
-.modalBody{padding:12px 12px 10px;}
-.chatLog{ height:320px; overflow:auto; border:1px solid rgba(214,177,94,.2); border-radius:14px; padding:10px; background:rgba(0,0,0,.18); }
-.msg{margin:10px 0; line-height:1.7;}
-.msg .role{font-size:12px; opacity:.75; margin-bottom:3px;}
-.msg .bubble{ display:inline-block; padding:10px 12px; border-radius:14px; border:1px solid rgba(214,177,94,.2); background:rgba(255,255,255,.06); white-space:pre-wrap; }
-.msg.user .bubble{border-color:rgba(214,177,94,.35)}
-.msg.ai .bubble{background:rgba(214,177,94,.08)}
-.row{display:flex; gap:10px; margin-top:10px;}
-textarea{ flex:1; min-height:46px; max-height:120px; resize:vertical; border-radius:14px; padding:10px 12px; border:1px solid rgba(214,177,94,.25); background:rgba(0,0,0,.22); color:var(--text); outline:none; font-family:"Noto Serif TC",serif; }
-.send{ width:108px; border:none; cursor:pointer; border-radius:14px; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1b1207; font-weight:900; letter-spacing:2px; }
-.modeBar{display:flex; gap:10px; margin-top:10px; align-items:center;}
-.pill{ border:1px solid rgba(214,177,94,.25); padding:6px 10px; border-radius:999px; cursor:pointer; color:var(--gold); user-select:none; }
-.pill.active{background:rgba(214,177,94,.16); border-color:rgba(214,177,94,.45);}
-.status{margin-left:auto; font-size:12px; opacity:.8;}
+body{margin:0;font-family:"Noto Serif TC",serif;color:var(--text);background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+.wrap{max-width:860px;margin:0 auto;padding:26px 16px 44px;}
+.title{font-size:42px;letter-spacing:4px;text-align:center;color:var(--gold);margin:6px 0 6px;}
+.subtitle{opacity:.85;text-align:center;margin:0 0 18px;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+.card{ border:1px solid var(--stroke); background:var(--card); border-radius:18px; padding:18px; min-height:106px; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow:0 10px 40px rgba(0,0,0,.35); cursor:pointer; user-select:none; transition:transform .15s ease; }
+.card:hover{transform:translateY(-2px)}
+.card .icon{font-size:26px; margin-bottom:10px; opacity:.95}
+.card .label{letter-spacing:2px}
+.panel{ border:1px solid var(--stroke); background:var(--card); border-radius:18px; padding:16px; margin-top:16px; box-shadow:0 10px 40px rgba(0,0,0,.35); }
+.panel h3{margin:0 0 8px;color:var(--gold);letter-spacing:3px}
+.panel ul{margin:8px 0 0 18px; padding:0; color:var(--muted); line-height:1.8}
+.btnHome{ width:100%; margin-top:14px; padding:14px 12px; border-radius:14px; border:none; cursor:pointer; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1b1207; font-weight:900; letter-spacing:3px; }
+.aiFab{ position:fixed; right:18px; bottom:24px; width:84px; height:84px; border-radius:999px; border:2px solid rgba(214,177,94,.55); background:radial-gradient(circle at 30% 30%, rgba(214,177,94,.28), rgba(0,0,0,.35)); display:flex; align-items:center; justify-content:center; box-shadow:0 16px 50px rgba(0,0,0,.45); cursor:pointer; user-select:none; }
+.aiFab span{color:var(--gold);font-weight:900;letter-spacing:2px}
+.toast{margin-top:10px; text-align:center; color:rgba(247,243,232,.78); min-height:22px}
+/* Modal */
+.modalMask{ position:fixed; inset:0; background:rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; padding:18px; }
+.modal{ width:min(720px,100%); border-radius:18px; border:1px solid var(--stroke); background:linear-gradient(180deg, rgba(20,12,7,.95), rgba(10,6,4,.92)); box-shadow:0 24px 80px rgba(0,0,0,.65); overflow:hidden; }
+.modalHead{ display:flex; align-items:center; justify-content:space-between; padding:14px 14px 10px; border-bottom:1px solid rgba(214,177,94,.18); }
+.modalTitle{display:flex; gap:10px; align-items:center; color:var(--gold); letter-spacing:2px}
+.closeBtn{ width:38px; height:38px; border-radius:12px; border:1px solid rgba(214,177,94,.28); background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; }
+.chat{ padding:12px 14px; height:44vh; overflow:auto; }
+.msg{display:flex; margin:10px 0;}
+.msg.ai{justify-content:flex-start}
+.msg.user{justify-content:flex-end}
+.bubble{ max-width:88%; padding:12px 12px; border-radius:14px; line-height:1.7; white-space:pre-wrap; border:1px solid rgba(214,177,94,.18); }
+.ai .bubble{background:rgba(255,255,255,.06); color:var(--text)}
+.user .bubble{background:rgba(214,177,94,.14); color:var(--text)}
+.modalFoot{ display:flex; gap:10px; padding:12px 14px 14px; border-top:1px solid rgba(214,177,94,.18); align-items:center; }
+.modeSel{ border-radius:12px; padding:10px 10px; border:1px solid rgba(214,177,94,.25); background:rgba(0,0,0,.25); color:var(--text); font-family:"Noto Serif TC",serif; }
+.input{ flex:1; border-radius:12px; padding:12px 12px; border:1px solid rgba(214,177,94,.25); background:rgba(0,0,0,.25); color:var(--text); outline:none; font-family:"Noto Serif TC",serif; }
+.sendBtn{ padding:12px 14px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1b1207; font-weight:900; letter-spacing:2px; }
+@media (max-width:720px){ .grid{grid-template-columns:repeat(2,1fr)} .title{font-size:36px} .aiFab{width:78px;height:78px} }
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="header">
-<h1 class="h1">探索中心</h1>
-<div class="sub" id="welcomeLine">歡迎</div>
-</div>
-<div class="opening" id="welcomeMessage">
-<span class="muted">正在讀取命盤資料…</span>
-</div>
+<div class="title">探索中心</div>
+<div class="subtitle" id="welcomeName">歡迎・朋友</div>
+<div class="toast" id="welcomeMessage"></div>
 <div class="grid">
-<div class="tile" onclick="showComingSoon('八字命盤')"> <div class="icon">📜</div><div class="t">八字命盤</div> </div>
-<div class="tile" onclick="showComingSoon('姓名分析')"> <div class="icon">✍️</div><div class="t">姓名分析</div> </div>
-<div class="tile" onclick="showComingSoon('情緒曲線')"> <div class="icon">📊</div><div class="t">情緒曲線</div> </div>
-<div class="tile" onclick="showComingSoon('AI畫像')"> <div class="icon">🎨</div><div class="t">AI畫像</div> </div>
-<div class="tile" onclick="showComingSoon('智慧卡')"> <div class="icon">🃏</div><div class="t">智慧卡</div> </div>
-<div class="tile" onclick="showComingSoon('測字')"> <div class="icon">🖋️</div><div class="t">測字</div> </div>
+<div class="card" onclick="featureComingSoon('八字命盤')"> <div class="icon">📜</div><div class="label">八字命盤</div> </div>
+<div class="card" onclick="featureComingSoon('姓名分析')"> <div class="icon">✍️</div><div class="label">姓名分析</div> </div>
+<div class="card" onclick="featureComingSoon('情緒曲線')"> <div class="icon">📊</div><div class="label">情緒曲線</div> </div>
+<div class="card" onclick="featureComingSoon('AI畫像')"> <div class="icon">🎨</div><div class="label">AI畫像</div> </div>
+<div class="card" onclick="featureComingSoon('智慧卡')"> <div class="icon">🃏</div><div class="label">智慧卡</div> </div>
+<div class="card" onclick="featureComingSoon('測字')"> <div class="icon">🖋️</div><div class="label">測字</div> </div>
 </div>
-<button class="footerBtn" onclick="location.href='index.html'">回首頁</button>
+<div class="panel">
+<h3>今日指引</h3>
+<ul>
+<li>點擊任一功能了解自己</li>
+<li>有問題可以問 AI 助理（已自動讀取你剛剛輸入的資料）</li>
+</ul>
+<button class="btnHome" onclick="goHome()">回首頁</button>
 </div>
-<div class="floatAI" onclick="openAI()">問 AI</div>
+</div>
+<div class="aiFab" onclick="openAI()"><span>問AI</span></div>
 <!-- AI Modal -->
-<div class="modalMask" id="modalMask">
-<div class="modal">
-<div class="modalHeader">
-<div class="ttl">AI 命理顧問</div>
-<button onclick="closeAI()">關閉</button>
+<div class="modalMask" id="modalMask" onclick="maskClose(event)">
+<div class="modal" onclick="event.stopPropagation()">
+<div class="modalHead">
+<div class="modalTitle"> <span>💬</span> <span>AI 命理顧問</span> </div>
+<button class="closeBtn" onclick="closeAI()">×</button>
 </div>
-<div class="modalBody">
-<div class="modeBar">
-<div class="pill active" id="modeQuick" onclick="setMode('quick')">Quick</div>
-<div class="pill" id="modeDeep" onclick="setMode('deep')">Deep</div>
-<div class="status" id="statusText">已讀取：—</div>
-</div>
-<div class="chatLog" id="chatLog"></div>
-<div class="row">
-<textarea id="qBox" placeholder="直接問：最近財運 / 感情 / 事業 / 身體哪裡要注意？"></textarea>
-<button class="send" onclick="sendQ()">送出</button>
-</div>
+<div class="chat" id="chat"></div>
+<div class="modalFoot">
+<select class="modeSel" id="modeSel">
+<option value="quick">Quick（快問快答）</option>
+<option value="deep">Deep（深度解盤）</option>
+</select>
+<input class="input" id="chatInput" placeholder="想問就問：感情/財運/健康/工作/近三個月走勢…" />
+<button class="sendBtn" onclick="sendChat()">送出</button>
 </div>
 </div>
 </div>
 <script>
 const LS_KEY = "metamind_profile";
-let PROFILE = null;
-let MODE = "quick";let INTRO_DONE = false;
-function showComingSoon(name){ alert(name + "：功能頁面可接下一步，目前先把『AI 自動開口 + 問答』跑穩。"); }
-function setMode(m){ MODE = m; document.getElementById("modeQuick").classList.toggle("active", m==="quick"); document.getElementById("modeDeep").classList.toggle("active", m==="deep"); }
-function openAI(){
-document.getElementById("modalMask").style.display = "flex";
-if(!PROFILE){ appendMsg("ai", "我找不到你的出生資料。請回首頁重新輸入一次。"); return; }
-document.getElementById("statusText").innerText = "已讀取：" + PROFILE.name + "｜" + PROFILE.year + "/" + PROFILE.month + "/" + PROFILE.day + "｜" + PROFILE.hourBranch + "時";
-if(!INTRO_DONE){ appendMsg("ai", "我已讀取你的命盤資料。你直接問就好，不用再重複輸入生日。"); INTRO_DONE = true; }
-}
-function closeAI(){ document.getElementById("modalMask").style.display = "none"; }
-function appendMsg(role, text){
-const log = document.getElementById("chatLog");
-const wrap = document.createElement("div");
-wrap.className = "msg " + role;
-wrap.innerHTML = '<div class="role">' + (role === "user" ? "你" : "AI") + '</div><div class="bubble"></div>';
-wrap.querySelector(".bubble").textContent = text;
-log.appendChild(wrap);
-log.scrollTop = log.scrollHeight;
-}
-async function callAI({mode, question}){
-const res = await fetch("/.netlify/functions/bazi_ai", {
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body: JSON.stringify({ ...PROFILE, mode, question: question || "" })
-});
-const data = await res.json();
-return { ok: res.ok, status: res.status, data };
-}
-async function autoIntro(){
-if(!PROFILE){ document.getElementById("welcomeLine").innerText = "找不到資料，請回首頁重新輸入"; document.getElementById("welcomeMessage").innerHTML = "<span class=\"muted\">沒有讀到 localStorage：metamind_profile</span>"; return; }
-document.getElementById("welcomeLine").innerText = "歡迎・" + PROFILE.name + "的專屬分析";
-document.getElementById("welcomeMessage").innerHTML = "<span class=\"muted\">AI 正在快速起盤…（Quick 模式）</span>";
-const r = await callAI({ mode:"quick", question:"" });
-if(r.ok && r.data && r.data.opening){ document.getElementById("welcomeMessage").textContent = r.data.opening; INTRO_DONE = true; }else{
-document.getElementById("welcomeMessage").textContent = "目前 AI 連線不穩（可能是 Functions/Key/模型限制）。你仍可點右下『問 AI』再試。";
-}
-}
-async function sendQ(){
-const q = (document.getElementById("qBox").value || "").trim();
-if(!q) return;
-appendMsg("user", q);
-document.getElementById("qBox").value = "";
-appendMsg("ai", "我看一下…");
-const r = await callAI({ mode: MODE, question: q });
-const log = document.getElementById("chatLog");
-log.removeChild(log.lastChild);
-if(r.ok && r.data){
-const text = (r.data.answer || r.data.summary || "我拿到結果了，但內容空白。");
-appendMsg("ai", text);
-if(r.data.followups && Array.isArray(r.data.followups) && r.data.followups.length){
-appendMsg("ai", "你可以接著問：\n- " + r.data.followups.join("\n- "));
-}
+function goHome(){ window.location.href = "index.html"; }
+function featureComingSoon(name){ alert(name + "：功能正在上線中，先用『問AI』可直接解答。"); }
+function getProfile(){ try{ return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch(e){ return null; } }
+function setWelcome(profile){ const name = (profile && profile.name) ? profile.name : "朋友"; document.getElementById("welcomeName").innerText = "歡迎・" + name; }
+async function fetchIntro(profile){
+const el = document.getElementById("welcomeMessage");
+el.innerText = "正在讀盤…";
+if(!profile || !profile.name || !profile.year || !profile.month || !profile.day || !profile.hourBranch){
+el.innerText = "錯誤：找不到你的出生資料，請回首頁重新輸入。";
 return;
 }
-appendMsg("ai", "連線失敗。通常原因：Netlify Functions 沒部署成功、OPENAI_API_KEY 沒設，或模型回應超時。");
-}
-window.addEventListener("DOMContentLoaded", () => {
 try{
-PROFILE = JSON.parse(localStorage.getItem(LS_KEY) || "null");
-}catch(e){ PROFILE = null; }
-autoIntro();
+const r = await fetch("/.netlify/functions/bazi_ai",{ method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ ...profile, mode: "quick", question: "__INTRO__" }) });
+const data = await r.json();
+if(!r.ok){ el.innerText = "錯誤：請稍後再試"; return; }
+el.innerText = data?.reply?.opening || data?.opening || "已讀取命盤。你可以直接點右下角問 AI。";
+}catch(e){ el.innerText = "連線不穩：先點右下角問 AI（系統會自動帶入你的資料）。"; }
+}
+function openAI(){
+const mask = document.getElementById("modalMask");
+mask.style.display = "flex";
+document.getElementById("chatInput").focus();
+const profile = getProfile();
+const name = (profile && profile.name) ? profile.name : "朋友";
+if(document.getElementById("chat").children.length === 0){
+pushAI("你好，" + name + "。我已讀取你剛剛輸入的出生資料。想問哪一塊？我可以先從你最近『心緒/睡眠/身體火氣』或『工作壓力/財務節奏』切入。");
+}
+}
+function closeAI(){ document.getElementById("modalMask").style.display = "none"; }
+function maskClose(e){ if(e.target.id === "modalMask") closeAI(); }
+function pushAI(text){
+const chat = document.getElementById("chat");
+const row = document.createElement("div");
+row.className = "msg ai";
+const b = document.createElement("div");
+b.className = "bubble";
+b.textContent = text;
+row.appendChild(b);
+chat.appendChild(row);
+chat.scrollTop = chat.scrollHeight;
+}
+function pushUser(text){
+const chat = document.getElementById("chat");
+const row = document.createElement("div");
+row.className = "msg user";
+const b = document.createElement("div");
+b.className = "bubble";
+b.textContent = text;
+row.appendChild(b);
+chat.appendChild(row);
+chat.scrollTop = chat.scrollHeight;
+}
+async function sendChat(){
+const input = document.getElementById("chatInput");
+const q = (input.value || "").trim();
+if(!q) return;
+const mode = document.getElementById("modeSel").value || "quick";
+const profile = getProfile();
+pushUser(q);
+input.value = "";
+if(!profile || !profile.name){
+pushAI("我這邊沒讀到你的資料，請回首頁重新輸入一次（姓名/年月日/時辰）。");
+return;
+}
+pushAI("我看一下…");
+try{
+const r = await fetch("/.netlify/functions/bazi_ai",{ method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ ...profile, mode, question: q }) });
+const data = await r.json();
+const last = document.getElementById("chat").lastChild;
+if(last && last.className.includes("ai")){
+last.querySelector(".bubble").textContent = (data?.reply?.text || data?.text || "我剛剛的推演被打斷了，你再送一次，我會用更短的版本回你。");
+}
+}catch(e){
+const last = document.getElementById("chat").lastChild;
+if(last && last.className.includes("ai")){
+last.querySelector(".bubble").textContent = "連線不穩或超時。我先給你一句短判：『這題你要的是結論，不是過程。』你再補一句：你最在意的是感情、錢、還是身體？我會直接切中。";
+}
+}
+}
+window.addEventListener("DOMContentLoaded", async () => {
+const p = getProfile();
+setWelcome(p);
+await fetchIntro(p);
 });
 </script>
 </body>
