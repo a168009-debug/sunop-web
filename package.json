@@ -1,0 +1,7 @@
+{
+  "name": "metamind",
+  "version": "1.0.0",
+  "dependencies": {
+    "lunar-javascript": "^1.9.0"
+  }
+}
