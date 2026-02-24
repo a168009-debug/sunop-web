@@ -22,7 +22,16 @@
 </div>
 
 <div id="answer" class="answer"></div>
-<button id="shareAnswerBtn" class="share-btn" style="display:none;">📤 分享</button>
+
+<!-- Share row -->
+<div class="share-row">
+<button id="shareBtn" class="btn-share" type="button" aria-label="分享">
+<span class="share-icon" aria-hidden="true">⤴︎</span>
+<span>分享</span>
+</button>
+</div>
+<!-- Toast -->
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <div class="features">
 <div id="featureGrid" class="feature-grid"></div>
