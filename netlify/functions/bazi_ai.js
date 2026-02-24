@@ -30,27 +30,32 @@ function validateProfile(p) {
 }
 function buildSystemPrompt(mode) {
   const base = `
-你是一位資深八字命理顧問。
-語氣沉穩、精準、直接。
-先給一句命中式判語，再用條列式拆解。
-不要灌雞湯。
-不要要求使用者重複提供出生資料。
+你是一位閱歷深厚的命理師，風格類似資深風水師或命理前輩。
+語氣要求：
+- 高深莫測、內斂、含蓄
+- 帶有命理洞察，但不直白批評
+- 不要情緒分析師的口吻
+- 不要太自我中心
+
+範例：
+不要說：「你最近壓力大」
+要說：「氣場略顯浮動，心念未定，外境之壓未必來自他人，或許源自內在未決之言」
+
+不要直接批判個性，要像點醒而非分析。
 `;
   if (mode === "deep") {
     return base + `
 深度模式：
-1. 一句命中判語
-2. 近況（情緒/壓力）
-3. 財務與工作
-4. 感情與人際
-5. 三個可執行建議
+1. 一句引導式判語（帶玄機但不空泛）
+2. 近半年運勢走向（事業/財富/感情各一句）
+3. 宜注意之事（以勸誡語氣）
+4. 建議方向（點到為止）
 `;
   }
   return base + `
 快速模式：
-1. 一句命中判語（20字內）
-2. 三個重點
-3. 兩個追問問題
+1. 一句命理判語（20字內，含蓄點醒）
+2. 兩個建議方向（短句）
 `;
 }
 function buildUserPrompt(profile, question) {
@@ -59,18 +64,20 @@ function buildUserPrompt(profile, question) {
     return `
 姓名：${name}
 出生：${year}-${month}-${day}（${hourBranch}時）
-請直接開口：
-1. 告訴他為什麼他會來
-2. 先猜他最近的核心困擾
-3. 給一句命中式判語
+
+請用命理師口吻對他開口：
+1. 先給一句「點醒式」判語
+2. 點出他最近可能在糾結的方向
+3. 給一個建議方向（不要多）
 `;
   }
   return `
 姓名：${name}
 出生：${year}-${month}-${day}（${hourBranch}時）
-問題：
-${question}
-請用命理口吻回答，務實可執行。
+
+問題：${question}
+
+請用含蓄的命理師口吻回答，點到為止，不要長篇分析。
 `;
 }
 async function callOpenAI({ apiKey, model, max_tokens, timeoutMs, systemPrompt, userPrompt }) {
@@ -107,16 +114,15 @@ async function callOpenAI({ apiKey, model, max_tokens, timeoutMs, systemPrompt, 
   finally { clearTimeout(timeout); }
 }
 function fallbackReply(profile, question) {
-  const name = profile?.name || "朋友";
+  const name = profile?.name || "閣下";
   if (question === "__INTRO__") {
     return {
-      opening: "你好，" + name + "。你今天來，不是為了聽好聽的話，你是來確認一個答案。",
-      text: "你現在糾結的是方向，而不是能力。",
+      text: "「緣起而聚，氣隨心轉。」" + name + "，你今日到此，必有惑。欲知前路，且道來。",
       fallback: true
     };
   }
   return {
-    text: "這題你要的是結論，而不是分析。你再補一句：你最在意的是錢、感情、還是身體？",
+    text: "天機不可盡洩。你且說，最在意的是「財」還是「情」？",
     fallback: true
   };
 }
