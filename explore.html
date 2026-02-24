@@ -52,5 +52,19 @@
 <div class="footerline"><a href="/index.html?v=20260224-2" style="color:#999;text-decoration:none;">← 重新輸入資料</a></div>
 </div>
 <script defer src="/assets/app.js?v=20260224-2"></script>
+<script>
+(function(){
+  var t=setTimeout(function(){
+    var before=getComputedStyle(document.body,"::before").content;
+    if(!before||before==="none"||before==='""'){
+      var warn=document.createElement("div");
+      warn.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;padding:12px 14px;background:#111;color:#fff;border-radius:12px;z-index:99999;font-size:14px;opacity:.95";
+      warn.textContent="⚠️ CSS/JS 可能未載入（請檢查 /assets 路徑或 404）";
+      document.body.appendChild(warn);
+    }
+  },1200);
+  window.addEventListener("load",function(){clearTimeout(t)});
+})();
+</script>
 </body>
 </html>
