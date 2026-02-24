@@ -69,7 +69,7 @@ function callOpenAI(apiKey, messages) {
       model: "gpt-3.5-turbo",
       messages,
       temperature: 0.7,
-      max_tokens: 800,
+      max_tokens: 1200,
     });
 
     const options = {
