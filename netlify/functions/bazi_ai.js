@@ -33,50 +33,34 @@ function calculateBazi(year, month, day, hour) {
   // Day Master (日主)
   const 日主五行 = 地支五行[日柱[1]];
   
-  // Ten Gods (十神) - simplified
-  const 日干 = 日柱[0];
-  const 十神表 = {
-    "甲":{"甲":"比肩","乙":"劫財","丙":"食神","丁":"傷官","戊":"偏財","己":"正財","庚":"七殺","辛":"正官","壬":"偏印","癸":"正印"},
-    "乙":{"甲":"劫財","乙":"比肩","丙":"傷官","丁":"食神","戊":"正財","己":"偏財","庚":"正官","辛":"七殺","壬":"正印","癸":"偏印"},
-    "丙":{"甲":"偏印","乙":"正印","丙":"比肩","丁":"劫財","戊":"偏神","己":"傷官","庚":"偏財","辛":"正財","壬":"七殺","癸":"正官"},
-    "丁":{"甲":"正印","乙":"偏印","丁":"比肩","戊":"傷官","己":"食神","庚":"正財","辛":"偏財","壬":"正官","癸":"七殺"},
-    "戊":{"甲":"七殺","乙":"正官","丙":"偏印","丁":"正印","戊":"比肩","己":"劫財","庚":"食神","辛":"傷官","壬":"偏財","癸":"正財"},
-    "己":{"甲":"正官","乙":"七殺","丙":"正印","丁":"偏印","戊":"劫財","己":"比肩","庚":"傷官","辛":"食神","壬":"正財","癸":"偏財"},
-    "庚":{"甲":"偏財","乙":"正財","丙":"七殺","丁":"正官","戊":"偏印","己":"正印","庚":"比肩","辛":"劫財","壬":"食神","癸":"傷官"},
-    "辛":{"甲":"正財","乙":"偏財","丙":"正官","丁":"七殺","戊":"正印","己":"偏印","庚":"劫財","辛":"比肩","壬":"傷官","癸":"食神"},
-    "壬":{"甲":"食神","乙":"傷官","丙":"偏財","丁":"正財","戊":"七殺","己":"正官","庚":"偏印","辛":"正印","壬":"比肩","癸":"劫財"},
-    "癸":{"甲":"傷官","乙":"食神","丙":"正財","丁":"偏財","戊":"正官","己":"七殺","庚":"正印","辛":"偏印","壬":"劫財","癸":"比肩"}
-  };
-  
-  const 日主十神 = 十神表[日干];
-  
-  // Strength analysis (simplified)
+  // Strength analysis
   const 五行分佈 = Object.entries(五行統計).map(([k,v]) => ({五行:k, count:v}));
   const 日主Strength = 五行統計[日主五行] || 0;
   const strengthLevel = 日主Strength >= 3 ? "強" : 日主Strength >= 2 ? "中等" : "弱";
   
-  // Useful God (用神) - simplified logic
+  // Useful God
   const 用神候選 = [];
   if (strengthLevel === "弱") {
-    if (日主五行 === "木") 用神候選.push({五行:"水",理由:"水生木"});
-    else if (日主五行 === "火") 用神候選.push({五行:"木",理由:"木生火"});
-    else if (日主五行 === "土") 用神候選.push({五行:"火",理由:"火生土"});
-    else if (日主五行 === "金") 用神候選.push({五行:"土",理由:"土生金"});
-    else if (日主五行 === "水") 用神候選.push({五行:"金",理由:"金生水"});
+    const 生扶 = { 木:水, 火:木, 土:火, 金:土, 水:金 };
+    用神候選.push({五行:生扶[日主五行],理由:日主五行+"弱需"+生扶[日主五行]+"生扶"});
   } else {
-    if (日主五行 === "木") 用神候選.push({五行:"金",理由:"金克木"});
-    else if (日主五行 === "火") 用神候選.push({五行:"水",理由:"水克火"});
-    else if (日主五行 === "土") 用神候選.push({五行:"木",理由:"木克土"});
-    else if (日主五行 === "金") 用神候選.push({五行:"火",理由:"火克金"});
-    else if (日主五行 === "水") 用神候選.push({五行:"土",理由:"土克水"});
+    const 剋洩 = { 木:金, 火:水, 土:木, 金:火, 水:土 };
+    用神候選.push({五行:剋洩[日主五行],理由:日主五行+"旺需"+剋洩[日主五行]+"剋洩"});
   }
   
   return {
-    pillars: {年柱, 月柱, 日柱, 時柱},
-    日主: {五行: 日主五行, 十神: 日主十神, 強弱: strengthLevel},
-    五行分佈,
-    用神候選,
-    timestamp: Date.now()
+    name: "", // to be filled
+    birth: { year, month, day, hourBranch: hour },
+    pillars: { 
+      year: { stem: 年柱[0], branch: 年柱[1] }, 
+      month: { stem: 月柱[0], branch: 月柱[1] }, 
+      day: { stem: 日柱[0], branch: 日柱[1] }, 
+      hour: { stem: 時柱[0], branch: 時柱[1] } 
+    },
+    dayMaster: { stem: 日柱[0], element: 日主五行 },
+    fiveElements: { 木:五行統計.木, 火:五行統計.火, 土:五行統計.土, 金:五行統計.金, 水:五行統計.水 },
+    usefulGod: { candidates: 用神候選.map(x => x.五行), reasoning: 用神候選.map(x => x.理由).join("、") },
+    disclaimers: ["此為程式計算結果，AI 推論必須以此為準"]
   };
 }
 
@@ -85,151 +69,93 @@ exports.handler = async (event) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json",
+    "Content-Type": "application/json; charset=utf-8",
   };
 
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers: corsHeaders, body: "" };
-  }
+  const json = (status, obj) => ({ statusCode: status, headers: corsHeaders, body: JSON.stringify(obj) });
 
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, headers: corsHeaders, body: JSON.stringify({ error: "Method Not Allowed" }) };
-  }
+  if (event.httpMethod === "OPTIONS") return json(200, { ok: true });
+  if (event.httpMethod !== "POST") return json(405, { error: "Method Not Allowed" });
 
   try {
-    const { year, month, day, hour, mode, dryRun } = JSON.parse(event.body || "{}");
-    const apiKey = process.env.OPENAI_API_KEY;
+    const { name, year, month, day, hourBranch, mode = "quick", question = "", dryRun = false } = JSON.parse(event.body || "{}");
 
-    // Validation
-    if (!year || !month || !day || !hour) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "缺少必要參數: year, month, day, hour" }) };
+    if (!year || !month || !day || !hourBranch) {
+      return json(400, { error: "missing_input", message: "name/year/month/day/hourBranch required" });
     }
 
-    // Layer 0: Calculate Bazi Profile
-    const baziProfile = calculateBazi(year, month, day, hour);
+    // Layer 0: Build profile
+    const baziProfile = calculateBazi(year, month, day, hourBranch);
+    baziProfile.name = name || "訪客";
     
-    // Dry run mode - return only profile
     if (dryRun) {
-      return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ profile: baziProfile }) };
+      return json(200, { ok: true, mode, baziProfile });
     }
 
-    // No API key = error
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "請在 Netlify 設定 OPENAI_API_KEY" }) };
+      return json(500, { error: "missing_server_key", message: "OPENAI_API_KEY not set on Netlify" });
     }
 
-    // Determine mode
-    const isDeep = mode === "deep";
-    const maxTokens = isDeep ? 1500 : 700;
-    const temperature = isDeep ? 0.6 : 0.7;
+    // Build prompts
+    const systemPrompt = [
+      "你是專業八字命理顧問（偏現代、可落地），嚴格遵守：只能依據 baziProfile 推論。",
+      "不可捏造不存在的四柱、十神、大運資訊；不確定要說「以目前資料推估」。",
+      "輸出必須是 JSON，不要有多餘文字。"
+    ].join("\n");
 
-    // Generate prompt based on mode
-    const systemPrompt = isDeep ? getDeepPrompt(baziProfile) : getQuickPrompt(baziProfile);
+    const userPrompt = mode === "quick" 
+      ? buildQuickPrompt(baziProfile) 
+      : buildDeepPrompt(baziProfile, question);
+
+    // Call OpenAI
+    const reply = await callOpenAI(apiKey, systemPrompt, userPrompt, mode);
     
-    const messages = [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: isDeep ? "請給我深度八字分析" : "請給我快速八字解讀" }
-    ];
+    return json(200, { ok: true, mode, baziProfile, result: reply });
 
-    const reply = await callOpenAI(apiKey, messages, maxTokens, temperature, isDeep ? 20000 : 10000);
-
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({ 
-        profile: baziProfile,
-        reply,
-        mode: isDeep ? "deep" : "quick"
-      }),
-    };
   } catch (err) {
-    const errorMsg = err.message || String(err);
-    console.error("Error:", errorMsg);
-    
-    let statusCode = 500;
-    if (errorMsg.includes("quota") || errorMsg.includes("exceeded") || errorMsg.includes("insufficient")) {
-      statusCode = 402;
-    } else if (errorMsg.includes("timeout") || errorMsg.includes("超時")) {
-      statusCode = 504;
-    }
-    
-    return { 
-      statusCode, 
-      headers: corsHeaders, 
-      body: JSON.stringify({ 
-        error: errorMsg,
-        error_code: errorMsg.includes("quota") ? "QUOTA_EXCEEDED" : "UNKNOWN_ERROR"
-      }) 
-    };
+    console.error("Error:", err.message);
+    let errorCode = "server_exception";
+    if (err.message.includes("quota") || err.message.includes("exceeded")) errorCode = "quota_exceeded";
+    return json(500, { error: errorCode, message: String(err.message || err) });
   }
 };
 
-// ============ Quick Mode Prompt ============
-function getQuickPrompt(profile) {
-  const p = profile.pillars;
-  const d = profile.日主;
-  const y = profile.五行分佈;
-  const yong = profile.用神候選;
-  
-  return `你是專業八字命理師。用繁體中文回答。
+function buildQuickPrompt(b) {
+  return `請根據以下 baziProfile 產生「快速模式」JSON，欄位必須包含：
+opening (2~4句、算命師口吻、先抓情緒/健康/壓力方向)
+highlights (3~5點)
+risk_flags (0~3個，像：消化/睡眠/焦慮/壓力/火氣…)
+suggested_questions (3個可追問問題)
 
-【使用者八字資料】（務必引用）
-- 年柱：${p.年柱}
-- 月柱：${p.月柱}
-- 日柱：${p.日柱}
-- 時柱：${p.時柱}
-- 日主：${d.五行}（${d.強弱}）
-- 五行分佈：${y.map(x => x.五行 + x.count).join('、')}
-- 建議用神：${yong.map(x => x.五行 + '（' + x.理由 + '）').join('、')}
+baziProfile: ${JSON.stringify(b, null, 2)}
 
-【輸出格式】（嚴格 JSON）
-{
-  "opening": "2-4句算命師口吻開場白，稱呼對方姓名",
-  "highlights": ["重點1", "重點2", "重點3"],
-  "risk_flags": [{"類型": "健康/情緒/財務", "內容": "具體說明"}],
-  "suggested_questions": ["問題1", "問題2", "問題3"]
+輸出嚴格 JSON：
+{ "opening": "...", "highlights": ["..."], "risk_flags": ["..."], "suggested_questions": ["...","...","..."] }
+`.trim();
 }
 
-請嚴格輸出 JSON，不要有額外文字。`;
+function buildDeepPrompt(b, question) {
+  return `請根據 baziProfile 產生「深度模式」JSON，欄位必須包含：
+sections: [ {title, summary, bullets} ]
+
+baziProfile: ${JSON.stringify(b, null, 2)}
+${question ? "使用者問題: " + question : ""}
+
+輸出嚴格 JSON。
+`.trim();
 }
 
-// ============ Deep Mode Prompt ============
-function getDeepPrompt(profile) {
-  const p = profile.pillars;
-  const d = profile.日主;
-  const y = profile.五行分佈;
-  const yong = profile.用神候選;
-  
-  return `你是專業八字命理大師。用繁體中文詳細回答。
-
-【使用者八字資料】（務必引用）
-- 年柱：${p.年柱}
-- 月柱：${p.月柱}
-- 日柱：${p.日柱}
-- 時柱：${p.時柱}
-- 日主：${d.五行}（${d.強弱}），${d.十神}
-- 五行分佈：${y.map(x => x.五行 + x.count).join('、')}
-- 建議用神：${yong.map(x => x.五行 + '（' + x.理由 + '）').join('、')}
-
-【輸出格式】（分段標題）
-1. 命格結構與性格核心
-2. 健康與情緒五行分析
-3. 事業財運用神取向
-4. 感情關係模式
-5. 近一年運勢建議
-
-請用專業但淺顯易懂的方式解釋，用列表呈現。`;
-}
-
-// ============ OpenAI API Call ============
-function callOpenAI(apiKey, messages, maxTokens, temperature, timeout) {
+function callOpenAI(apiKey, system, user, mode) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify({
-      model: "gpt-4o-mini",
-      messages,
-      temperature,
-      max_tokens: maxTokens,
+      model: "gpt-4.1-mini",
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user }
+      ],
+      max_output_tokens: mode === "quick" ? 900 : 1600,
+      temperature: 0.6
     });
 
     const options = {
@@ -241,7 +167,7 @@ function callOpenAI(apiKey, messages, maxTokens, temperature, timeout) {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Length": Buffer.byteLength(data),
       },
-      timeout,
+      timeout: mode === "quick" ? 10000 : 20000,
     };
 
     const req = https.request(options, (res) => {
@@ -250,15 +176,18 @@ function callOpenAI(apiKey, messages, maxTokens, temperature, timeout) {
       res.on("end", () => {
         try {
           const json = JSON.parse(body || "{}");
-          if (json.error) {
-            return reject(new Error(json.error.message));
-          }
-          if (!res.statusCode || res.statusCode >= 400) {
-            return reject(new Error(`HTTP ${res.statusCode}: ${body}`));
-          }
+          if (json.error) reject(new Error(json.error.message));
+          if (!res.statusCode || res.statusCode >= 400) reject(new Error(`HTTP ${res.statusCode}`));
           const content = json?.choices?.[0]?.message?.content;
-          if (!content) return reject(new Error("回應為空"));
-          resolve(content);
+          if (!content) reject(new Error("回應為空"));
+          
+          // Try parse JSON
+          try {
+            resolve(JSON.parse(content));
+          } catch(e) {
+            // Return as text if not JSON
+            resolve({ text: content });
+          }
         } catch (e) {
           reject(new Error("解析失敗"));
         }
@@ -266,7 +195,7 @@ function callOpenAI(apiKey, messages, maxTokens, temperature, timeout) {
     });
 
     req.on("error", (e) => reject(new Error("網路錯誤")));
-    req.setTimeout(timeout, () => { req.destroy(); reject(new Error("超時")); });
+    req.setTimeout(mode === "quick" ? 10000 : 20000, () => { req.destroy(); reject(new Error("超時")); });
     req.write(data);
     req.end();
   });
