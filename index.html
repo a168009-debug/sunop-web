@@ -351,7 +351,7 @@ async function generateBaziAnalysis(年柱, 月柱, 日柱, 時柱, 日五行) {
     });
     var data = await resp.json();
     if (data.reply) {
-      var html = '<div class="ai-analysis"><strong>✨ AI 解析</strong><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div><button class="ask-ai-small" onclick="askAIWithContext()">💬 繼續問AI</button>';
+      var html = '<div class="ai-analysis"><strong>✨ AI 解析</strong><div>' + data.reply.replace(/\n/g, '<br>') + '</div></div>';
       document.getElementById('aiAnalysis').innerHTML = html;
     }
   } catch(e) {
@@ -371,7 +371,7 @@ function analyzeName() {
   var 天干表 = ["","甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
   var stem = 天干表[strokes % 10] || 天干表[10];
   var element = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[stem];
-  document.getElementById('nameResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+firstChar+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div><div class="health-tip"><strong>建議：</strong>'+element+'代表特質</div><button class="ask-ai-small" onclick="setContext(\'姓名分析\');showAIChat()">💬 問AI</button>';
+  document.getElementById('nameResult').innerHTML = '<div class="result-box"><div class="result-row"><span class="result-label">姓名</span><span class="result-value">'+name+'</span></div><div class="result-row"><span class="result-label">首字</span><span class="result-value">'+firstChar+'</span></div><div class="result-row"><span class="result-label">筆畫</span><span class="result-value">'+strokes+'畫</span></div><div class="result-row"><span class="result-label">五行</span><span class="result-value">'+element+'</span></div></div><div class="health-tip"><strong>建議：</strong>'+element+'代表特質</div>';
 }
 
 var moodChart;
