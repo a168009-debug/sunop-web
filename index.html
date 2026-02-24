@@ -326,8 +326,15 @@ function startAnalysis() {
   localStorage.setItem('metamind_user', JSON.stringify(window.userData));
   
   // 儲存給 explore.html 使用的資料
-  var baziInput = { name: name, year: Number(year), month: Number(month), day: Number(day), hourBranch: hour };
-  localStorage.setItem('bazi_input', JSON.stringify(baziInput));
+  var baziInput = { 
+    name: name, 
+    year: Number(year), 
+    month: Number(month), 
+    day: Number(day), 
+    hourZhi: hour,
+    createdAt: new Date().toISOString()
+  };
+  localStorage.setItem('metamind_profile', JSON.stringify(baziInput));
   
   // 跳轉到探索頁面
   window.location.href = 'explore.html';
