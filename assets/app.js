@@ -16,7 +16,6 @@ function loadProfile(){
 function saveProfile(profile){
   localStorage.setItem("metamind_profile", JSON.stringify(profile));
 }
-// INDEX PAGE - NO localStorage READ, NO PRE-FILL
 const form = $("baziForm");
 if(form){
   form.addEventListener("submit", (e) => {
@@ -38,7 +37,6 @@ if(form){
   });
   return;
 }
-// EXPLORE PAGE
 const profileLine = $("profileLine");
 const quickReading = $("quickReading");
 const featureGrid = $("featureGrid");
