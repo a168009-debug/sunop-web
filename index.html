@@ -6,18 +6,18 @@
 <title>MetaMind 智慧命理</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-:root{ --gold:#d6b15e; --gold2:#b8923a; --gold-dim:rgba(214,177,94,.22); --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); }
+:root{ --gold:#d6b15e; --gold2:#b8923a; --bg1:#050404; --bg2:#120c07; --text:#f7f3e8; --card:rgba(255,255,255,.06); --stroke:rgba(214,177,94,.25); }
 *{box-sizing:border-box}
-body{ margin:0; font-family:"Noto Serif TC",serif; color:var(--text); background:linear-gradient(180deg,var(--bg1),var(--bg2)); }
-.wrap{max-width:520px; margin:0 auto; padding:28px 18px 40px;}
-.title{font-size:40px; letter-spacing:2px; text-align:center; color:var(--gold); margin:12px 0 6px;}
-.sub{opacity:.85; text-align:center; margin:0 0 18px;}
-.panel{ border:1px solid var(--stroke); background:var(--card); border-radius:18px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,.35); }
+body{margin:0;font-family:"Noto Serif TC",serif;color:var(--text);background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+.wrap{max-width:520px;margin:0 auto;padding:28px 18px 40px;}
+.title{font-size:40px;letter-spacing:2px;text-align:center;color:var(--gold);margin:12px 0 6px;}
+.sub{opacity:.85;text-align:center;margin:0 0 18px;}
+.panel{border:1px solid var(--stroke);background:var(--card);border-radius:18px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.35);}
 .group{margin:12px 0;}
-label{display:block; font-size:13px; opacity:.9; margin:0 0 6px;}
-input,select{ width:100%; padding:12px 12px; border-radius:12px; border:1px solid rgba(214,177,94,.25); background:rgba(0,0,0,.25); color:var(--text); outline:none; font-family:"Noto Serif TC",serif; }
-.btn{ width:100%; margin-top:14px; padding:14px 12px; border-radius:14px; border:none; cursor:pointer; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1b1207; font-weight:800; letter-spacing:2px; }
-.hint{opacity:.75; font-size:12px; margin-top:10px; line-height:1.6;}
+label{display:block;font-size:13px;opacity:.9;margin:0 0 6px;}
+input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(214,177,94,.25);background:rgba(0,0,0,.25);color:var(--text);outline:none;font-family:"Noto Serif TC",serif;}
+.btn{width:100%;margin-top:14px;padding:14px 12px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#1b1207;font-weight:800;letter-spacing:2px;}
+.hint{opacity:.75;font-size:12px;margin-top:10px;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -59,7 +59,7 @@ input,select{ width:100%; padding:12px 12px; border-radius:12px; border:1px soli
 </select>
 </div>
 <button class="btn" onclick="startAnalysis()">開始分析</button>
-<div class="hint">會將資料儲存在本機（localStorage），進入探索中心後 AI 會自動讀取並開口。</div>
+<div class="hint">會將資料儲存在本機（localStorage：metamind_profile），進入探索中心後 AI 會自動讀取並開口。</div>
 </div>
 </div>
 <script>
@@ -71,7 +71,7 @@ const month = Number(document.getElementById("month").value);
 const day = Number(document.getElementById("day").value);
 const hourBranch = document.getElementById("hourBranch").value || "子";
 if(!name || !year || !month || !day || !hourBranch){
-alert("請完整填寫姓名 / 年 / 月 / 時辰");
+alert("請完整填寫姓名 / 年 / 月 / 日 / 時辰");
 return;
 }
 const profile = { name, year, month, day, hourBranch };
