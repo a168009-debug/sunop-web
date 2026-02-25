@@ -1,46 +1,97 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MetaMind｜探索中心</title>
-<!-- METAMIND_HTML_OK -->
-<link rel="stylesheet" href="/assets/style.css?v=LUX_004" />
+<link rel="stylesheet" href="/assets/style.css?v=BLACK_GOLD_001">
 </head>
 <body>
-<main class="page">
+<div class="page">
 <header class="hero">
-<h1 class="brand">MetaMind</h1>
-<p class="sub">探索中心</p>
+<h1 class="brand">METAMIND</h1>
+<p class="sub" id="modeDisplay">命 理 探 索</p>
 </header>
-<section class="card">
-<div id="profileLine" class="profileLine">載入中...</div>
-<div class="masterLineWrap">
-<div class="masterLabel">師傅看盤中…</div>
-<div id="masterLine" class="masterLine"></div>
+
+<!-- Feature Content Area -->
+<section class="card" id="featureContent">
+<div id="featureIntro" style="text-align:center;padding:20px;">
+<p style="color:var(--mm-text-muted);margin-bottom:20px;">選擇下方功能開始探索</p>
 </div>
-<div class="qa">
-<label class="field">
-<span>問師傅</span>
-<textarea id="question" rows="3" placeholder="你想問什麼？" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
-</label>
-<button id="askBtn" class="btn-primary" type="button">送出</button>
+
+<div class="feature-list">
+<div class="feature-item" data-feature="bazi">
+<span class="feature-icon">☯</span>
+<div><strong>八字命盤</strong><p style="font-size:12px;color:var(--mm-text-muted);">五行強弱，日主旺衰</p></div>
 </div>
-<div id="answerWrap" class="answerWrap">
-<div id="answer" class="answer"></div>
-<button id="shareBtn" class="btn-share" type="button">⤴ 分享</button>
+<div class="feature-item" data-feature="ziwei">
+<span class="feature-icon">✦</span>
+<div><strong>紫微斗數</strong><p style="font-size:12px;color:var(--mm-text-muted);">星曜組合，宮位解讀</p></div>
 </div>
-<h3 class="sectionTitle">我的問答</h3>
-<div id="history" class="history"></div>
-<button id="clearHistoryBtn" class="btn-ghost" type="button">清空</button>
-<div class="debugRow">
-<button id="reportBtn" class="btn-link" type="button">回報除錯資訊</button>
-<a class="btn-link" href="https://stunning-gecko-4a2c8b.netlify.app/" rel="noopener">← 重新輸入資料</a>
+<div class="feature-item" data-feature="lifescript">
+<span class="feature-icon">⟡</span>
+<div><strong>生命靈數</strong><p style="font-size:12px;color:var(--mm-text-muted);">生命密碼，天賦特質</p></div>
+</div>
+<div class="feature-item" data-feature="name">
+<span class="feature-icon">筆</span>
+<div><strong>姓名分析</strong><p style="font-size:12px;color:var(--mm-text-muted);">五行筆畫，音義能量</p></div>
+</div>
+<div class="feature-item" data-feature="cards">
+<span class="feature-icon">◈</span>
+<div><strong>智慧卡</strong><p style="font-size:12px;color:var(--mm-text-muted);">奧修禪卡，靈性指引</p></div>
+</div>
+<div class="feature-item" data-feature="zici">
+<span class="feature-icon">□</span>
+<div><strong>測字</strong><p style="font-size:12px;color:var(--mm-text-muted);">心字為引，象意解讀</p></div>
+</div>
 </div>
 </section>
-<div id="toast" class="toast">已複製到剪貼簿！</div>
-<footer class="copyright">© MetaMind</footer>
-</main>
-<script src="/assets/app.js?v=LUX_004" defer></script>
+
+<!-- Profile Info -->
+<section class="card" id="profileCard" style="display:none;">
+<h3 style="color:var(--mm-gold-light);font-size:14px;margin-bottom:12px;">你的命盤</h3>
+<div id="profileInfo" style="font-size:13px;color:var(--mm-text-muted);"></div>
+<button class="btn-ghost" id="editProfile" style="margin-top:12px;">修改資料</button>
+</section>
+
+<footer style="text-align:center;padding:40px 0 100px;color:var(--mm-text-muted);font-size:12px;">
+<p><a href="/" style="color:var(--mm-gold-light);text-decoration:none;">← 返回首頁</a></p>
+</footer>
+</div>
+
+<!-- Floating AI Button -->
+<button class="ai-float-btn" id="aiBtn">🤖</button>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+<a href="/" class="nav-item"><span class="nav-icon">◈</span><span>探索</span></a>
+<a href="#" class="nav-item active"><span class="nav-icon">命</span><span>命盤</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">曆</span><span>日曆</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">藏</span><span>收藏</span></a>
+<a href="#" class="nav-item"><span class="nav-icon">設</span><span>設定</span></a>
+</nav>
+
+<!-- Chat Modal -->
+<div class="chat-modal" id="chatModal">
+<div class="chat-content">
+<div class="chat-header">
+<span style="color:var(--mm-gold-light);font-weight:600;" id="chatTitle">AI 命理顧問</span>
+<button id="closeChat" style="background:none;border:none;color:var(--mm-text-muted);font-size:20px;cursor:pointer;">✕</button>
+</div>
+<div class="chat-messages" id="chatMessages"></div>
+<div class="chat-input-area">
+<div class="api-key-section">
+<input type="password" class="api-key-input" id="apiKeyInput" placeholder="OpenAI API Key (sk-...)">
+<p class="api-key-hint">密鑰僅存在本地</p>
+</div>
+<textarea class="chat-input" id="chatInput" placeholder="輸入你的問題..." rows="2"></textarea>
+<button class="btn-primary" id="sendChatBtn" style="margin-top:8px;">送出</button>
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast">已儲存</div>
+
+<script src="/assets/app.js?v=BLACK_GOLD_001" defer></script>
 </body>
 </html>
